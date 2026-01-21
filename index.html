@@ -1751,7 +1751,8 @@
 #controle-colaborador .search-box i {
     color: var(--gray-color) !important;
 }    
-    </style>
+
+</style>
 </head>
 <body>
     
@@ -2277,33 +2278,90 @@
             </div>
             
             <!-- Controle por Colaborador Tab -->
-<!-- Controle por Colaborador Tab -->
 <div id="controle-colaborador" class="tab-content">
-    <h2 class="section-title" style="color: var(--primary-color) !important;"><i class="fas fa-users"></i> Controle por Colaborador</h2>
+    <h2 class="section-title" style="color: var(--primary-color) !important;">
+        <i class="fas fa-users"></i> Controle por Colaborador
+    </h2>
     
+    <!-- Lista de colaboradores em cima -->
+    <div class="card">
+        <h3 class="card-title" style="color: var(--primary-color) !important;">
+            <i class="fas fa-list"></i> Lista de Colaboradores
+        </h3>
+        
+        <div class="search-box">
+            <i class="fas fa-search" style="color: var(--gray-color) !important;"></i>
+            <input type="text" id="searchColaborador" placeholder="Buscar colaborador por nome, matrícula ou setor..." style="color: var(--text-color) !important; background-color: white !important;">
+        </div>
+        
+        <div class="tools-list">
+            <div class="table-container">
+                <table id="colaboradoresTable">
+                    <thead>
+                        <tr>
+                            <th style="color: var(--primary-color) !important;">Nome</th>
+                            <th style="color: var(--primary-color) !important;">Matrícula</th>
+                            <th style="color: var(--primary-color) !important;">Setor</th>
+                            <th style="color: var(--primary-color) !important;">Cargo</th>
+                            <th style="color: var(--primary-color) !important;">Telefone</th>
+                            <th style="color: var(--primary-color) !important;">Email</th>
+                            <th style="color: var(--primary-color) !important;">Ferramentas</th>
+                            <th style="color: var(--primary-color) !important;">Status</th>
+                            <th style="color: var(--primary-color) !important;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="colaboradoresTableBody">
+                        <tr id="noColaboradoresRow">
+                            <td colspan="9" style="text-align: center; padding: 40px; color: var(--gray-color) !important;">
+                                Nenhum colaborador cadastrado. Cadastre um colaborador para começar.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cards abaixo da lista -->
     <div class="cards-container">
         <!-- Formulário para cadastrar/atualizar colaborador -->
         <div class="card">
-            <h3 class="card-title" style="color: var(--primary-color) !important;"><i class="fas fa-user-plus"></i> Cadastrar/Editar Colaborador</h3>
+            <h3 class="card-title" style="color: var(--primary-color) !important;">
+                <i class="fas fa-user-plus"></i> Cadastrar/Editar Colaborador
+            </h3>
             
             <div class="form-container" style="background-color: white !important;">
                 <form id="colaboradorForm">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="colaboradorNome" class="required" style="color: var(--text-color) !important;">Nome do Colaborador</label>
-                            <input type="text" id="colaboradorNome" required maxlength="100" placeholder="Ex: João da Silva" style="color: var(--text-color) !important; background-color: white !important;">
-                            <div class="error-message" id="colaboradorNomeError" style="color: var(--danger-color) !important;">O nome é obrigatório</div>
+                            <label for="colaboradorNome" class="required" style="color: var(--text-color) !important;">
+                                Nome do Colaborador
+                            </label>
+                            <input type="text" id="colaboradorNome" required maxlength="100" 
+                                   placeholder="Ex: João da Silva" 
+                                   style="color: var(--text-color) !important; background-color: white !important;">
+                            <div class="error-message" id="colaboradorNomeError" style="color: var(--danger-color) !important;">
+                                O nome é obrigatório
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label for="colaboradorMatricula" class="required" style="color: var(--text-color) !important;">Matrícula</label>
-                            <input type="text" id="colaboradorMatricula" required maxlength="50" placeholder="Ex: MAT-001" style="color: var(--text-color) !important; background-color: white !important;">
-                            <div class="error-message" id="colaboradorMatriculaError" style="color: var(--danger-color) !important;">A matrícula é obrigatória</div>
+                            <label for="colaboradorMatricula" class="required" style="color: var(--text-color) !important;">
+                                Matrícula
+                            </label>
+                            <input type="text" id="colaboradorMatricula" required maxlength="50" 
+                                   placeholder="Ex: MAT-001" 
+                                   style="color: var(--text-color) !important; background-color: white !important;">
+                            <div class="error-message" id="colaboradorMatriculaError" style="color: var(--danger-color) !important;">
+                                A matrícula é obrigatória
+                            </div>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="colaboradorSetor" style="color: var(--text-color) !important;">Setor/Departamento</label>
+                            <label for="colaboradorSetor" style="color: var(--text-color) !important;">
+                                Setor/Departamento
+                            </label>
                             <select id="colaboradorSetor" style="color: var(--text-color) !important; background-color: white !important;">
                                 <option value="">Selecione um setor</option>
                                 <option value="Manutenção">Manutenção</option>
@@ -2317,25 +2375,41 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="colaboradorCargo" style="color: var(--text-color) !important;">Cargo/Função</label>
-                            <input type="text" id="colaboradorCargo" maxlength="100" placeholder="Ex: Técnico de Manutenção" style="color: var(--text-color) !important; background-color: white !important;">
+                            <label for="colaboradorCargo" style="color: var(--text-color) !important;">
+                                Cargo/Função
+                            </label>
+                            <input type="text" id="colaboradorCargo" maxlength="100" 
+                                   placeholder="Ex: Técnico de Manutenção" 
+                                   style="color: var(--text-color) !important; background-color: white !important;">
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="colaboradorTelefone" style="color: var(--text-color) !important;">Telefone</label>
-                            <input type="text" id="colaboradorTelefone" maxlength="20" placeholder="Ex: (11) 99999-9999" style="color: var(--text-color) !important; background-color: white !important;">
+                            <label for="colaboradorTelefone" style="color: var(--text-color) !important;">
+                                Telefone
+                            </label>
+                            <input type="text" id="colaboradorTelefone" maxlength="20" 
+                                   placeholder="Ex: (11) 99999-9999" 
+                                   style="color: var(--text-color) !important; background-color: white !important;">
                         </div>
                         <div class="form-group">
-                            <label for="colaboradorEmail" style="color: var(--text-color) !important;">Email</label>
-                            <input type="email" id="colaboradorEmail" maxlength="100" placeholder="Ex: joao@empresa.com" style="color: var(--text-color) !important; background-color: white !important;">
+                            <label for="colaboradorEmail" style="color: var(--text-color) !important;">
+                                Email
+                            </label>
+                            <input type="email" id="colaboradorEmail" maxlength="100" 
+                                   placeholder="Ex: joao@empresa.com" 
+                                   style="color: var(--text-color) !important; background-color: white !important;">
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="colaboradorObservacoes" style="color: var(--text-color) !important;">Observações</label>
-                        <textarea id="colaboradorObservacoes" rows="2" maxlength="500" placeholder="Observações sobre o colaborador..." style="color: var(--text-color) !important; background-color: white !important;"></textarea>
+                        <label for="colaboradorObservacoes" style="color: var(--text-color) !important;">
+                            Observações
+                        </label>
+                        <textarea id="colaboradorObservacoes" rows="2" maxlength="500" 
+                                  placeholder="Observações sobre o colaborador..." 
+                                  style="color: var(--text-color) !important; background-color: white !important;"></textarea>
                     </div>
                     
                     <input type="hidden" id="colaboradorId">
@@ -2357,34 +2431,52 @@
         
         <!-- Área para atribuição de ferramentas -->
         <div class="card">
-            <h3 class="card-title" style="color: var(--primary-color) !important;"><i class="fas fa-tools"></i> Atribuir Ferramentas</h3>
+            <h3 class="card-title" style="color: var(--primary-color) !important;">
+                <i class="fas fa-tools"></i> Atribuir Ferramentas
+            </h3>
             
             <div id="atribuicaoContainer" style="display: none;">
                 <div class="form-group">
                     <label style="color: var(--text-color) !important;">Colaborador Selecionado:</label>
                     <div style="background-color: #f5f5f5; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-                        <strong id="colaboradorSelecionadoNome" style="color: var(--primary-color) !important;">Nenhum</strong> - 
-                        <span id="colaboradorSelecionadoMatricula" style="color: var(--text-color) !important;">Nenhum</span> |
-                        <span id="colaboradorFerramentasAtuais" style="color: var(--text-color) !important;">0 ferramentas atribuídas</span>
+                        <strong id="colaboradorSelecionadoNome" style="color: var(--primary-color) !important;">
+                            Nenhum
+                        </strong> - 
+                        <span id="colaboradorSelecionadoMatricula" style="color: var(--text-color) !important;">
+                            Nenhum
+                        </span> |
+                        <span id="colaboradorFerramentasAtuais" style="color: var(--text-color) !important;">
+                            0 ferramentas atribuídas
+                        </span>
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="ferramentaParaAtribuir" style="color: var(--text-color) !important;">Selecionar Ferramenta para Atribuir:</label>
-                    <select id="ferramentaParaAtribuir" class="form-control" style="color: var(--text-color) !important; background-color: white !important;">
+                    <label for="ferramentaParaAtribuir" style="color: var(--text-color) !important;">
+                        Selecionar Ferramenta para Atribuir:
+                    </label>
+                    <select id="ferramentaParaAtribuir" class="form-control" 
+                            style="color: var(--text-color) !important; background-color: white !important;">
                         <option value="">Selecione uma ferramenta</option>
                         <!-- Opções serão preenchidas via JavaScript -->
                     </select>
                 </div>
                 
                 <div class="form-group">
-                    <label for="dataAtribuicao" style="color: var(--text-color) !important;">Data de Atribuição</label>
-                    <input type="date" id="dataAtribuicao" class="form-control" value="" style="color: var(--text-color) !important; background-color: white !important;">
+                    <label for="dataAtribuicao" style="color: var(--text-color) !important;">
+                        Data de Atribuição
+                    </label>
+                    <input type="date" id="dataAtribuicao" class="form-control" value="" 
+                           style="color: var(--text-color) !important; background-color: white !important;">
                 </div>
                 
                 <div class="form-group">
-                    <label for="observacaoAtribuicao" style="color: var(--text-color) !important;">Observação da Atribuição</label>
-                    <textarea id="observacaoAtribuicao" rows="2" maxlength="500" placeholder="Observação sobre esta atribuição..." class="form-control" style="color: var(--text-color) !important; background-color: white !important;"></textarea>
+                    <label for="observacaoAtribuicao" style="color: var(--text-color) !important;">
+                        Observação da Atribuição
+                    </label>
+                    <textarea id="observacaoAtribuicao" rows="2" maxlength="500" 
+                              placeholder="Observação sobre esta atribuição..." class="form-control"
+                              style="color: var(--text-color) !important; background-color: white !important;"></textarea>
                 </div>
                 
                 <div class="btn-group">
@@ -2399,44 +2491,9 @@
             
             <div id="semColaboradorSelecionado" style="text-align: center; padding: 20px;">
                 <i class="fas fa-user" style="font-size: 40px; color: var(--gray-color); margin-bottom: 10px;"></i>
-                <p style="color: var(--text-color) !important;">Selecione um colaborador para atribuir ferramentas</p>
-            </div>
-        </div>
-        
-        <!-- Lista de colaboradores -->
-        <div class="card" style="grid-column: span 2;">
-            <h3 class="card-title" style="color: var(--primary-color) !important;"><i class="fas fa-list"></i> Lista de Colaboradores</h3>
-            
-            <div class="search-box">
-                <i class="fas fa-search" style="color: var(--gray-color) !important;"></i>
-                <input type="text" id="searchColaborador" placeholder="Buscar colaborador por nome, matrícula ou setor..." style="color: var(--text-color) !important; background-color: white !important;">
-            </div>
-            
-            <div class="tools-list">
-                <div class="table-container">
-                    <table id="colaboradoresTable">
-                        <thead>
-                            <tr>
-                                <th style="color: var(--primary-color) !important;">Nome</th>
-                                <th style="color: var(--primary-color) !important;">Matrícula</th>
-                                <th style="color: var(--primary-color) !important;">Setor</th>
-                                <th style="color: var(--primary-color) !important;">Cargo</th>
-                                <th style="color: var(--primary-color) !important;">Telefone</th>
-                                <th style="color: var(--primary-color) !important;">Email</th>
-                                <th style="color: var(--primary-color) !important;">Ferramentas</th>
-                                <th style="color: var(--primary-color) !important;">Status</th>
-                                <th style="color: var(--primary-color) !important;">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="colaboradoresTableBody">
-                            <tr id="noColaboradoresRow">
-                                <td colspan="9" style="text-align: center; padding: 40px; color: var(--gray-color) !important;">
-                                    Nenhum colaborador cadastrado. Cadastre um colaborador para começar.
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <p style="color: var(--text-color) !important;">
+                    Selecione um colaborador na lista acima para atribuir ferramentas
+                </p>
             </div>
         </div>
     </div>
@@ -2445,7 +2502,9 @@
     <div id="ferramentasColaboradorModal" class="modal">
         <div class="modal-content" style="max-width: 900px;">
             <div class="modal-header">
-                <h3 class="modal-title" style="color: var(--primary-color) !important;">Ferramentas do Colaborador</h3>
+                <h3 class="modal-title" style="color: var(--primary-color) !important;">
+                    Ferramentas do Colaborador
+                </h3>
                 <button class="modal-close" id="closeFerramentasModalBtn">&times;</button>
             </div>
             <div class="modal-body" id="ferramentasColaboradorBody">
@@ -2851,6 +2910,24 @@
         // ============================================
         // FUNÇÕES DE COLABORADORES
         // ============================================
+
+        // ============================================
+        // FUNÇÃO AUXILIAR: Verificar se ferramenta está atribuída
+        // ============================================
+
+        function isToolAssigned(toolId) {
+            if (!colaboradores || !Array.isArray(colaboradores)) return false;
+    
+            for (const colaborador of colaboradores) {
+                if (colaborador.ferramentasAtribuidas && 
+                Array.isArray(colaborador.ferramentasAtribuidas) && 
+                colaborador.ferramentasAtribuidas.includes(toolId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
         // Carregar colaboradores do localStorage
         function loadColaboradores() {
@@ -3312,64 +3389,65 @@
             document.getElementById('ferramentasColaboradorModal').style.display = 'flex';
         }
 
-        // Devolver ferramenta do colaborador
-        async function devolverFerramenta(colaboradorId, toolId) {
-            // Verificar permissão
-            if (currentUser.role === 'user') {
-                showNotification('Usuário não tem permissão para devolver ferramentas.', 'error');
-                return;
-            }
-            
-            const colaborador = colaboradores.find(c => c.id === colaboradorId);
-            const tool = tools.find(t => t.id === toolId);
-            
-            if (!colaborador || !tool) {
-                showNotification('Colaborador ou ferramenta não encontrada!', 'error');
-                return;
-            }
-            
-            if (!confirm(`Devolver "${tool.name}" do colaborador ${colaborador.nome}?`)) {
-                return;
-            }
-            
-            try {
-                // Atualizar status da ferramenta
-                tool.status = 'Disponível';
-                
-                // Remover ferramenta da lista do colaborador
-                colaborador.ferramentasAtribuidas = colaborador.ferramentasAtribuidas.filter(id => id !== toolId);
-                
-                // Atualizar histórico de atribuições
-                const atribuicaoIndex = historicoAtribuicoes.findIndex(h => 
-                    h.colaboradorId === colaboradorId && 
-                    h.toolId === toolId && 
-                    !h.dataDevolucao
-                );
-                
-                if (atribuicaoIndex !== -1) {
-                    historicoAtribuicoes[atribuicaoIndex].dataDevolucao = new Date().toISOString().split('T')[0];
-                    historicoAtribuicoes[atribuicaoIndex].usuarioDevolucao = currentUser.name;
-                }
-                
-                // Salvar alterações
-                await saveTools();
-                await saveColaboradores();
-                
-                // Atualizar interfaces
-                updateColaboradoresList();
-                updateAtribuicaoUI();
-                loadToolsList(currentStatusFilter);
-                
-                // Fechar modal se estiver aberto
-                document.getElementById('ferramentasColaboradorModal').style.display = 'none';
-                
-                showNotification(`Ferramenta "${tool.name}" devolvida com sucesso!`, 'success');
-                
-            } catch (error) {
-                console.error('Erro ao devolver ferramenta:', error);
-                showNotification('Erro ao devolver ferramenta.', 'error');
-            }
+        // Devolver ferramenta do colaborador (CORRIGIDA)
+async function devolverFerramenta(colaboradorId, toolId) {
+    // Verificar permissão
+    if (currentUser.role === 'user') {
+        showNotification('Usuário não tem permissão para devolver ferramentas.', 'error');
+        return;
+    }
+    
+    const colaborador = colaboradores.find(c => c.id === colaboradorId);
+    const tool = tools.find(t => t.id === toolId);
+    
+    if (!colaborador || !tool) {
+        showNotification('Colaborador ou ferramenta não encontrada!', 'error');
+        return;
+    }
+    
+    if (!confirm(`Devolver "${tool.name}" do colaborador ${colaborador.nome}?`)) {
+        return;
+    }
+    
+    try {
+        // Atualizar status da ferramenta para "Disponível"
+        tool.status = 'Disponível';
+        
+        // Remover ferramenta da lista do colaborador
+        colaborador.ferramentasAtribuidas = colaborador.ferramentasAtribuidas.filter(id => id !== toolId);
+        
+        // Atualizar histórico de atribuições
+        const atribuicaoIndex = historicoAtribuicoes.findIndex(h => 
+            h.colaboradorId === colaboradorId && 
+            h.toolId === toolId && 
+            !h.dataDevolucao
+        );
+        
+        if (atribuicaoIndex !== -1) {
+            historicoAtribuicoes[atribuicaoIndex].dataDevolucao = new Date().toISOString().split('T')[0];
+            historicoAtribuicoes[atribuicaoIndex].usuarioDevolucao = currentUser.name;
         }
+        
+        // Salvar alterações
+        await saveTools();
+        await saveColaboradores();
+        
+        // Atualizar interfaces
+        updateColaboradoresList();
+        updateAtribuicaoUI();
+        loadToolsList(currentStatusFilter); // Atualiza lista de ferramentas
+        loadFerramentasDisponiveis(); // Atualiza lista de disponíveis
+        
+        // Fechar modal se estiver aberto
+        document.getElementById('ferramentasColaboradorModal').style.display = 'none';
+        
+        showNotification(`Ferramenta "${tool.name}" devolvida com sucesso!`, 'success');
+        
+    } catch (error) {
+        console.error('Erro ao devolver ferramenta:', error);
+        showNotification('Erro ao devolver ferramenta.', 'error');
+    }
+}
 
         // Selecionar colaborador para atribuição
         function selectColaboradorForAtribuicao(colaboradorId) {
@@ -3418,108 +3496,136 @@
             document.getElementById('dataAtribuicao').value = new Date().toISOString().split('T')[0];
         }
 
-        // Carregar ferramentas disponíveis para atribuição
-        function loadFerramentasDisponiveis() {
-            const select = document.getElementById('ferramentaParaAtribuir');
-            select.innerHTML = '<option value="">Selecione uma ferramenta</option>';
-            
-            // Filtrar ferramentas disponíveis e não já atribuídas a este colaborador
-            const ferramentasAtribuidas = colaboradorSelecionado ? colaboradorSelecionado.ferramentasAtribuidas || [] : [];
-            
-            tools
-                .filter(tool => tool.status === 'Disponível' || tool.status === 'Em Uso')
-                .filter(tool => !ferramentasAtribuidas.includes(tool.id))
-                .forEach(tool => {
-                    const option = document.createElement('option');
-                    option.value = tool.id;
-                    option.textContent = `${tool.code} - ${tool.name} (${tool.category})`;
-                    select.appendChild(option);
-                });
+        // Carregar ferramentas disponíveis para atribuição (CORRIGIDA)
+function loadFerramentasDisponiveis() {
+    const select = document.getElementById('ferramentaParaAtribuir');
+    select.innerHTML = '<option value="">Selecione uma ferramenta</option>';
+    
+    if (!colaboradorSelecionado) return;
+    
+    // Identificar quais ferramentas já estão atribuídas a QUALQUER colaborador
+    const todasFerramentasAtribuidas = [];
+    
+    colaboradores.forEach(colaborador => {
+        if (colaborador.ferramentasAtribuidas && colaborador.ferramentasAtribuidas.length > 0) {
+            todasFerramentasAtribuidas.push(...colaborador.ferramentasAtribuidas);
         }
+    });
+    
+    // Filtrar ferramentas:
+    // 1. Que estão disponíveis OU em uso (porque se já está em uso, significa que está com alguém)
+    // 2. E que NÃO estão atribuídas a nenhum colaborador atualmente
+    tools
+        .filter(tool => {
+            // Verificar se a ferramenta NÃO está na lista de ferramentas atribuídas
+            const naoAtribuida = !todasFerramentasAtribuidas.includes(tool.id);
+            
+            // Verificar se está disponível ou reservada (não em uso)
+            const statusValido = tool.status === 'Disponível' || tool.status === 'Reservado';
+            
+            return naoAtribuida && statusValido;
+        })
+        .forEach(tool => {
+            const option = document.createElement('option');
+            option.value = tool.id;
+            option.textContent = `${tool.code} - ${tool.name} (${tool.category}) | ${tool.status}`;
+            select.appendChild(option);
+        });
+    
+    // Se não houver ferramentas disponíveis
+    if (select.options.length === 1) {
+        const option = document.createElement('option');
+        option.value = "";
+        option.textContent = "Nenhuma ferramenta disponível para atribuição";
+        option.disabled = true;
+        option.selected = true;
+        select.appendChild(option);
+    }
+}
 
         // Atribuir ferramenta ao colaborador
-        async function atribuirFerramenta() {
-            // Verificar permissão
-            if (currentUser.role === 'user') {
-                showNotification('Usuário não tem permissão para atribuir ferramentas.', 'error');
-                return;
-            }
-            
-            if (!colaboradorSelecionado) {
-                showNotification('Selecione um colaborador primeiro!', 'error');
-                return;
-            }
-            
-            const toolId = parseInt(document.getElementById('ferramentaParaAtribuir').value);
-            const dataAtribuicao = document.getElementById('dataAtribuicao').value;
-            const observacao = document.getElementById('observacaoAtribuicao').value.trim();
-            
-            if (!toolId) {
-                showNotification('Selecione uma ferramenta!', 'error');
-                return;
-            }
-            
-            const tool = tools.find(t => t.id === toolId);
-            if (!tool) {
-                showNotification('Ferramenta não encontrada!', 'error');
-                return;
-            }
-            
-            // Verificar limite de 20 ferramentas
-            const ferramentasCount = colaboradorSelecionado.ferramentasAtribuidas ? colaboradorSelecionado.ferramentasAtribuidas.length : 0;
-            if (ferramentasCount >= 20) {
-                showNotification('Este colaborador já atingiu o limite de 20 ferramentas!', 'error');
-                return;
-            }
-            
-            try {
-                // Atualizar status da ferramenta
-                tool.status = 'Em Uso';
-                
-                // Adicionar ferramenta à lista do colaborador
-                if (!colaboradorSelecionado.ferramentasAtribuidas) {
-                    colaboradorSelecionado.ferramentasAtribuidas = [];
-                }
-                colaboradorSelecionado.ferramentasAtribuidas.push(toolId);
-                
-                // Adicionar ao histórico de atribuições
-                const historicoItem = {
-                    id: Date.now(),
-                    colaboradorId: colaboradorSelecionado.id,
-                    colaboradorNome: colaboradorSelecionado.nome,
-                    toolId: toolId,
-                    toolNome: tool.name,
-                    toolCodigo: tool.code,
-                    dataAtribuicao: dataAtribuicao,
-                    observacao: observacao,
-                    usuarioAtribuicao: currentUser.name,
-                    dataDevolucao: null,
-                    usuarioDevolucao: null
-                };
-                
-                historicoAtribuicoes.push(historicoItem);
-                
-                // Salvar alterações
-                await saveTools();
-                await saveColaboradores();
-                
-                // Atualizar interfaces
-                updateColaboradoresList();
-                updateAtribuicaoUI();
-                loadToolsList(currentStatusFilter);
-                
-                // Limpar formulário de atribuição
-                document.getElementById('ferramentaParaAtribuir').value = '';
-                document.getElementById('observacaoAtribuicao').value = '';
-                document.getElementById('dataAtribuicao').value = new Date().toISOString().split('T')[0];
-                
-                showNotification(`Ferramenta "${tool.name}" atribuída a ${colaboradorSelecionado.nome}!`, 'success');
-                
-            } catch (error) {
-                console.error('Erro ao atribuir ferramenta:', error);
-                showNotification('Erro ao atribuir ferramenta.', 'error');
-            }
+async function atribuirFerramenta() {
+    // Verificar permissão
+    if (currentUser.role === 'user') {
+        showNotification('Usuário não tem permissão para atribuir ferramentas.', 'error');
+        return;
+    }
+    
+    if (!colaboradorSelecionado) {
+        showNotification('Selecione um colaborador primeiro!', 'error');
+        return;
+    }
+    
+    const toolId = parseInt(document.getElementById('ferramentaParaAtribuir').value);
+    const dataAtribuicao = document.getElementById('dataAtribuicao').value;
+    const observacao = document.getElementById('observacaoAtribuicao').value.trim();
+    
+    if (!toolId) {
+        showNotification('Selecione uma ferramenta!', 'error');
+        return;
+    }
+    
+    const tool = tools.find(t => t.id === toolId);
+    if (!tool) {
+        showNotification('Ferramenta não encontrada!', 'error');
+        return;
+    }
+    
+    // Verificar limite de 20 ferramentas
+    const ferramentasCount = colaboradorSelecionado.ferramentasAtribuidas ? colaboradorSelecionado.ferramentasAtribuidas.length : 0;
+    if (ferramentasCount >= 20) {
+        showNotification('Este colaborador já atingiu o limite de 20 ferramentas!', 'error');
+        return;
+    }
+    
+    try {
+        // Atualizar status da ferramenta
+        tool.status = 'Em Uso';
+        
+        // Adicionar ferramenta à lista do colaborador
+        if (!colaboradorSelecionado.ferramentasAtribuidas) {
+            colaboradorSelecionado.ferramentasAtribuidas = [];
         }
+        colaboradorSelecionado.ferramentasAtribuidas.push(toolId);
+        
+        // Adicionar ao histórico de atribuições
+        const historicoItem = {
+            id: Date.now(),
+            colaboradorId: colaboradorSelecionado.id,
+            colaboradorNome: colaboradorSelecionado.nome,
+            toolId: toolId,
+            toolNome: tool.name,
+            toolCodigo: tool.code,
+            dataAtribuicao: dataAtribuicao,
+            observacao: observacao,
+            usuarioAtribuicao: currentUser.name,
+            dataDevolucao: null,
+            usuarioDevolucao: null
+        };
+        
+        historicoAtribuicoes.push(historicoItem);
+        
+        // Salvar alterações
+        await saveTools();
+        await saveColaboradores();
+        
+        // Atualizar interfaces
+        updateColaboradoresList();
+        updateAtribuicaoUI();
+        loadToolsList(currentStatusFilter);
+        
+        // Limpar formulário de atribuição
+        document.getElementById('ferramentaParaAtribuir').value = '';
+        document.getElementById('observacaoAtribuicao').value = '';
+        document.getElementById('dataAtribuicao').value = new Date().toISOString().split('T')[0];
+        
+        showNotification(`Ferramenta "${tool.name}" atribuída a ${colaboradorSelecionado.nome}!`, 'success');
+        
+    } catch (error) {
+        console.error('Erro ao atribuir ferramenta:', error);
+        showNotification('Erro ao atribuir ferramenta.', 'error');
+    }
+}
 
         // ============================================
         // SISTEMA DE VISUALIZAÇÃO DE IMAGEM AMPLIADA
@@ -3590,6 +3696,11 @@
             
             document.addEventListener('keydown', closeOnEsc);
         }
+
+
+
+
+
 
         // Adicionar event listeners para miniaturas
         function addThumbnailEventListeners() {
@@ -5384,10 +5495,22 @@ function showMapQRCode() {
             
             let filteredTools = tools;
             
-            // Aplicar filtro de status
-            if (statusFilter !== 'all') {
-                filteredTools = tools.filter(tool => tool.status === statusFilter);
-            }
+            // Aplicar filtro de status (CORRIGIDO)
+if (statusFilter !== 'all') {
+    filteredTools = tools.filter(tool => {
+        // Verificar se a ferramenta está atribuída
+        const estaAtribuida = isToolAssigned(tool.id);
+        
+        if (statusFilter === 'Em Uso') {
+            // Para filtro "Em Uso", mostrar tanto ferramentas com status "Em Uso"
+            // QUANTO ferramentas atribuídas (mesmo se status for "Disponível")
+            return tool.status === 'Em Uso' || estaAtribuida;
+        } else {
+            // Para outros filtros, usar apenas o status
+            return tool.status === statusFilter;
+        }
+    });
+}
             
             // Aplicar filtro de estoque baixo
             const lowStockBtn = document.getElementById('filterLowStockBtn');
@@ -5432,79 +5555,84 @@ function showMapQRCode() {
         }
 
         function createTableRow(tool) {
-            const statusClass = getStatusClass(tool.status);
-            const stockInfo = getStockInfo(tool);
-            
-            // Verificar permissões para ações
-            const canEdit = currentUser.role !== 'user';
-            
-            // Gerar HTML para a miniatura da imagem
-            let imageHTML = '';
-            if (tool.image) {
-                imageHTML = `
-                    <div class="tool-thumbnail-container" style="position: relative; display: inline-block;">
-                        <img src="${tool.image}" 
-                             alt="${tool.name}" 
-                             class="tool-thumbnail" 
-                             data-id="${tool.id}"
-                             style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 2px solid #ddd; cursor: zoom-in;"
-                             title="Clique para ampliar">
-                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
-                                   background: rgba(0,0,0,0.2); border-radius: 6px; opacity: 0; 
-                                   transition: opacity 0.3s; pointer-events: none;">
-                            <i class="fas fa-search-plus" style="position: absolute; top: 50%; left: 50%; 
-                               transform: translate(-50%, -50%); color: white; font-size: 14px;"></i>
-                        </div>
-                    </div>
-                `;
-            } else {
-                imageHTML = `
-                    <div class="no-image-placeholder" data-id="${tool.id}" 
-                         style="width: 50px; height: 50px; background: #f5f5f5; border-radius: 6px; 
-                                display: flex; align-items: center; justify-content: center; 
-                                border: 2px solid #ddd; cursor: pointer;" 
-                         title="Sem imagem - Clique para ver detalhes">
-                        <i class="fas fa-image" style="color: #ccc; font-size: 20px;"></i>
-                    </div>
-                `;
-            }
-            
-            return `
-                <td style="text-align: center; vertical-align: middle; padding: 8px;">
-                    ${imageHTML}
-                </td>
-                <td><strong>${tool.code}</strong></td>
-                <td>${tool.name}</td>
-                <td>${tool.patrimonio || '-'}</td>
-                <td>${tool.category}</td>
-                <td><span class="status-badge ${statusClass}">${tool.status}</span></td>
-                <td>${tool.location}</td>
-                <td>${tool.condition}</td>
-                <td>${tool.unidade || 'UN'}</td>
-                <td class="${stockInfo.class}">${stockInfo.text}</td>
-                <td>${tool.preco ? formatCurrency(tool.preco) : '-'}</td>
-                <td>${formatDate(tool.dataCadastro)}</td>
-                <td>${tool.usuarioCadastro || '-'}</td>
-                <td>
-                    <div class="action-buttons">
-                        <button class="action-btn action-btn-view" data-id="${tool.id}" title="Visualizar">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        ${canEdit ? `
-                            <button class="action-btn action-btn-edit" data-id="${tool.id}" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn action-btn-delete" data-id="${tool.id}" title="Excluir">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        ` : ''}
-                        <button class="action-btn action-btn-view" data-id="${tool.id}" title="Gerar QR Code" style="color: #8e44ad;">
-                            <i class="fas fa-qrcode"></i>
-                        </button>
-                    </div>
-                </td>
-            `;
-        }
+    // VERIFICAR SE A FERRAMENTA ESTÁ ATRIBUÍDA
+    const estaAtribuida = isToolAssigned(tool.id);
+    
+    // Se estiver atribuída, mostrar "Em Uso" mesmo se estiver marcada como "Disponível"
+    const statusParaExibir = estaAtribuida ? 'Em Uso' : tool.status;
+    const statusClass = getStatusClass(statusParaExibir);
+    const stockInfo = getStockInfo(tool);
+    
+    // Verificar permissões para ações
+    const canEdit = currentUser.role !== 'user';
+    
+    // Gerar HTML para a miniatura da imagem
+    let imageHTML = '';
+    if (tool.image) {
+        imageHTML = `
+            <div class="tool-thumbnail-container" style="position: relative; display: inline-block;">
+                <img src="${tool.image}" 
+                     alt="${tool.name}" 
+                     class="tool-thumbnail" 
+                     data-id="${tool.id}"
+                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 2px solid #ddd; cursor: zoom-in;"
+                     title="Clique para ampliar">
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+                           background: rgba(0,0,0,0.2); border-radius: 6px; opacity: 0; 
+                           transition: opacity 0.3s; pointer-events: none;">
+                    <i class="fas fa-search-plus" style="position: absolute; top: 50%; left: 50%; 
+                       transform: translate(-50%, -50%); color: white; font-size: 14px;"></i>
+                </div>
+            </div>
+        `;
+    } else {
+        imageHTML = `
+            <div class="no-image-placeholder" data-id="${tool.id}" 
+                 style="width: 50px; height: 50px; background: #f5f5f5; border-radius: 6px; 
+                        display: flex; align-items: center; justify-content: center; 
+                        border: 2px solid #ddd; cursor: pointer;" 
+                 title="Sem imagem - Clique para ver detalhes">
+                <i class="fas fa-image" style="color: #ccc; font-size: 20px;"></i>
+            </div>
+        `;
+    }
+    
+    return `
+        <td style="text-align: center; vertical-align: middle; padding: 8px;">
+            ${imageHTML}
+        </td>
+        <td><strong>${tool.code}</strong></td>
+        <td>${tool.name}</td>
+        <td>${tool.patrimonio || '-'}</td>
+        <td>${tool.category}</td>
+        <td><span class="status-badge ${statusClass}">${statusParaExibir}</span></td>
+        <td>${tool.location}</td>
+        <td>${tool.condition}</td>
+        <td>${tool.unidade || 'UN'}</td>
+        <td class="${stockInfo.class}">${stockInfo.text}</td>
+        <td>${tool.preco ? formatCurrency(tool.preco) : '-'}</td>
+        <td>${formatDate(tool.dataCadastro)}</td>
+        <td>${tool.usuarioCadastro || '-'}</td>
+        <td>
+            <div class="action-buttons">
+                <button class="action-btn action-btn-view" data-id="${tool.id}" title="Visualizar">
+                    <i class="fas fa-eye"></i>
+                </button>
+                ${canEdit ? `
+                    <button class="action-btn action-btn-edit" data-id="${tool.id}" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn action-btn-delete" data-id="${tool.id}" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                ` : ''}
+                <button class="action-btn action-btn-view" data-id="${tool.id}" title="Gerar QR Code" style="color: #8e44ad;">
+                    <i class="fas fa-qrcode"></i>
+                </button>
+            </div>
+        </td>
+    `;
+}
 
         function getStatusClass(status) {
             switch(status) {
