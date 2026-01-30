@@ -4461,35 +4461,78 @@ async function saveAtribuicaoToSupabase(atribuicao) {
     }
 }
 // ============================================
-// BUSCAR ATRIBUIÇÕES DO SUPABASE
+// FUNÇÃO CORRIGIDA: Buscar atribuições do Supabase
 // ============================================
 
 async function fetchAtribuicoesFromSupabase() {
     try {
-        if (!supabaseClient || !isOnlineMode) {
+        console.log('🔄 [DEBUG] Iniciando busca de atribuições...');
+        
+        if (!supabaseClient) {
+            console.log('❌ [DEBUG] supabaseClient não existe');
+            showNotification('Cliente Supabase não configurado.', 'error');
             return false;
         }
         
-        console.log('🔄 Buscando atribuições do Supabase...');
+        if (!isOnlineMode) {
+            console.log('❌ [DEBUG] Modo offline');
+            showNotification('Não conectado à nuvem.', 'warning');
+            return false;
+        }
         
+        console.log('🔍 [DEBUG] Consultando tabela tool_assignments...');
+        
+        // Primeiro, contar registros
+        const { count, error: countError } = await supabaseClient
+            .from('tool_assignments')
+            .select('*', { count: 'exact', head: true });
+        
+        if (countError) {
+            console.error('❌ [DEBUG] Erro ao contar:', countError);
+            
+            if (countError.message.includes('does not exist')) {
+                console.log('📋 [DEBUG] Tabela não existe');
+                showNotification('Tabela de atribuições não existe no banco.', 'error');
+                return false;
+            }
+            
+            throw countError;
+        }
+        
+        console.log(`📊 [DEBUG] Total na nuvem: ${count} registros`);
+        
+        if (count === 0) {
+            console.log('📭 [DEBUG] Nenhuma atribuição na nuvem');
+            showNotification('Nenhuma atribuição encontrada na nuvem.', 'info');
+            return false;
+        }
+        
+        // Buscar dados completos
+        console.log('📥 [DEBUG] Buscando dados completos...');
         const { data, error } = await supabaseClient
             .from('tool_assignments')
             .select('*')
             .order('created_at', { ascending: false });
         
         if (error) {
-            if (error.message.includes('does not exist')) {
-                console.log('📋 Tabela tool_assignments não existe ainda');
-                return false;
-            }
+            console.error('❌ [DEBUG] Erro ao buscar dados:', error);
             throw error;
         }
         
-        if (data && data.length > 0) {
-            console.log(`📥 ${data.length} atribuições recebidas do Supabase`);
+        console.log(`✅ [DEBUG] ${data.length} atribuições recebidas`);
+        console.log('📋 [DEBUG] Primeira atribuição:', data[0]);
+        
+        if (data.length === 0) {
+            console.log('📭 [DEBUG] Array de dados vazio');
+            showNotification('Nenhuma atribuição encontrada.', 'info');
+            return false;
+        }
+        
+        // Converter para formato local
+        const convertedAtribuicoes = data.map(item => {
+            console.log('🔄 [DEBUG] Convertendo item:', item.id);
             
-            // Converter para formato local
-            const convertedAtribuicoes = data.map(item => ({
+            return {
                 id: item.id,
                 colaboradorId: item.collaborator_id,
                 colaboradorNome: item.collaborator_name,
@@ -4505,86 +4548,130 @@ async function fetchAtribuicoesFromSupabase() {
                 createdAt: item.created_at,
                 updatedAt: item.updated_at,
                 status: item.status
-            }));
-            
-            // Mesclar com atribuições locais
-            await processMergeAtribuicoes(convertedAtribuicoes);
-            
-            return true;
-        } else {
-            console.log('📭 Nenhuma atribuição encontrada na nuvem');
-            return false;
-        }
+            };
+        });
+        
+        console.log(`🔄 [DEBUG] ${convertedAtribuicoes.length} itens convertidos`);
+        
+        // Processar mesclagem
+        const mergeResult = await processMergeAtribuicoes(convertedAtribuicoes);
+        
+        console.log('✅ [DEBUG] Busca e processamento concluídos');
+        showNotification(`${data.length} atribuições atualizadas da nuvem!`, 'success');
+        
+        return true;
+        
     } catch (error) {
-        console.error('❌ Erro ao buscar atribuições do Supabase:', error);
-        showNotification(`Erro ao buscar atribuições: ${error.message}`, 'error');
+        console.error('❌ [DEBUG] Erro completo na busca:', error);
+        console.error('Detalhes do erro:', {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+        });
+        
+        let errorMessage = 'Erro ao buscar atribuições';
+        if (error.message) {
+            errorMessage += `: ${error.message}`;
+        }
+        
+        showNotification(errorMessage, 'error');
         return false;
     }
 }
 // ============================================
-// PROCESSAR MESCLAGEM DE ATRIBUIÇÕES
+// FUNÇÃO CORRIGIDA: Processar mesclagem de atribuições
 // ============================================
 
 async function processMergeAtribuicoes(cloudAtribuicoes) {
     try {
+        console.log('🔄 [DEBUG] Iniciando processamento de mesclagem...');
+        console.log(`📊 [DEBUG] Cloud: ${cloudAtribuicoes.length} | Local: ${historicoAtribuicoes.length}`);
+        
+        // Se não há atribuições locais, simplesmente substituir
+        if (historicoAtribuicoes.length === 0) {
+            console.log('📭 [DEBUG] Nenhuma atribuição local, usando dados da nuvem');
+            historicoAtribuicoes = [...cloudAtribuicoes];
+            await saveColaboradores();
+            updateLocalAtribuicoesCount();
+            console.log(`✅ [DEBUG] ${cloudAtribuicoes.length} atribuições importadas`);
+            return true;
+        }
+        
         // Criar mapa das atribuições da nuvem
         const cloudMap = new Map();
         cloudAtribuicoes.forEach(atribuicao => {
-            // Usar chave composta para identificar unicamente
-            const key = `${atribuicao.toolCodigo}_${atribuicao.colaboradorMatricula}_${atribuicao.dataAtribuicao}`;
-            cloudMap.set(key, atribuicao);
+            // Usar ID como chave principal
+            cloudMap.set(atribuicao.id, atribuicao);
         });
+        
+        console.log(`🗺️ [DEBUG] Mapa da nuvem criado com ${cloudMap.size} itens`);
         
         let updatedCount = 0;
         let addedCount = 0;
         
         // Atualizar atribuições existentes
         historicoAtribuicoes.forEach((localAtribuicao, index) => {
-            const key = `${localAtribuicao.toolCodigo}_${localAtribuicao.colaboradorMatricula}_${localAtribuicao.dataAtribuicao}`;
-            const cloudAtribuicao = cloudMap.get(key);
+            const cloudAtribuicao = cloudMap.get(localAtribuicao.id);
             
             if (cloudAtribuicao) {
-                // Mesclar dados, mantendo prioridade da nuvem para campos conflitantes
+                console.log(`🔄 [DEBUG] Atualizando atribuição ID: ${localAtribuicao.id}`);
+                
+                // Mesclar dados, mantendo prioridade da nuvem
                 historicoAtribuicoes[index] = {
                     ...localAtribuicao,
                     ...cloudAtribuicao,
+                    // Manter alguns campos locais se necessário
                     id: cloudAtribuicao.id // Usar ID da nuvem
                 };
                 updatedCount++;
-                cloudMap.delete(key);
+                cloudMap.delete(localAtribuicao.id);
             }
         });
         
         // Adicionar novas atribuições da nuvem
         const newAtribuicoes = Array.from(cloudMap.values());
         if (newAtribuicoes.length > 0) {
+            console.log(`➕ [DEBUG] Adicionando ${newAtribuicoes.length} novas atribuições`);
             historicoAtribuicoes = [...historicoAtribuicoes, ...newAtribuicoes];
             addedCount = newAtribuicoes.length;
         }
         
         // Salvar localmente
-        await saveColaboradores(); // Esta função salva também o historicoAtribuicoes
+        await saveColaboradores();
         
         // Atualizar interface
-        updateColaboradoresList();
+        updateLocalAtribuicoesCount();
         
-        // Feedback
+        // Atualizar listas de colaboradores e ferramentas
+        updateColaboradoresList();
+        updateFerramentasFromAtribuicoes();
+        
+        console.log(`✅ [DEBUG] Mesclagem concluída: ${updatedCount} atualizadas, ${addedCount} novas`);
+        
+        // Feedback ao usuário
         if (updatedCount > 0 || addedCount > 0) {
-            showNotification(`${updatedCount} atribuições atualizadas, ${addedCount} novas da nuvem!`, 'success');
-            console.log(`✅ ${updatedCount} atualizadas, ${addedCount} novas atribuições`);
+            showNotification(`${updatedCount} atribuições atualizadas, ${addedCount} novas importadas!`, 'success');
+        } else {
+            showNotification('Dados já sincronizados.', 'info');
         }
         
+        return true;
+        
     } catch (error) {
-        console.error('❌ Erro ao processar mesclagem de atribuições:', error);
+        console.error('❌ [DEBUG] Erro no processamento:', error);
         throw error;
     }
 }
-// Sincronizar todas as atribuições ativas para o Supabase
+// ============================================
+// SINCRONIZAR TODAS AS ATRIBUIÇÕES PARA SUPABASE
+// ============================================
+
 async function syncAtribuicoesToSupabase() {
     try {
         if (!supabaseClient || !isOnlineMode) {
             showNotification('Não conectado à nuvem.', 'warning');
-            return;
+            return false;
         }
         
         // Filtrar apenas atribuições ativas (não devolvidas)
@@ -4592,8 +4679,10 @@ async function syncAtribuicoesToSupabase() {
         
         if (atribuicoesAtivas.length === 0) {
             showNotification('Nenhuma atribuição ativa para sincronizar.', 'info');
-            return;
+            return false;
         }
+        
+        console.log(`🔄 Sincronizando ${atribuicoesAtivas.length} atribuições ativas...`);
         
         let successCount = 0;
         let errorCount = 0;
@@ -4611,18 +4700,54 @@ async function syncAtribuicoesToSupabase() {
         
         if (errorCount === 0) {
             showNotification(`${successCount} atribuições sincronizadas com sucesso!`, 'success');
+            return true;
         } else {
-            showNotification(`${successCount} sucessos, ${errorCount} erros na sincronização de atribuições.`, 'warning');
+            showNotification(`${successCount} sucessos, ${errorCount} erros na sincronização.`, 'warning');
+            return false;
         }
         
-        return true;
     } catch (error) {
-        console.error('Erro na sincronização de atribuições:', error);
+        console.error('❌ Erro na sincronização de atribuições:', error);
         showNotification('Erro na sincronização de atribuições.', 'error');
         return false;
     }
 }
+// ============================================
+// ATUALIZAR STATUS DAS FERRAMENTAS BASEADO EM ATRIBUIÇÕES
+// ============================================
 
+function updateFerramentasFromAtribuicoes() {
+    console.log('🔄 [DEBUG] Atualizando status das ferramentas...');
+    
+    // Resetar todas as ferramentas para "Disponível"
+    tools.forEach(tool => {
+        tool.status = 'Disponível';
+    });
+    
+    // Para cada atribuição ativa, marcar ferramenta como "Em Uso"
+    const atribuicoesAtivas = historicoAtribuicoes.filter(a => !a.dataDevolucao);
+    
+    console.log(`📊 [DEBUG] ${atribuicoesAtivas.length} atribuições ativas`);
+    
+    atribuicoesAtivas.forEach(atribuicao => {
+        const toolIndex = tools.findIndex(t => t.id === atribuicao.toolId);
+        
+        if (toolIndex !== -1) {
+            tools[toolIndex].status = 'Em Uso';
+            console.log(`🔄 [DEBUG] Ferramenta ${tools[toolIndex].code} marcada como "Em Uso"`);
+        } else {
+            console.warn(`⚠️ [DEBUG] Ferramenta ID ${atribuicao.toolId} não encontrada`);
+        }
+    });
+    
+    // Salvar alterações
+    saveTools();
+    
+    // Atualizar interface
+    loadToolsList(currentStatusFilter);
+    
+    console.log('✅ [DEBUG] Status das ferramentas atualizado');
+}
 // ============================================
 // MODIFICAÇÕES NA FUNÇÃO DE VALIDAÇÃO
 // ============================================
@@ -6013,7 +6138,55 @@ function forceDarkModeForColaboradores() {
                 colaboradores = getExampleColaboradores();
             }
         }
+// ============================================
+// FUNÇÃO DE DEPURAÇÃO: Verificar conexão
+// ============================================
 
+async function debugAtribuicoesConnection() {
+    console.log('🔍 DEPURAÇÃO: Verificando conexão com atribuições...');
+    console.log('isOnlineMode:', isOnlineMode);
+    console.log('supabaseClient:', supabaseClient ? '✅ Existe' : '❌ Não existe');
+    
+    if (!supabaseClient || !isOnlineMode) {
+        console.log('❌ Não está conectado à nuvem');
+        return;
+    }
+    
+    try {
+        // Testar consulta simples
+        console.log('🔍 Testando consulta à tabela tool_assignments...');
+        
+        const { data, error, count } = await supabaseClient
+            .from('tool_assignments')
+            .select('*', { count: 'exact', head: true });
+        
+        if (error) {
+            console.error('❌ Erro na consulta:', error);
+        } else {
+            console.log(`✅ Tabela acessível. Total de registros: ${count}`);
+        }
+        
+        // Testar consulta com dados
+        console.log('🔍 Buscando dados completos...');
+        const { data: fullData, error: fullError } = await supabaseClient
+            .from('tool_assignments')
+            .select('*')
+            .limit(5);
+        
+        if (fullError) {
+            console.error('❌ Erro na consulta completa:', fullError);
+        } else {
+            console.log(`✅ Dados encontrados: ${fullData?.length || 0} registros`);
+            console.log('Primeiros registros:', fullData);
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro geral:', error);
+    }
+}
+
+// Adicione um botão para testar:
+document.getElementById('testarConexaoBtn')?.addEventListener('click', debugAtribuicoesConnection);
         // Salvar colaboradores no localStorage
         function saveColaboradores() {
             try {
@@ -7220,27 +7393,30 @@ toolsData.forEach((tool, index) => {
             document.getElementById('ferramentasColaboradorModal').style.display = 'flex';
         }
 
-        // Devolver ferramenta do colaborador (CORRIGIDA)
-        async function devolverFerramenta(colaboradorId, toolId) {
-        // Verificar permissão
-        if (currentUser.role === 'user') {
+        // ============================================
+// ATUALIZADA: Devolver ferramenta do colaborador
+// ============================================
+
+async function devolverFerramenta(colaboradorId, toolId) {
+    // Verificar permissão
+    if (currentUser.role === 'user') {
         showNotification('Usuário não tem permissão para devolver ferramentas.', 'error');
-        return;
-        }
-    
-        const colaborador = colaboradores.find(c => c.id === colaboradorId);
-        const tool = tools.find(t => t.id === toolId);
-    
-        if (!colaborador || !tool) {
-        showNotification('Colaborador ou ferramenta não encontrada!', 'error');
-        return;
-        }
-    
-        if (!confirm(`Devolver "${tool.name}" do colaborador ${colaborador.nome}?`)) {
         return;
     }
     
-        try {
+    const colaborador = colaboradores.find(c => c.id === colaboradorId);
+    const tool = tools.find(t => t.id === toolId);
+    
+    if (!colaborador || !tool) {
+        showNotification('Colaborador ou ferramenta não encontrada!', 'error');
+        return;
+    }
+    
+    if (!confirm(`Devolver "${tool.name}" do colaborador ${colaborador.nome}?`)) {
+        return;
+    }
+    
+    try {
         // Atualizar status da ferramenta para "Disponível"
         tool.status = 'Disponível';
         
@@ -7257,28 +7433,88 @@ toolsData.forEach((tool, index) => {
         if (atribuicaoIndex !== -1) {
             historicoAtribuicoes[atribuicaoIndex].dataDevolucao = new Date().toISOString().split('T')[0];
             historicoAtribuicoes[atribuicaoIndex].usuarioDevolucao = currentUser.name;
+            historicoAtribuicoes[atribuicaoIndex].updatedAt = new Date().toISOString();
+            
+            // Atualizar na nuvem
+            if (isOnlineMode && supabaseClient) {
+                try {
+                    await saveAtribuicaoToSupabase(historicoAtribuicoes[atribuicaoIndex]);
+                    console.log('✅ Devolução atualizada na nuvem');
+                } catch (cloudError) {
+                    console.error('⚠️ Erro ao atualizar devolução na nuvem:', cloudError);
+                }
+            }
         }
         
-        // Salvar alterações
+        // Salvar alterações locais
         await saveTools();
         await saveColaboradores();
         
         // Atualizar interfaces
         updateColaboradoresList();
         updateAtribuicaoUI();
-        loadToolsList(currentStatusFilter); // Atualiza lista de ferramentas
-        loadFerramentasDisponiveis(); // Atualiza lista de disponíveis
-        updateLocalAtribuicoesCount(); // ADICIONE ESTA LINHA
+        loadToolsList(currentStatusFilter);
+        loadFerramentasDisponiveis();
+        updateLocalAtribuicoesCount();
+        
         // Fechar modal se estiver aberto
         document.getElementById('ferramentasColaboradorModal').style.display = 'none';
         
         showNotification(`Ferramenta "${tool.name}" devolvida com sucesso!`, 'success');
         
-        } catch (error) {
+    } catch (error) {
         console.error('Erro ao devolver ferramenta:', error);
         showNotification('Erro ao devolver ferramenta.', 'error');
-        }
     }
+}
+// ============================================
+// VERIFICAR STATUS DAS ATRIBUIÇÕES
+// ============================================
+
+async function checkAtribuicoesStatus() {
+    if (!isOnlineMode || !supabaseClient) {
+        showNotification('Não conectado à nuvem.', 'error');
+        return;
+    }
+    
+    try {
+        // Contar atribuições na nuvem
+        const { count: cloudCount } = await supabaseClient
+            .from('tool_assignments')
+            .select('*', { count: 'exact', head: true });
+        
+        const localCount = historicoAtribuicoes.length;
+        const localAtivas = historicoAtribuicoes.filter(a => !a.dataDevolucao).length;
+        const localDevolvidas = historicoAtribuicoes.filter(a => a.dataDevolucao).length;
+        
+        // Atualizar UI
+        const statusDiv = document.getElementById('atribuicoesSyncStatus');
+        if (statusDiv) {
+            statusDiv.style.display = 'block';
+            statusDiv.style.backgroundColor = 'rgba(52, 152, 219, 0.1)';
+            statusDiv.style.border = '1px solid var(--secondary-color)';
+            statusDiv.style.color = 'var(--secondary-color)';
+            
+            statusDiv.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>Status das Atribuições:</strong><br>
+                        <small>Local: ${localCount} (${localAtivas} ativas, ${localDevolvidas} devolvidas)</small><br>
+                        <small>Nuvem: ${cloudCount || 0} registros</small>
+                    </div>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 8000);
+        }
+        
+    } catch (error) {
+        showNotification(`❌ Erro ao verificar status: ${error.message}`, 'error');
+    }
+}
 
         // Selecionar colaborador para atribuição
         function selectColaboradorForAtribuicao(colaboradorId) {
@@ -7374,15 +7610,18 @@ toolsData.forEach((tool, index) => {
         }
     }
 
-        // Atribuir ferramenta ao colaborador
-        async function atribuirFerramenta() {
-        // Verificar permissão
-        if (currentUser.role === 'user') {
+// ============================================
+// ATUALIZADA: Atribuir ferramenta ao colaborador
+// ============================================
+
+async function atribuirFerramenta() {
+    // Verificar permissão
+    if (currentUser.role === 'user') {
         showNotification('Usuário não tem permissão para atribuir ferramentas.', 'error');
         return;
     }
     
-        if (!colaboradorSelecionado) {
+    if (!colaboradorSelecionado) {
         showNotification('Selecione um colaborador primeiro!', 'error');
         return;
     }
@@ -7424,6 +7663,7 @@ toolsData.forEach((tool, index) => {
             id: Date.now(),
             colaboradorId: colaboradorSelecionado.id,
             colaboradorNome: colaboradorSelecionado.nome,
+            colaboradorMatricula: colaboradorSelecionado.matricula,
             toolId: toolId,
             toolNome: tool.name,
             toolCodigo: tool.code,
@@ -7431,20 +7671,32 @@ toolsData.forEach((tool, index) => {
             observacao: observacao,
             usuarioAtribuicao: currentUser.name,
             dataDevolucao: null,
-            usuarioDevolucao: null
+            usuarioDevolucao: null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
         };
         
         historicoAtribuicoes.push(historicoItem);
         
-        // Salvar alterações
+        // Salvar alterações locais
         await saveTools();
         await saveColaboradores();
+        
+        // Salvar na nuvem se estiver conectado
+        if (isOnlineMode && supabaseClient) {
+            try {
+                await saveAtribuicaoToSupabase(historicoItem);
+                console.log('✅ Atribuição salva na nuvem');
+            } catch (cloudError) {
+                console.error('⚠️ Erro ao salvar na nuvem, mas continua local:', cloudError);
+            }
+        }
         
         // Atualizar interfaces
         updateColaboradoresList();
         updateAtribuicaoUI();
         loadToolsList(currentStatusFilter);
-        updateLocalAtribuicoesCount(); // ADICIONE ESTA LINHA
+        updateLocalAtribuicoesCount();
         
         // Limpar formulário de atribuição
         document.getElementById('ferramentaParaAtribuir').value = '';
@@ -7694,7 +7946,47 @@ toolsData.forEach((tool, index) => {
         }, 1500);
     }
 }
+// ============================================
+// INICIALIZAR SISTEMA DE ATRIBUIÇÕES
+// ============================================
 
+function initializeAtribuicoesSystem() {
+    // Atualizar contagem local
+    updateLocalAtribuicoesCount();
+    
+    // Verificar status da nuvem
+    if (isOnlineMode) {
+        // Atualizar status UI
+        const statusElement = document.getElementById('atribuicoesCloudStatus');
+        if (statusElement) {
+            statusElement.textContent = 'Conectado';
+            statusElement.style.color = 'var(--success-color)';
+        }
+        
+        // Buscar atribuições da nuvem automaticamente após 2 segundos
+        setTimeout(async () => {
+            try {
+                await fetchAtribuicoesFromSupabase();
+            } catch (error) {
+                console.log('Busca automática de atribuições falhou:', error);
+            }
+        }, 2000);
+    }
+}
+
+// Chame esta função no initializeSystem():
+async function initializeSystem() {
+    try {
+        // ... código existente ...
+        
+        // Inicializar sistema de atribuições
+        initializeAtribuicoesSystem();
+        
+        // ... resto do código ...
+    } catch (error) {
+        // ... tratamento de erro ...
+    }
+}
         // ============================================
         // FUNÇÕES PARA A ABA MAPEAMENTO
         // ============================================
