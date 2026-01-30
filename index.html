@@ -2614,6 +2614,60 @@ body.dark-mode #controle-colaborador textarea,
 body.dark-mode #controle-colaborador button {
     color: #e0e0e0 !important;
 }
+
+/* ============================================ */
+/* ESTILOS PARA BOTÕES DE SINCRONIZAÇÃO DE COLABORADORES */
+/* ============================================ */
+
+#colaboradoresSyncButtons .btn {
+    min-width: 180px;
+    justify-content: center;
+}
+
+#colaboradoresSyncStatus {
+    transition: all 0.3s ease;
+    animation: fadeIn 0.3s ease;
+}
+
+#colaboradoresSyncStatus i {
+    font-size: 18px;
+}
+
+/* Animações para os botões */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+#colaboradoresSyncButtons .btn:hover {
+    animation: pulse 0.5s ease;
+}
+
+/* Estilo para modo noturno */
+body.dark-mode #colaboradoresSyncButtons h4 {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #colaboradoresSyncButtons .btn {
+    opacity: 0.9;
+}
+
+body.dark-mode #colaboradoresSyncButtons .btn:hover {
+    opacity: 1;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    #colaboradoresSyncButtons .btn {
+        min-width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    #colaboradoresSyncButtons .btn-group {
+        flex-direction: column;
+    }
+}
         </style>
     </head>
 <body>
@@ -4347,15 +4401,128 @@ function editColaborador(colaboradorId) {
             }
         }
 
-        // Buscar colaboradores do Supabase
-        async function fetchColaboradoresFromSupabase() {
-            try {
-                if (!supabaseClient || !isOnlineMode) {
-                    showNotification('Não conectado à nuvem.', 'warning');
-                    return false;
+        // ============================================
+// BUSCA AUTOMÁTICA DE COLABORADORES DA NUVEM
+// ============================================
+
+// Modifique a função initializeSystem para buscar colaboradores da nuvem
+async function initializeSystem() {
+    try {
+        console.log('🔧 INICIALIZANDO SISTEMA para:', currentUser?.email);
+        
+        // 1. Adicionar campo oculto para usuário
+        const usuarioField = document.createElement('input');
+        usuarioField.type = 'hidden';
+        usuarioField.id = 'usuarioCadastroField';
+        usuarioField.value = currentUser ? currentUser.name : 'Sistema';
+        document.getElementById('toolForm').appendChild(usuarioField);
+        
+        // 2. Carregar dados locais
+        await loadInitialTools();
+        console.log('📁 Dados locais carregados:', tools.length, 'itens');
+        
+        // 3. Carregar colaboradores LOCAIS primeiro
+        loadColaboradores();
+        console.log('👥 Colaboradores locais:', colaboradores.length);
+        
+        // 4. Verificar status do IndexedDB
+        await updateIndexedDBStatus();
+        
+        // 5. ATUALIZAR INTERFACE INICIAL
+        updateHeaderStats();
+        updateStatistics();
+        loadToolsList();
+        updateColaboradoresList();
+        // 5. Inicializar sistema de romaneio
+        initializeRomaneioListeners();
+        loadRomaneioTemplates();
+        // 6. Configurar data atual
+        document.getElementById('dataCadastro').value = new Date().toISOString().split('T')[0];
+        document.getElementById('dataAtribuicao').value = new Date().toISOString().split('T')[0];
+        
+        // 7. INICIALIZAR GERADOR DE CÓDIGO PARA COLABORADORES
+        inicializarGeradorCodigoColaborador();
+        
+        // 8. SEMPRE tentar conectar ao Supabase com credenciais fixas
+        console.log('☁️ Conectando automaticamente ao Supabase...');
+        console.log('URL:', FIXED_SUPABASE_CONFIG.url);
+        
+        const connected = await setupSupabaseClient();
+        
+        if (connected) {
+            console.log('✅ Conectado ao Supabase! Buscando dados...');
+            
+            // 9. BUSCA AUTOMÁTICA DE COLABORADORES DA NUVEM (com delay)
+            setTimeout(async () => {
+                try {
+                    console.log('🔄 Buscando colaboradores da nuvem...');
+                    
+                    // Primeiro, buscar colaboradores da nuvem
+                    const fetchedColabs = await fetchColaboradoresFromSupabase();
+                    
+                    // Depois, buscar ferramentas da nuvem
+                    const fetchedTools = await fetchFromSupabase();
+                    
+                    if (fetchedColabs || fetchedTools) {
+                        console.log('✅ Dados sincronizados da nuvem');
+                        lastSyncTime = new Date();
+                        updateConnectionStatus();
+                        
+                        // Atualizar contagem de colaboradores na interface
+                        updateColaboradoresCountUI();
+                    }
+                } catch (syncError) {
+                    console.error('❌ Erro na sincronização automática:', syncError);
+                    showNotification('Erro na sincronização automática da nuvem.', 'warning');
                 }
+            }, 1500); // Delay de 1.5 segundos para não sobrecarregar
+            
+        } else {
+            console.log('⚠️ Modo local ativo');
+            showNotification('Modo local ativo.', 'info');
+        }
+        
+        // 10. Mostrar botão de enviar para nuvem (se tiver permissão)
+        showCloudUploadButton();
+        
+        // 11. Atualizar status da conexão
+        updateConnectionStatus();
+        
+        showNotification('Sistema inicializado!', 'success');
+        console.log('✅ Sistema inicializado com sucesso');
+        
+    } catch (error) {
+        console.error('❌ Erro na inicialização:', error);
+        showNotification('Erro ao inicializar.', 'error');
+    }
+}
+
+// Função para atualizar contagem de colaboradores na UI
+function updateColaboradoresCountUI() {
+    const colaboradoresCountElement = document.getElementById('colaboradoresCount');
+    if (colaboradoresCountElement) {
+        colaboradoresCountElement.textContent = colaboradores.length;
+    }
+    
+    // Também atualizar no painel de status do banco de dados
+    const localColaboradoresElement = document.getElementById('localColaboradoresCount');
+    if (localColaboradoresElement) {
+        localColaboradoresElement.textContent = colaboradores.length;
+    }
+}
+
+// Modifique a função fetchColaboradoresFromSupabase para melhor feedback
+async function fetchColaboradoresFromSupabase() {
+    try {
+        if (!supabaseClient || !isOnlineMode) {
+            showNotification('Não conectado à nuvem.', 'warning');
+            return false;
+        }
         
         console.log('🔄 Buscando colaboradores do Supabase...');
+        
+        // Mostrar loader se possível
+        showLoading('Buscando colaboradores da nuvem...');
         
         const { data, error } = await supabaseClient
             .from('collaborators')
@@ -4364,18 +4531,22 @@ function editColaborador(colaboradorId) {
         
         if (error) {
             if (error.message.includes('does not exist')) {
-                showNotification('Tabela de colaboradores não existe no banco de dados.', 'error');
+                // Tabela não existe, podemos criar mais tarde
+                console.log('📋 Tabela de colaboradores não existe ainda');
+                hideLoading();
                 return false;
             }
             throw error;
         }
+        
+        hideLoading();
         
         if (data && data.length > 0) {
             console.log(`📥 ${data.length} colaboradores recebidos do Supabase`);
             
             // Converter para formato local
             const convertedColaboradores = data.map(item => ({
-                id: item.id,
+                id: item.id || Date.now(),
                 nome: item.name,
                 matricula: item.registration,
                 setor: item.sector,
@@ -4384,71 +4555,123 @@ function editColaborador(colaboradorId) {
                 email: item.email,
                 observacoes: item.observations,
                 dataCadastro: item.admission_date,
-                status: item.status,
+                status: item.status || 'active',
                 usuarioCadastro: item.created_by || 'Sistema',
                 ferramentasAtribuidas: [], // Será preenchido separadamente
                 createdAt: item.created_at,
                 updatedAt: item.updated_at
             }));
             
-            // Mesclar dados corretamente
-            // 1. Criar mapa dos dados da nuvem pela matrícula
-            const cloudMap = new Map();
-            convertedColaboradores.forEach(colaborador => {
-                cloudMap.set(colaborador.matricula, colaborador);
-            });
-            
-            // 2. Atualizar colaboradores existentes e adicionar novos
-            let updatedCount = 0;
-            let addedCount = 0;
-            
-            colaboradores.forEach((localColab, index) => {
-                const cloudColab = cloudMap.get(localColab.matricula);
-                if (cloudColab) {
-                    // Preservar ferramentas atribuídas do colaborador local
-                    const ferramentasAtribuidas = colaboradores[index].ferramentasAtribuidas || [];
-                    
-                    colaboradores[index] = {
-                        ...localColab,
-                        ...cloudColab,
-                        id: localColab.id, // Mantém o ID local
-                        ferramentasAtribuidas: ferramentasAtribuidas,
-                        updatedAt: new Date().toISOString()
-                    };
-                    updatedCount++;
-                    cloudMap.delete(localColab.matricula); // Remove do mapa para não adicionar novamente
-                }
-            });
-            
-            // 3. Adicionar colaboradores que não existiam localmente
-            const newColaboradores = Array.from(cloudMap.values());
-            if (newColaboradores.length > 0) {
-                colaboradores = [...colaboradores, ...newColaboradores];
-                addedCount = newColaboradores.length;
-            }
-            
-            // 4. Salvar e atualizar interface
-            await saveColaboradores();
-            updateColaboradoresList();
-            
-            if (updatedCount > 0 || addedCount > 0) {
-                showNotification(`${updatedCount} colaboradores atualizados, ${addedCount} novos da nuvem!`, 'success');
-                console.log(`✅ ${updatedCount} atualizados, ${addedCount} novos colaboradores`);
-            } else {
-                showNotification('Dados de colaboradores já sincronizados.', 'info');
-            }
+            // Processar mesclagem de dados
+            await processMergeColaboradores(convertedColaboradores);
             
             return true;
         } else {
+            console.log('📭 Nenhum colaborador encontrado na nuvem');
             showNotification('Nenhum colaborador encontrado na nuvem.', 'info');
             return false;
         }
-        } catch (error) {
-            console.error('Erro ao buscar colaboradores do Supabase:', error);
-            showNotification(`Erro ao buscar colaboradores: ${error.message}`, 'error');
-            return false;
-        }
+    } catch (error) {
+        console.error('❌ Erro ao buscar colaboradores do Supabase:', error);
+        showNotification(`Erro ao buscar colaboradores: ${error.message}`, 'error');
+        return false;
     }
+}
+
+// Função para processar mesclagem de colaboradores
+async function processMergeColaboradores(cloudColaboradores) {
+    try {
+        // 1. Criar mapa dos dados da nuvem pela matrícula
+        const cloudMap = new Map();
+        cloudColaboradores.forEach(colaborador => {
+            cloudMap.set(colaborador.matricula, colaborador);
+        });
+        
+        // 2. Atualizar colaboradores existentes e adicionar novos
+        let updatedCount = 0;
+        let addedCount = 0;
+        
+        colaboradores.forEach((localColab, index) => {
+            const cloudColab = cloudMap.get(localColab.matricula);
+            if (cloudColab) {
+                // Preservar ferramentas atribuídas do colaborador local
+                const ferramentasAtribuidas = colaboradores[index].ferramentasAtribuidas || [];
+                
+                // Mesclar dados, mantendo ferramentas atribuídas locais
+                colaboradores[index] = {
+                    ...localColab,
+                    ...cloudColab,
+                    id: localColab.id, // Mantém o ID local
+                    ferramentasAtribuidas: ferramentasAtribuidas,
+                    updatedAt: new Date().toISOString()
+                };
+                updatedCount++;
+                cloudMap.delete(localColab.matricula); // Remove do mapa para não adicionar novamente
+            }
+        });
+        
+        // 3. Adicionar colaboradores que não existiam localmente
+        const newColaboradores = Array.from(cloudMap.values());
+        if (newColaboradores.length > 0) {
+            colaboradores = [...colaboradores, ...newColaboradores];
+            addedCount = newColaboradores.length;
+        }
+        
+        // 4. Salvar localmente e atualizar interface
+        await saveColaboradores();
+        updateColaboradoresList();
+        updateColaboradoresCountUI();
+        
+        // 5. Feedback ao usuário
+        if (updatedCount > 0 || addedCount > 0) {
+            showNotification(`${updatedCount} colaboradores atualizados, ${addedCount} novos da nuvem!`, 'success');
+            console.log(`✅ ${updatedCount} atualizados, ${addedCount} novos colaboradores`);
+        } else {
+            showNotification('Dados de colaboradores já sincronizados.', 'info');
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao processar mesclagem de colaboradores:', error);
+        throw error;
+    }
+}
+
+// Funções auxiliares para loading
+function showLoading(message = 'Processando...') {
+    // Remover loading existente
+    hideLoading();
+    
+    const loadingDiv = document.createElement('div');
+    loadingDiv.id = 'globalLoading';
+    loadingDiv.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.7);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        color: white;
+    `;
+    
+    loadingDiv.innerHTML = `
+        <div class="loader" style="width: 60px; height: 60px; border: 5px solid #f3f3f3; border-top: 5px solid var(--secondary-color); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <p style="margin-top: 20px; font-size: 16px;">${message}</p>
+    `;
+    
+    document.body.appendChild(loadingDiv);
+}
+
+function hideLoading() {
+    const existingLoading = document.getElementById('globalLoading');
+    if (existingLoading) {
+        existingLoading.remove();
+    }
+}
 
         // Sincronizar colaboradores para o Supabase
         async function syncColaboradoresToSupabase() {
@@ -4486,6 +4709,346 @@ function editColaborador(colaboradorId) {
     }
 }
 
+// ============================================
+// ADICIONAR BOTÕES DE SINCRONIZAÇÃO NA ABA COLABORADOR
+// ============================================
+
+// Função para adicionar botões na aba de colaboradores
+function addSyncButtonsToColaboradoresTab() {
+    // Encontrar o container do formulário de colaboradores
+    const colaboradorCard = document.querySelector('#controle-colaborador .cards-container .card:first-child');
+    
+    if (!colaboradorCard) {
+        console.log('Card de colaborador não encontrado');
+        return;
+    }
+    
+    // Verificar se os botões já existem
+    if (document.getElementById('colaboradoresSyncButtons')) {
+        return;
+    }
+    
+    // Adicionar container para os botões após o formulário
+    const formContainer = colaboradorCard.querySelector('.form-container');
+    if (formContainer) {
+        const buttonsContainer = document.createElement('div');
+        buttonsContainer.id = 'colaboradoresSyncButtons';
+        buttonsContainer.style.cssText = `
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid var(--border-color);
+        `;
+        
+        buttonsContainer.innerHTML = `
+            <h4 style="color: var(--primary-color) !important; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-cloud"></i> Sincronização com a Nuvem
+            </h4>
+            
+            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--warning-color);">
+                <p style="color: var(--text-color) !important; margin: 0; font-size: 14px;">
+                    <i class="fas fa-info-circle"></i> 
+                    <strong>Colaboradores Locais:</strong> ${colaboradores.length} | 
+                    <strong>Status:</strong> <span id="colaboradoresCloudStatus">${isOnlineMode ? 'Conectado' : 'Desconectado'}</span>
+                </p>
+            </div>
+            
+            <div class="btn-group" style="justify-content: center; flex-wrap: wrap; gap: 10px;">
+                <button type="button" class="btn btn-success" id="fetchColaboradoresBtn" 
+                        style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-cloud-download-alt"></i> Buscar da Nuvem
+                </button>
+                
+                <button type="button" class="btn btn-primary" id="pushColaboradoresBtn" 
+                        style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-cloud-upload-alt"></i> Enviar para Nuvem
+                </button>
+                
+                <button type="button" class="btn btn-warning" id="syncAllColaboradoresBtn" 
+                        style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-sync-alt"></i> Sincronizar Tudo
+                </button>
+                
+                <button type="button" class="btn btn-info" id="checkColaboradoresBtn" 
+                        style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-search"></i> Verificar Status
+                </button>
+            </div>
+            
+            <div id="colaboradoresSyncStatus" style="margin-top: 15px; padding: 10px; border-radius: 6px; display: none;">
+                <!-- Status será preenchido dinamicamente -->
+            </div>
+        `;
+        
+        // Inserir após o formulário
+        formContainer.parentNode.insertBefore(buttonsContainer, formContainer.nextSibling);
+        
+        // Adicionar event listeners
+        addColaboradoresSyncEventListeners();
+    }
+}
+
+// Adicionar event listeners aos botões
+function addColaboradoresSyncEventListeners() {
+    // Botão: Buscar da Nuvem
+    document.getElementById('fetchColaboradoresBtn').addEventListener('click', async function() {
+        if (!isOnlineMode || !supabaseClient) {
+            showNotification('Não conectado à nuvem.', 'error');
+            return;
+        }
+        
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando...';
+        
+        try {
+            const success = await fetchColaboradoresFromSupabase();
+            if (success) {
+                showSyncStatus('success', `✅ Colaboradores buscados da nuvem com sucesso!`);
+                updateColaboradoresList();
+            }
+        } catch (error) {
+            showSyncStatus('error', `❌ Erro ao buscar colaboradores: ${error.message}`);
+        } finally {
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Buscar da Nuvem';
+        }
+    });
+    
+    // Botão: Enviar para Nuvem
+    document.getElementById('pushColaboradoresBtn').addEventListener('click', async function() {
+        if (!isOnlineMode || !supabaseClient) {
+            showNotification('Não conectado à nuvem.', 'error');
+            return;
+        }
+        
+        if (colaboradores.length === 0) {
+            showNotification('Nenhum colaborador local para enviar.', 'warning');
+            return;
+        }
+        
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        
+        try {
+            const success = await syncColaboradoresToSupabase();
+            if (success) {
+                showSyncStatus('success', `✅ ${colaboradores.length} colaboradores enviados para a nuvem!`);
+            }
+        } catch (error) {
+            showSyncStatus('error', `❌ Erro ao enviar colaboradores: ${error.message}`);
+        } finally {
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Enviar para Nuvem';
+        }
+    });
+    
+    // Botão: Sincronizar Tudo (busca e envia)
+    document.getElementById('syncAllColaboradoresBtn').addEventListener('click', async function() {
+        if (!isOnlineMode || !supabaseClient) {
+            showNotification('Não conectado à nuvem.', 'error');
+            return;
+        }
+        
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sincronizando...';
+        
+        try {
+            showSyncStatus('info', '🔄 Iniciando sincronização completa...');
+            
+            // Primeiro enviar dados locais
+            await syncColaboradoresToSupabase();
+            
+            // Depois buscar dados atualizados
+            await fetchColaboradoresFromSupabase();
+            
+            showSyncStatus('success', '✅ Sincronização completa realizada com sucesso!');
+            updateColaboradoresList();
+            
+        } catch (error) {
+            showSyncStatus('error', `❌ Erro na sincronização: ${error.message}`);
+        } finally {
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-sync-alt"></i> Sincronizar Tudo';
+        }
+    });
+    
+    // Botão: Verificar Status
+    document.getElementById('checkColaboradoresBtn').addEventListener('click', async function() {
+        checkColaboradoresCloudStatus();
+    });
+}
+
+// Função para mostrar status da sincronização
+function showSyncStatus(type, message) {
+    const statusDiv = document.getElementById('colaboradoresSyncStatus');
+    if (!statusDiv) return;
+    
+    statusDiv.style.display = 'block';
+    statusDiv.className = '';
+    
+    switch(type) {
+        case 'success':
+            statusDiv.style.backgroundColor = 'rgba(39, 174, 96, 0.1)';
+            statusDiv.style.border = '1px solid var(--success-color)';
+            statusDiv.style.color = 'var(--success-color)';
+            break;
+        case 'error':
+            statusDiv.style.backgroundColor = 'rgba(231, 76, 60, 0.1)';
+            statusDiv.style.border = '1px solid var(--danger-color)';
+            statusDiv.style.color = 'var(--danger-color)';
+            break;
+        case 'info':
+            statusDiv.style.backgroundColor = 'rgba(52, 152, 219, 0.1)';
+            statusDiv.style.border = '1px solid var(--secondary-color)';
+            statusDiv.style.color = 'var(--secondary-color)';
+            break;
+        case 'warning':
+            statusDiv.style.backgroundColor = 'rgba(243, 156, 18, 0.1)';
+            statusDiv.style.border = '1px solid var(--warning-color)';
+            statusDiv.style.color = 'var(--warning-color)';
+            break;
+    }
+    
+    statusDiv.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+            ${type === 'success' ? '<i class="fas fa-check-circle"></i>' : 
+              type === 'error' ? '<i class="fas fa-exclamation-circle"></i>' : 
+              type === 'warning' ? '<i class="fas fa-exclamation-triangle"></i>' : 
+              '<i class="fas fa-info-circle"></i>'}
+            <span>${message}</span>
+        </div>
+    `;
+    
+    // Auto-esconder após 5 segundos
+    setTimeout(() => {
+        statusDiv.style.display = 'none';
+    }, 5000);
+}
+
+// Verificar status dos colaboradores na nuvem
+async function checkColaboradoresCloudStatus() {
+    const statusElement = document.getElementById('colaboradoresCloudStatus');
+    if (!statusElement) return;
+    
+    if (!isOnlineMode || !supabaseClient) {
+        statusElement.textContent = 'Desconectado';
+        statusElement.style.color = 'var(--danger-color)';
+        showSyncStatus('error', '❌ Não conectado à nuvem');
+        return;
+    }
+    
+    try {
+        statusElement.textContent = 'Verificando...';
+        statusElement.style.color = 'var(--warning-color)';
+        
+        // Contar colaboradores na nuvem
+        const { count: cloudCount } = await supabaseClient
+            .from('collaborators')
+            .select('*', { count: 'exact', head: true });
+        
+        const localCount = colaboradores.length;
+        
+        statusElement.textContent = `Nuvem: ${cloudCount || 0} | Local: ${localCount}`;
+        
+        if (cloudCount === localCount) {
+            statusElement.style.color = 'var(--success-color)';
+            showSyncStatus('success', `✅ Sincronizado! ${localCount} colaboradores locais e na nuvem.`);
+        } else if (cloudCount > localCount) {
+            statusElement.style.color = 'var(--warning-color)';
+            showSyncStatus('warning', `⚠️ A nuvem tem ${cloudCount - localCount} colaboradores a mais que o local.`);
+        } else {
+            statusElement.style.color = 'var(--warning-color)';
+            showSyncStatus('warning', `⚠️ O local tem ${localCount - cloudCount} colaboradores a mais que a nuvem.`);
+        }
+        
+    } catch (error) {
+        statusElement.textContent = 'Erro ao verificar';
+        statusElement.style.color = 'var(--danger-color)';
+        showSyncStatus('error', `❌ Erro ao verificar status: ${error.message}`);
+    }
+}
+
+// Atualizar status ao carregar a aba
+function updateColaboradoresCloudStatusUI() {
+    const statusElement = document.getElementById('colaboradoresCloudStatus');
+    if (statusElement) {
+        if (isOnlineMode) {
+            statusElement.textContent = `Conectado (${colaboradores.length} locais)`;
+            statusElement.style.color = 'var(--success-color)';
+        } else {
+            statusElement.textContent = 'Desconectado';
+            statusElement.style.color = 'var(--danger-color)';
+        }
+    }
+}
+
+// ============================================
+// MODIFICAR FUNÇÃO PARA CARREGAR A ABA COLABORADORES
+// ============================================
+
+// Adicione este código ao event listener da aba de colaboradores
+document.querySelector('[data-tab="controle-colaborador"]')?.addEventListener('click', function() {
+    // Carregar lista de colaboradores
+    updateColaboradoresList();
+    
+    // Adicionar botões de sincronização (se ainda não existirem)
+    setTimeout(() => {
+        addSyncButtonsToColaboradoresTab();
+        updateColaboradoresCloudStatusUI();
+    }, 100);
+    
+    // Forçar modo noturno se necessário
+    setTimeout(forceDarkModeForColaboradores, 100);
+});
+
+// ============================================
+// ATUALIZAR O DOMContentLoaded
+// ============================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    // ... (código existente) ...
+    
+    // Inicializar gerador de código para colaboradores
+    inicializarGeradorCodigoColaborador();
+    
+    // ... (restante do código) ...
+});
+
+// ============================================
+// FUNÇÃO PARA ATUALIZAR CONTAGEM NO CABEÇALHO
+// ============================================
+
+// Adicione esta função para mostrar contagem no cabeçalho
+function updateHeaderStats() {
+    document.getElementById('totalTools').textContent = tools.length;
+    
+    // Calcular valor total
+    const totalValue = tools.reduce((sum, tool) => {
+        const preco = parseFloat(tool.preco) || 0;
+        const quantidade = parseInt(tool.quantidade) || 1;
+        return sum + (preco * quantidade);
+    }, 0);
+    
+    document.getElementById('totalValue').textContent = formatCurrency(totalValue);
+    document.getElementById('lastUpdate').textContent = new Date().toLocaleDateString('pt-BR');
+    
+    // Adicionar contagem de colaboradores se o elemento existir
+    const colaboradoresCountElement = document.getElementById('colaboradoresCount');
+    if (!colaboradoresCountElement) {
+        // Adicionar elemento se não existir
+        const projectInfo = document.querySelector('.project-info');
+        if (projectInfo) {
+            const colaboradoresItem = document.createElement('div');
+            colaboradoresItem.className = 'info-item';
+            colaboradoresItem.innerHTML = `
+                <div class="info-label">Colaboradores</div>
+                <div class="info-value" id="colaboradoresCount">${colaboradores.length}</div>
+            `;
+            projectInfo.insertBefore(colaboradoresItem, projectInfo.children[2]);
+        }
+    } else {
+        colaboradoresCountElement.textContent = colaboradores.length;
+    }
+}
         // Funções de colaboradores atualizadas (salvar e excluir):
 
         // Criar novo colaborador (ATUALIZADA)
