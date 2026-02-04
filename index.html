@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ferramentas - Login</title>
+    <title>Sistema de Controle</title>
     <link rel="icon" type="image/x-icon" href="fw_mini.ico">
     <link rel="icon" type="image/x-icon" href="fw_mini.ico">
     <link rel="shortcut icon" href="fw_mini.ico">
@@ -1385,7 +1385,7 @@
         }
         
         .money-input::before {
-            content: "R$";
+            content: "";
             position: absolute;
             left: 12px;
             top: 12px;
@@ -2679,7 +2679,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
                 <div class="login-logo-fw">
                     <img src="FW Logo.png" alt="FW Logo">
                 </div>
-                <h1 class="login-title">Sistema de Controle de Ferramentas</h1>
+                <h1 class="login-title">Controle de Ferramentas</h1>
                 <p class="login-subtitle">Faça login para acessar o sistema</p>
             </div>
             
@@ -2711,15 +2711,15 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
                         </div>
                         <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
                             <span style="font-size: 12px; display: block;">Almoxarife</span>
-                            <span style="font-size: 10px;">emerson.silva@fwcompany.com.br  EmersonFW1@</span>
+                            <span style="font-size: 0px;">emerson.silva@fwcompany.com.br  EmersonFW1@</span>
                         </div>
                         <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
                             <span style="font-size: 12px; display: block;">Consultas</span>
-                            <span style="font-size: 10px;">fwuser / User123</span>
+                            <span style="font-size: 14px;">fwuser / User123</span>
                         </div>
                         <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
                             <span style="font-size: 12px; display: block;">Outros</span>
-                            <span style="font-size: 10px;">raquel@fwcompany.com.br  RaqueL1234</span>
+                            <span style="font-size: 0px;">raquel@fwcompany.com.br  RaqueL1234</span>
                         </div>
                     </div>
                 </div>
@@ -3805,7 +3805,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
                             <div class="form-group">
                                 <label>URL do Projeto</label>
                                 <div style="background-color: #f5f5f5; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color);">
-                                    <strong>https://azlgjkjzitbolyfyyaip.supabase.co</strong>
+                                    <strong>https://eokhafnfmynhridksnuh.supabase.co</strong>
                                     <p style="margin-top: 5px; font-size: 12px; color: var(--gray-color);">
                                         Configurada automaticamente no sistema
                                     </p>
@@ -3927,7 +3927,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
         <footer class="site-footer">
             <div class="footer-content">
                 <p>Desenvolvido por Fábio Mendes Rodrigues, Planejador da F.W. Company</p>
-                <p class="footer-version">Versão 3.0_rev03 | Última atualização: <span id="currentDate"></span></p>
+                <p class="footer-version">Versão 3.0_rev05 | Última atualização: <span id="currentDate"></span></p>
             </div>
         </footer>
 
@@ -3943,8 +3943,8 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
         
         // 1. CONFIGURAÇÃO SUPABASE (FIXA)
         const FIXED_SUPABASE_CONFIG = {
-            url: 'https://azlgjkjzitbolyfyyaip.supabase.co',
-            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6bGdqa2p6aXRib2x5Znl5YWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY0MTQ1NjcsImV4cCI6MjA4MTk5MDU2N30.PefjFNb5Phq2ZkR26-RlJdb-pnFUbYp1PxjYwI1LUpA'
+            url: 'https://eokhafnfmynhridksnuh.supabase.co',
+            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVva2hhZm5mbXluaHJpZGtzbnVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxMzYwMDIsImV4cCI6MjA4NTcxMjAwMn0.-RZtzUYpdOI4_WKOmP9lqw9guJmvh8XFeAL6UXhA4vo'
         };
 
         // ============================================
@@ -4005,37 +4005,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
         let currentColaboradorId = null;
         let colaboradorSelecionado = null;
 
-        // Dados de exemplo para colaboradores
-        function getExampleColaboradores() {
-            return [
-                {
-                    id: 1,
-                    nome: 'João da Silva',
-                    matricula: 'MAT-001',
-                    setor: 'Manutenção',
-                    cargo: 'Técnico de Manutenção',
-                    telefone: '(11) 99999-9999',
-                    email: 'joao@empresa.com',
-                    observacoes: 'Colaborador dedicado e cuidadoso com ferramentas',
-                    dataCadastro: new Date().toISOString().split('T')[0],
-                    usuarioCadastro: 'Sistema',
-                    ferramentasAtribuidas: [] // Array de IDs de ferramentas atribuídas
-                },
-                {
-                    id: 2,
-                    nome: 'Maria Santos',
-                    matricula: 'MAT-002',
-                    setor: 'Elétrica',
-                    cargo: 'Eletricista',
-                    telefone: '(11) 98888-8888',
-                    email: 'maria@empresa.com',
-                    observacoes: 'Especialista em instalações elétricas',
-                    dataCadastro: new Date().toISOString().split('T')[0],
-                    usuarioCadastro: 'Sistema',
-                    ferramentasAtribuidas: []
-                }
-            ];
-        }
+        
 
         // Array para histórico de atribuições
         let historicoAtribuicoes = [];
@@ -4388,43 +4358,49 @@ async function saveAtribuicaoToSupabase(atribuicao) {
             return false;
         }
         
-        const atribuicaoData = convertAtribuicaoToSupabaseFormat(atribuicao);
+        // FORMATO CORRETO para a tabela tool_assignments
+        const atribuicaoData = {
+            tool_id: atribuicao.toolId,
+            tool_code: atribuicao.toolCodigo,
+            tool_name: atribuicao.toolNome,
+            collaborator_id: atribuicao.colaboradorId,
+            collaborator_registration: atribuicao.colaboradorMatricula,
+            collaborator_name: atribuicao.colaboradorNome,
+            assignment_date: atribuicao.dataAtribuicao,
+            assignment_type: 'collaborator',
+            assigned_to_type: 'colaborador',
+            assigned_to_id: atribuicao.colaboradorId.toString(),
+            assigned_to_name: atribuicao.colaboradorNome,
+            status: atribuicao.dataDevolucao ? 'returned' : 'active',
+            observations: atribuicao.observacao || null,
+            user_assigned: atribuicao.usuarioAtribuicao || currentUser?.name || 'Sistema',
+            user_returned: atribuicao.usuarioDevolucao || null,
+            returned_date: atribuicao.dataDevolucao || null,
+            expected_return_date: null,
+            actual_return_date: atribuicao.dataDevolucao || null,
+            local_id: atribuicao.id, // Salvar ID local como referência
+            sync_status: 'synced',
+            created_at: atribuicao.createdAt || new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
         
-        // Verificar se já existe uma atribuição ativa para esta ferramenta
-        const { data: existingActive } = await supabaseClient
-            .from('tool_assignments')
-            .select('id')
-            .eq('tool_code', atribuicao.toolCodigo)
-            .eq('status', 'active')
-            .maybeSingle();
+        console.log('📤 Enviando atribuição para nuvem:', {
+            tool_code: atribuicaoData.tool_code,
+            collaborator: atribuicaoData.collaborator_name,
+            status: atribuicaoData.status
+        });
         
-        if (existingActive) {
-            // Se existe ativa e estamos marcando como devolvida
-            if (atribuicao.dataDevolucao) {
-                const { error } = await supabaseClient
-                    .from('tool_assignments')
-                    .update({
-                        status: 'returned',
-                        user_returned: atribuicao.usuarioDevolucao,
-                        returned_date: atribuicao.dataDevolucao,
-                        actual_return_date: atribuicao.dataDevolucao,
-                        updated_at: new Date().toISOString()
-                    })
-                    .eq('id', existingActive.id);
-                
-                if (error) throw error;
-            } else {
-                // Atualizar atribuição existente
-                const { error } = await supabaseClient
-                    .from('tool_assignments')
-                    .update(atribuicaoData)
-                    .eq('id', existingActive.id);
-                
-                if (error) throw error;
-            }
-        } else if (atribuicao.dataDevolucao) {
-            // Não fazer nada se for apenas devolução sem atribuição ativa
-            return true;
+        let result;
+        
+        // Se já existe um ID do Supabase, atualizar
+        if (atribuicao.supabase_id) {
+            const { data, error } = await supabaseClient
+                .from('tool_assignments')
+                .update(atribuicaoData)
+                .eq('id', atribuicao.supabase_id);
+            
+            if (error) throw error;
+            result = data;
         } else {
             // Inserir nova atribuição
             const { data, error } = await supabaseClient
@@ -4434,27 +4410,29 @@ async function saveAtribuicaoToSupabase(atribuicao) {
             
             if (error) throw error;
             
-            // Atualizar o ID local com o ID gerado pelo Supabase
+            // Salvar o ID do Supabase localmente
             if (data && data[0]) {
-                atribuicao.id = data[0].id;
+                const index = historicoAtribuicoes.findIndex(a => a.id === atribuicao.id);
+                if (index !== -1) {
+                    historicoAtribuicoes[index].supabase_id = data[0].id;
+                    await saveColaboradores();
+                }
             }
+            result = data;
         }
         
+        console.log('✅ Atribuição salva na nuvem:', result);
         return true;
+        
     } catch (error) {
         console.error('❌ Erro ao salvar atribuição no Supabase:', error);
-        console.error('Detalhes do erro:', {
-            message: error.message,
-            details: error.details,
-            hint: error.hint,
-            code: error.code
-        });
+        console.error('Detalhes:', error.message);
         
-        // Verificar se é erro de coluna inexistente
-        if (error.message && error.message.includes('column')) {
-            showNotification('Erro: Coluna não existe na tabela do banco de dados.', 'error');
-        } else {
-            showNotification('Erro ao salvar atribuição na nuvem.', 'warning');
+        // Marcar como não sincronizada
+        const index = historicoAtribuicoes.findIndex(a => a.id === atribuicao.id);
+        if (index !== -1) {
+            historicoAtribuicoes[index].sync_status = 'failed';
+            await saveColaboradores();
         }
         
         return false;
@@ -4466,116 +4444,72 @@ async function saveAtribuicaoToSupabase(atribuicao) {
 
 async function fetchAtribuicoesFromSupabase() {
     try {
-        console.log('🔄 [DEBUG] Iniciando busca de atribuições...');
+        console.log('🔄 Buscando atribuições da nuvem...');
         
-        if (!supabaseClient) {
-            console.log('❌ [DEBUG] supabaseClient não existe');
-            showNotification('Cliente Supabase não configurado.', 'error');
-            return false;
-        }
-        
-        if (!isOnlineMode) {
-            console.log('❌ [DEBUG] Modo offline');
+        if (!supabaseClient || !isOnlineMode) {
             showNotification('Não conectado à nuvem.', 'warning');
             return false;
         }
         
-        console.log('🔍 [DEBUG] Consultando tabela tool_assignments...');
-        
-        // Primeiro, contar registros
-        const { count, error: countError } = await supabaseClient
-            .from('tool_assignments')
-            .select('*', { count: 'exact', head: true });
-        
-        if (countError) {
-            console.error('❌ [DEBUG] Erro ao contar:', countError);
-            
-            if (countError.message.includes('does not exist')) {
-                console.log('📋 [DEBUG] Tabela não existe');
-                showNotification('Tabela de atribuições não existe no banco.', 'error');
-                return false;
-            }
-            
-            throw countError;
-        }
-        
-        console.log(`📊 [DEBUG] Total na nuvem: ${count} registros`);
-        
-        if (count === 0) {
-            console.log('📭 [DEBUG] Nenhuma atribuição na nuvem');
-            showNotification('Nenhuma atribuição encontrada na nuvem.', 'info');
-            return false;
-        }
-        
-        // Buscar dados completos
-        console.log('📥 [DEBUG] Buscando dados completos...');
+        // Buscar TODAS as atribuições
         const { data, error } = await supabaseClient
             .from('tool_assignments')
             .select('*')
             .order('created_at', { ascending: false });
         
         if (error) {
-            console.error('❌ [DEBUG] Erro ao buscar dados:', error);
+            console.error('❌ Erro ao buscar atribuições:', error);
+            
+            if (error.message.includes('does not exist')) {
+                showNotification('Tabela de atribuições não existe no banco.', 'error');
+                return false;
+            }
+            
             throw error;
         }
         
-        console.log(`✅ [DEBUG] ${data.length} atribuições recebidas`);
-        console.log('📋 [DEBUG] Primeira atribuição:', data[0]);
-        
-        if (data.length === 0) {
-            console.log('📭 [DEBUG] Array de dados vazio');
-            showNotification('Nenhuma atribuição encontrada.', 'info');
+        if (!data || data.length === 0) {
+            console.log('📭 Nenhuma atribuição na nuvem');
+            showNotification('Nenhuma atribuição encontrada na nuvem.', 'info');
             return false;
         }
         
+        console.log(`📥 ${data.length} atribuições recebidas da nuvem`);
+        
         // Converter para formato local
-        const convertedAtribuicoes = data.map(item => {
-            console.log('🔄 [DEBUG] Convertendo item:', item.id);
-            
-            return {
-                id: item.id,
-                colaboradorId: item.collaborator_id,
-                colaboradorNome: item.collaborator_name,
-                colaboradorMatricula: item.collaborator_registration,
-                toolId: item.tool_id,
-                toolNome: item.tool_name,
-                toolCodigo: item.tool_code,
-                dataAtribuicao: item.assignment_date,
-                dataDevolucao: item.returned_date || item.actual_return_date,
-                observacao: item.observations,
-                usuarioAtribuicao: item.user_assigned,
-                usuarioDevolucao: item.user_returned,
-                createdAt: item.created_at,
-                updatedAt: item.updated_at,
-                status: item.status
-            };
-        });
+        const atribuicoesDaNuvem = data.map(item => ({
+            id: item.id, // Usar ID do Supabase como ID principal
+            supabase_id: item.id,
+            colaboradorId: item.collaborator_id,
+            colaboradorNome: item.collaborator_name,
+            colaboradorMatricula: item.collaborator_registration,
+            toolId: item.tool_id,
+            toolNome: item.tool_name,
+            toolCodigo: item.tool_code,
+            dataAtribuicao: item.assignment_date,
+            dataDevolucao: item.returned_date || item.actual_return_date,
+            observacao: item.observations,
+            usuarioAtribuicao: item.user_assigned,
+            usuarioDevolucao: item.user_returned,
+            status: item.status || (item.returned_date ? 'returned' : 'active'),
+            createdAt: item.created_at,
+            updatedAt: item.updated_at,
+            sync_status: 'synced',
+            source: 'cloud'
+        }));
         
-        console.log(`🔄 [DEBUG] ${convertedAtribuicoes.length} itens convertidos`);
+        // Mesclar com atribuições locais
+        await mergeAtribuicoes(atribuicoesDaNuvem);
         
-        // Processar mesclagem
-        const mergeResult = await processMergeAtribuicoes(convertedAtribuicoes);
+        // Atualizar status das ferramentas
+        updateFerramentasFromAtribuicoes();
         
-        console.log('✅ [DEBUG] Busca e processamento concluídos');
-        showNotification(`${data.length} atribuições atualizadas da nuvem!`, 'success');
-        
+        showNotification(`${data.length} atribuições sincronizadas da nuvem!`, 'success');
         return true;
         
     } catch (error) {
-        console.error('❌ [DEBUG] Erro completo na busca:', error);
-        console.error('Detalhes do erro:', {
-            message: error.message,
-            details: error.details,
-            hint: error.hint,
-            code: error.code
-        });
-        
-        let errorMessage = 'Erro ao buscar atribuições';
-        if (error.message) {
-            errorMessage += `: ${error.message}`;
-        }
-        
-        showNotification(errorMessage, 'error');
+        console.error('❌ Erro completo na busca de atribuições:', error);
+        showNotification(`Erro ao buscar atribuições: ${error.message}`, 'error');
         return false;
     }
 }
@@ -4663,6 +4597,93 @@ async function processMergeAtribuicoes(cloudAtribuicoes) {
         throw error;
     }
 }
+// =============================================
+// NOVA FUNÇÃO PARA SINCRONIZAÇÃO DE ATRIBUIÇÕES
+// =============================================
+async function mergeAtribuicoes(atribuicoesDaNuvem) {
+    try {
+        console.log('🔄 Mesclando atribuições...');
+        
+        // Criar mapa das atribuições da nuvem pelo ID do Supabase
+        const nuvemMap = new Map();
+        atribuicoesDaNuvem.forEach(atribuicao => {
+            nuvemMap.set(atribuicao.supabase_id, atribuicao);
+        });
+        
+        // Criar mapa das atribuições locais pelo tool_code + colaborador (atribuições ativas)
+        const localMap = new Map();
+        historicoAtribuicoes.forEach(atribuicao => {
+            if (!atribuicao.dataDevolucao) {
+                const key = `${atribuicao.toolCodigo}_${atribuicao.colaboradorId}`;
+                localMap.set(key, atribuicao);
+            }
+        });
+        
+        let added = 0;
+        let updated = 0;
+        
+        // Para cada atribuição da nuvem
+        for (const nuvemAtribuicao of atribuicoesDaNuvem) {
+            const key = `${nuvemAtribuicao.toolCodigo}_${nuvemAtribuicao.colaboradorId}`;
+            const localAtribuicao = localMap.get(key);
+            
+            if (localAtribuicao) {
+                // Atualizar atribuição local com dados da nuvem
+                const index = historicoAtribuicoes.findIndex(a => a.id === localAtribuicao.id);
+                if (index !== -1) {
+                    // Manter ID local, mas atualizar com dados da nuvem
+                    historicoAtribuicoes[index] = {
+                        ...localAtribuicao,
+                        ...nuvemAtribuicao,
+                        id: localAtribuicao.id, // Manter ID local
+                        supabase_id: nuvemAtribuicao.supabase_id // Atualizar ID do Supabase
+                    };
+                    updated++;
+                }
+            } else {
+                // Adicionar nova atribuição da nuvem
+                historicoAtribuicoes.push(nuvemAtribuicao);
+                added++;
+            }
+        }
+        
+        // Remover duplicatas (manter apenas a mais recente por tool+colaborador)
+        const uniqueAtribuicoes = [];
+        const seen = new Set();
+        
+        historicoAtribuicoes
+            .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)) // Mais recente primeiro
+            .forEach(atribuicao => {
+                const key = `${atribuicao.toolCodigo}_${atribuicao.colaboradorId}`;
+                
+                // Se for atribuição ativa, verificar se já existe
+                if (!atribuicao.dataDevolucao) {
+                    if (!seen.has(key)) {
+                        seen.add(key);
+                        uniqueAtribuicoes.push(atribuicao);
+                    }
+                } else {
+                    // Para devoluções, sempre adicionar
+                    uniqueAtribuicoes.push(atribuicao);
+                }
+            });
+        
+        historicoAtribuicoes = uniqueAtribuicoes;
+        
+        // Salvar localmente
+        await saveColaboradores();
+        
+        console.log(`✅ Mesclagem concluída: ${added} novas, ${updated} atualizadas`);
+        console.log(`📊 Total de atribuições: ${historicoAtribuicoes.length}`);
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Erro na mesclagem de atribuições:', error);
+        throw error;
+    }
+}
+
 // ============================================
 // SINCRONIZAR TODAS AS ATRIBUIÇÕES PARA SUPABASE
 // ============================================
@@ -4985,7 +5006,7 @@ async function initializeSystem() {
         
         // 3. Carregar colaboradores LOCAIS primeiro
         loadColaboradores();
-        console.log('👥 Colaboradores locais:', colaboradores.length);
+        console.log('👥 Colaboradores locais:', colaboradores ? colaboradores.length : 0);
         
         // 4. Verificar status do IndexedDB
         await updateIndexedDBStatus();
@@ -5052,10 +5073,25 @@ async function initializeSystem() {
         
         showNotification('Sistema inicializado!', 'success');
         console.log('✅ Sistema inicializado com sucesso');
+    // 12. Inicializar sistema de atribuições
+        setTimeout(async () => {
+            try {
+                console.log('🔄 Inicializando sistema de atribuições...');
+                initializeAtribuicoesSystem();
+                
+                // Verificar atribuições pendentes
+                const atribuicoesPendentes = historicoAtribuicoes.filter(a => !a.dataDevolucao);
+                console.log(`📊 Atribuições ativas: ${atribuicoesPendentes.length}`);
+                
+                // Atualizar status das ferramentas baseado nas atribuições
+                updateFerramentasFromAtribuicoes();
+            } catch (error) {
+                console.error('❌ Erro ao inicializar sistema de atribuições:', error);
+            }
+        }, 2000);
         
     } catch (error) {
-        console.error('❌ Erro na inicialização:', error);
-        showNotification('Erro ao inicializar.', 'error');
+        // ... tratamento de erro ...
     }
 }
 // ============================================
@@ -5509,7 +5545,22 @@ function addSyncButtonsToColaboradoresTab() {
         addColaboradoresSyncEventListeners();
     }
 }
-
+// Adicione no final da função addSyncButtonsToColaboradoresTab()
+function addSyncButtonsToColaboradoresTab() {
+    // ... código existente ...
+    
+    // Adicionar botão de sincronização de pendentes
+    const syncPendingBtn = document.createElement('button');
+    syncPendingBtn.className = 'btn btn-sm btn-info';
+    syncPendingBtn.innerHTML = '<i class="fas fa-sync"></i> Sincronizar Pendentes';
+    syncPendingBtn.onclick = syncPendingAtribuicoes;
+    
+    // Adicionar ao grupo de botões
+    const buttonGroup = document.querySelector('#colaboradoresSyncButtons .btn-group');
+    if (buttonGroup) {
+        buttonGroup.appendChild(syncPendingBtn);
+    }
+}
 // Adicionar event listeners aos botões
 function addColaboradoresSyncEventListeners() {
     // Botão: Buscar da Nuvem
@@ -6118,26 +6169,43 @@ function forceDarkModeForColaboradores() {
         });
             // Carregar colaboradores do localStorage
             function loadColaboradores() {
-            try {
-                const saved = localStorage.getItem('colaboradores');
-                if (saved) {
-                    colaboradores = JSON.parse(saved);
-                } else {
-                    colaboradores = getExampleColaboradores();
-                    saveColaboradores();
-                }
-                
-                // Carregar histórico de atribuições
-                const savedHistorico = localStorage.getItem('historicoAtribuicoes');
-                if (savedHistorico) {
-                    historicoAtribuicoes = JSON.parse(savedHistorico);
-                }
-                
-            } catch (error) {
-                console.error('Erro ao carregar colaboradores:', error);
-                colaboradores = getExampleColaboradores();
-            }
+    try {
+        const saved = localStorage.getItem('colaboradores');
+        
+        if (saved && saved !== "undefined" && saved !== "null") {
+            colaboradores = JSON.parse(saved);
+            console.log('✅ Colaboradores carregados:', colaboradores.length);
+        } else {
+            console.log('📭 Nenhum dado de colaboradores encontrado');
+            colaboradores = []; // Inicia com array vazio
+            
+            // Salvar array vazio para evitar undefined no futuro
+            saveColaboradores();
         }
+        
+        // Carregar histórico de atribuições
+        const savedHistorico = localStorage.getItem('historicoAtribuicoes');
+        if (savedHistorico && savedHistorico !== "undefined" && savedHistorico !== "null") {
+            historicoAtribuicoes = JSON.parse(savedHistorico);
+        } else {
+            historicoAtribuicoes = [];
+        }
+        
+    } catch (error) {
+        console.error('Erro ao carregar colaboradores:', error);
+        
+        // Em caso de erro, inicia com arrays vazios
+        colaboradores = [];
+        historicoAtribuicoes = [];
+        
+        // Tenta salvar arrays vazios
+        try {
+            saveColaboradores();
+        } catch (e) {
+            console.error('Erro ao salvar colaboradores após erro:', e);
+        }
+    }
+}
 // ============================================
 // FUNÇÃO DE DEPURAÇÃO: Verificar conexão
 // ============================================
@@ -6189,15 +6257,28 @@ async function debugAtribuicoesConnection() {
 document.getElementById('testarConexaoBtn')?.addEventListener('click', debugAtribuicoesConnection);
         // Salvar colaboradores no localStorage
         function saveColaboradores() {
-            try {
-                localStorage.setItem('colaboradores', JSON.stringify(colaboradores));
-                localStorage.setItem('historicoAtribuicoes', JSON.stringify(historicoAtribuicoes));
-                return true;
-            } catch (error) {
-                console.error('Erro ao salvar colaboradores:', error);
-                return false;
-            }
+    try {
+        // Garantir que são arrays
+        if (!Array.isArray(colaboradores)) {
+            console.warn('⚠️ colaboradores não é array, convertendo...');
+            colaboradores = [];
         }
+        
+        if (!Array.isArray(historicoAtribuicoes)) {
+            console.warn('⚠️ historicoAtribuicoes não é array, convertendo...');
+            historicoAtribuicoes = [];
+        }
+        
+        // Salvar no localStorage
+        localStorage.setItem('colaboradores', JSON.stringify(colaboradores));
+        localStorage.setItem('historicoAtribuicoes', JSON.stringify(historicoAtribuicoes));
+        
+        return true;
+    } catch (error) {
+        console.error('Erro ao salvar colaboradores:', error);
+        return false;
+    }
+}
 
         // Validar formulário de colaborador
         function validateColaboradorForm() {
@@ -7648,6 +7729,17 @@ async function atribuirFerramenta() {
         return;
     }
     
+    // VERIFICAR se já existe atribuição ativa para esta ferramenta
+    const atribuicaoExistente = historicoAtribuicoes.find(a => 
+        a.toolId === toolId && 
+        !a.dataDevolucao
+    );
+    
+    if (atribuicaoExistente) {
+        showNotification(`Esta ferramenta já está atribuída a ${atribuicaoExistente.colaboradorNome}!`, 'error');
+        return;
+    }
+    
     try {
         // Atualizar status da ferramenta
         tool.status = 'Em Uso';
@@ -7658,9 +7750,13 @@ async function atribuirFerramenta() {
         }
         colaboradorSelecionado.ferramentasAtribuidas.push(toolId);
         
+        // GERAR ID ÚNICO (timestamp + random)
+        const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+        
         // Adicionar ao histórico de atribuições
         const historicoItem = {
-            id: Date.now(),
+            id: uniqueId, // ID único local
+            supabase_id: null, // Será preenchido após salvar na nuvem
             colaboradorId: colaboradorSelecionado.id,
             colaboradorNome: colaboradorSelecionado.nome,
             colaboradorMatricula: colaboradorSelecionado.matricula,
@@ -7672,8 +7768,10 @@ async function atribuirFerramenta() {
             usuarioAtribuicao: currentUser.name,
             dataDevolucao: null,
             usuarioDevolucao: null,
+            status: 'active',
             createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
+            sync_status: 'pending' // Aguardando sincronização
         };
         
         historicoAtribuicoes.push(historicoItem);
@@ -7683,12 +7781,15 @@ async function atribuirFerramenta() {
         await saveColaboradores();
         
         // Salvar na nuvem se estiver conectado
+        let cloudSaved = false;
         if (isOnlineMode && supabaseClient) {
             try {
-                await saveAtribuicaoToSupabase(historicoItem);
-                console.log('✅ Atribuição salva na nuvem');
+                cloudSaved = await saveAtribuicaoToSupabase(historicoItem);
+                if (cloudSaved) {
+                    historicoItem.sync_status = 'synced';
+                }
             } catch (cloudError) {
-                console.error('⚠️ Erro ao salvar na nuvem, mas continua local:', cloudError);
+                console.error('⚠️ Erro ao salvar na nuvem:', cloudError);
             }
         }
         
@@ -7703,14 +7804,75 @@ async function atribuirFerramenta() {
         document.getElementById('observacaoAtribuicao').value = '';
         document.getElementById('dataAtribuicao').value = new Date().toISOString().split('T')[0];
         
-        showNotification(`Ferramenta "${tool.name}" atribuída a ${colaboradorSelecionado.nome}!`, 'success');
+        // Recarregar lista de ferramentas disponíveis
+        loadFerramentasDisponiveis();
+        
+        const mensagem = cloudSaved 
+            ? `Ferramenta "${tool.name}" atribuída a ${colaboradorSelecionado.nome} e sincronizada!`
+            : `Ferramenta "${tool.name}" atribuída a ${colaboradorSelecionado.nome} (apenas local)`;
+        
+        showNotification(mensagem, cloudSaved ? 'success' : 'warning');
         
     } catch (error) {
         console.error('Erro ao atribuir ferramenta:', error);
         showNotification('Erro ao atribuir ferramenta.', 'error');
     }
 }
-
+        // FUNÇÃO PARA SINCRONIZAR ATRIBUIÇÕES PENDENTES
+        async function syncPendingAtribuicoes() {
+    try {
+        if (!isOnlineMode || !supabaseClient) {
+            showNotification('Não conectado à nuvem.', 'warning');
+            return false;
+        }
+        
+        // Encontrar atribuições pendentes de sincronização
+        const pendingAtribuicoes = historicoAtribuicoes.filter(a => 
+            a.sync_status === 'pending' || a.sync_status === 'failed'
+        );
+        
+        if (pendingAtribuicoes.length === 0) {
+            showNotification('Nenhuma atribuição pendente para sincronizar.', 'info');
+            return true;
+        }
+        
+        console.log(`🔄 Sincronizando ${pendingAtribuicoes.length} atribuições pendentes...`);
+        showNotification(`Sincronizando ${pendingAtribuicoes.length} atribuições...`, 'info');
+        
+        let successCount = 0;
+        let errorCount = 0;
+        
+        for (const atribuicao of pendingAtribuicoes) {
+            try {
+                const success = await saveAtribuicaoToSupabase(atribuicao);
+                if (success) {
+                    successCount++;
+                } else {
+                    errorCount++;
+                }
+            } catch (error) {
+                errorCount++;
+                console.error(`Erro ao sincronizar atribuição ${atribuicao.id}:`, error);
+            }
+        }
+        
+        // Salvar status atualizado
+        await saveColaboradores();
+        
+        if (errorCount === 0) {
+            showNotification(`${successCount} atribuições sincronizadas com sucesso!`, 'success');
+            return true;
+        } else {
+            showNotification(`${successCount} sincronizadas, ${errorCount} com erro.`, 'warning');
+            return false;
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro na sincronização de atribuições pendentes:', error);
+        showNotification('Erro na sincronização.', 'error');
+        return false;
+    }
+}
         // ============================================
         // MÓDULO 3: FUNCIONALIDADES AVANÇADAS
         // ============================================
@@ -10860,8 +11022,7 @@ async function initializeSystem() {
                         localStorage.removeItem('historicoAtribuicoes');
                         
                         // 2. Carrega dados de exemplo
-                        tools = getExampleTools();
-                        colaboradores = getExampleColaboradores();
+                        tools = getExampleTools();                        
                         historicoAtribuicoes = [];
                         
                         // 3. Salva dados
