@@ -3959,7 +3959,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
         <footer class="site-footer">
             <div class="footer-content">
                 <p>Desenvolvido por Fábio Mendes Rodrigues, Planejador da F.W. Company</p>
-                <p class="footer-version">Versão 3.0_rev06c | Última atualização: <span id="currentDate"></span></p>
+                <p class="footer-version">Versão 3.0_rev06d | Última atualização: <span id="currentDate"></span></p>
             </div>
         </footer>
 
@@ -5079,30 +5079,38 @@ async function mergeAtribuicoes(atribuicoesDaNuvem) {
 }
 
 // ============================================
-// SINCRONIZAR TODAS AS ATRIBUIÇÕES PARA SUPABASE
+// FUNÇÃO CORRIGIDA: Sincronizar atribuições do colaborador selecionado
 // ============================================
 
-async function syncAtribuicoesToSupabase() {
+async function syncAtribuicoesColaboradorAtual() {
     try {
-        if (!supabaseClient || !isOnlineMode) {
+        if (!colaboradorSelecionado) {
+            showNotification('Selecione um colaborador primeiro!', 'error');
+            return false;
+        }
+        
+        if (!isOnlineMode || !supabaseClient) {
             showNotification('Não conectado à nuvem.', 'warning');
             return false;
         }
         
-        // Filtrar apenas atribuições ativas (não devolvidas)
-        const atribuicoesAtivas = historicoAtribuicoes.filter(atribuicao => !atribuicao.dataDevolucao);
+        // Filtrar apenas atribuições ativas DO COLABORADOR SELECIONADO
+        const atribuicoesAtivasColaborador = historicoAtribuicoes.filter(atribuicao => 
+            !atribuicao.dataDevolucao && atribuicao.colaboradorId === colaboradorSelecionado.id
+        );
         
-        if (atribuicoesAtivas.length === 0) {
-            showNotification('Nenhuma atribuição ativa para sincronizar.', 'info');
+        if (atribuicoesAtivasColaborador.length === 0) {
+            showNotification('Nenhuma atribuição ativa para este colaborador.', 'info');
             return false;
         }
         
-        console.log(`🔄 Sincronizando ${atribuicoesAtivas.length} atribuições ativas...`);
+        console.log(`🔄 Sincronizando ${atribuicoesAtivasColaborador.length} atribuições do colaborador ${colaboradorSelecionado.nome}...`);
+        showAtribuicoesStatus('info', `🔄 Enviando ${atribuicoesAtivasColaborador.length} atribuições do colaborador ${colaboradorSelecionado.nome}...`);
         
         let successCount = 0;
         let errorCount = 0;
         
-        for (const atribuicao of atribuicoesAtivas) {
+        for (const atribuicao of atribuicoesAtivasColaborador) {
             try {
                 const result = await saveAtribuicaoToSupabase(atribuicao);
                 if (result) successCount++;
@@ -5114,16 +5122,171 @@ async function syncAtribuicoesToSupabase() {
         }
         
         if (errorCount === 0) {
-            showNotification(`${successCount} atribuições sincronizadas com sucesso!`, 'success');
+            showAtribuicoesStatus('success', `✅ ${successCount} atribuições do colaborador ${colaboradorSelecionado.nome} enviadas para a nuvem!`);
+            showNotification(`${successCount} atribuições sincronizadas para ${colaboradorSelecionado.nome}!`, 'success');
             return true;
         } else {
+            showAtribuicoesStatus('warning', `⚠️ ${successCount} enviadas, ${errorCount} com erro`);
             showNotification(`${successCount} sucessos, ${errorCount} erros na sincronização.`, 'warning');
             return false;
         }
         
     } catch (error) {
-        console.error('❌ Erro na sincronização de atribuições:', error);
+        console.error('❌ Erro na sincronização das atribuições:', error);
+        showAtribuicoesStatus('error', `❌ Erro: ${error.message}`);
         showNotification('Erro na sincronização de atribuições.', 'error');
+        return false;
+    }
+}
+// ============================================
+// FUNÇÃO PARA VERIFICAR E EVITAR DUPLICAÇÕES
+// ============================================
+
+async function verificarAtribuicaoExistenteNoSupabase(atribuicao) {
+    try {
+        if (!supabaseClient || !isOnlineMode) return false;
+        
+        // Verificar se já existe uma atribuição ativa com o mesmo tool_id e colaborador_id
+        const { data: existente, error } = await supabaseClient
+            .from('tool_assignments')
+            .select('*')
+            .eq('tool_id', atribuicao.toolId)
+            .eq('collaborator_id', atribuicao.colaboradorId)
+            .eq('status', 'active')
+            .maybeSingle();
+        
+        if (error) {
+            console.error('Erro ao verificar atribuição existente:', error);
+            return false;
+        }
+        
+        return existente ? existente : false;
+    } catch (error) {
+        console.error('Erro na verificação de duplicação:', error);
+        return false;
+    }
+}
+// ============================================
+// FUNÇÃO ATUALIZADA: Salvar atribuição no Supabase (com verificação de duplicação)
+// ============================================
+
+async function saveAtribuicaoToSupabase(atribuicao) {
+    try {
+        if (!supabaseClient || !isOnlineMode) {
+            return false;
+        }
+        
+        // VERIFICAR SE JÁ EXISTE NO SUPABASE
+        const atribuicaoExistente = await verificarAtribuicaoExistenteNoSupabase(atribuicao);
+        
+        if (atribuicaoExistente) {
+            console.log('🔄 Atribuição já existe no Supabase. Atualizando...');
+            
+            // Atualizar atribuição existente
+            const atribuicaoData = {
+                tool_id: atribuicao.toolId,
+                tool_code: atribuicao.toolCodigo,
+                tool_name: atribuicao.toolNome,
+                collaborator_id: atribuicao.colaboradorId,
+                collaborator_registration: atribuicao.colaboradorMatricula,
+                collaborator_name: atribuicao.colaboradorNome,
+                assignment_date: atribuicao.dataAtribuicao,
+                assignment_type: 'collaborator',
+                assigned_to_type: 'colaborador',
+                assigned_to_id: atribuicao.colaboradorId.toString(),
+                assigned_to_name: atribuicao.colaboradorNome,
+                status: atribuicao.dataDevolucao ? 'returned' : 'active',
+                observations: atribuicao.observacao || null,
+                user_assigned: atribuicao.usuarioAtribuicao || currentUser?.name || 'Sistema',
+                user_returned: atribuicao.usuarioDevolucao || null,
+                returned_date: atribuicao.dataDevolucao || null,
+                expected_return_date: null,
+                actual_return_date: atribuicao.dataDevolucao || null,
+                local_id: atribuicao.id,
+                sync_status: 'synced',
+                updated_at: new Date().toISOString()
+            };
+            
+            const { error } = await supabaseClient
+                .from('tool_assignments')
+                .update(atribuicaoData)
+                .eq('id', atribuicaoExistente.id);
+            
+            if (error) throw error;
+            
+            // Atualizar ID local com o ID do Supabase
+            const index = historicoAtribuicoes.findIndex(a => a.id === atribuicao.id);
+            if (index !== -1) {
+                historicoAtribuicoes[index].supabase_id = atribuicaoExistente.id;
+                await saveColaboradores();
+            }
+            
+            console.log('✅ Atribuição atualizada no Supabase:', atribuicaoExistente.id);
+            return true;
+            
+        } else {
+            // Criar nova atribuição (código original)
+            const atribuicaoData = {
+                tool_id: atribuicao.toolId,
+                tool_code: atribuicao.toolCodigo,
+                tool_name: atribuicao.toolNome,
+                collaborator_id: atribuicao.colaboradorId,
+                collaborator_registration: atribuicao.colaboradorMatricula,
+                collaborator_name: atribuicao.colaboradorNome,
+                assignment_date: atribuicao.dataAtribuicao,
+                assignment_type: 'collaborator',
+                assigned_to_type: 'colaborador',
+                assigned_to_id: atribuicao.colaboradorId.toString(),
+                assigned_to_name: atribuicao.colaboradorNome,
+                status: atribuicao.dataDevolucao ? 'returned' : 'active',
+                observations: atribuicao.observacao || null,
+                user_assigned: atribuicao.usuarioAtribuicao || currentUser?.name || 'Sistema',
+                user_returned: atribuicao.usuarioDevolucao || null,
+                returned_date: atribuicao.dataDevolucao || null,
+                expected_return_date: null,
+                actual_return_date: atribuicao.dataDevolucao || null,
+                local_id: atribuicao.id,
+                sync_status: 'synced',
+                created_at: atribuicao.createdAt || new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+            
+            console.log('📤 Inserindo nova atribuição no Supabase:', {
+                tool_code: atribuicaoData.tool_code,
+                collaborator: atribuicaoData.collaborator_name
+            });
+            
+            const { data, error } = await supabaseClient
+                .from('tool_assignments')
+                .insert([atribuicaoData])
+                .select();
+            
+            if (error) throw error;
+            
+            // Salvar o ID do Supabase localmente
+            if (data && data[0]) {
+                const index = historicoAtribuicoes.findIndex(a => a.id === atribuicao.id);
+                if (index !== -1) {
+                    historicoAtribuicoes[index].supabase_id = data[0].id;
+                    await saveColaboradores();
+                }
+            }
+            
+            console.log('✅ Nova atribuição salva na nuvem:', data);
+            return true;
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao salvar atribuição no Supabase:', error);
+        console.error('Detalhes:', error.message);
+        
+        // Marcar como não sincronizada
+        const index = historicoAtribuicoes.findIndex(a => a.id === atribuicao.id);
+        if (index !== -1) {
+            historicoAtribuicoes[index].sync_status = 'failed';
+            await saveColaboradores();
+        }
+        
         return false;
     }
 }
