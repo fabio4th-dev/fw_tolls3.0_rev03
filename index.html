@@ -3927,7 +3927,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
         <footer class="site-footer">
             <div class="footer-content">
                 <p>Desenvolvido por Fábio Mendes Rodrigues, Planejador da F.W. Company</p>
-                <p class="footer-version">Versão 3.0_rev05 | Última atualização: <span id="currentDate"></span></p>
+                <p class="footer-version">Versão 3.0_rev06 | Última atualização: <span id="currentDate"></span></p>
             </div>
         </footer>
 
@@ -7319,42 +7319,48 @@ toolsData.forEach((tool, index) => {
 
         // Criar linha da tabela de colaboradores
         function createColaboradorTableRow(colaborador) {
-            const ferramentasCount = colaborador.ferramentasAtribuidas ? colaborador.ferramentasAtribuidas.length : 0;
-            const statusClass = ferramentasCount > 0 ? 'status-ontrack' : 'status-completed';
-            const statusText = ferramentasCount > 0 ? `${ferramentasCount} ferramentas` : 'Sem ferramentas';
-            
-            // Verificar permissões para ações
-            const canEdit = currentUser.role !== 'user';
-            
-            return `
-                <td><strong>${colaborador.nome}</strong></td>
-                <td>${colaborador.matricula}</td>
-                <td>${colaborador.setor || '-'}</td>
-                <td>${colaborador.cargo || '-'}</td>
-                <td>${colaborador.telefone || '-'}</td>
-                <td>${colaborador.email || '-'}</td>
-                <td>${ferramentasCount}</td>
-                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                <td>
-                    <div class="action-buttons">
-                        <button class="action-btn action-btn-view" data-id="${colaborador.id}" title="Visualizar ferramentas">
-                            <i class="fas fa-tools"></i>
-                        </button>
-                        <button class="action-btn action-btn-view" data-id="${colaborador.id}" title="Selecionar para atribuição">
-                            <i class="fas fa-user-check"></i>
-                        </button>
-                        ${canEdit ? `
-                            <button class="action-btn action-btn-edit" data-id="${colaborador.id}" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn action-btn-delete" data-id="${colaborador.id}" title="Excluir">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        ` : ''}
-                    </div>
-                </td>
-            `;
-        }
+    // CONTAGEM CORRIGIDA: Buscar ferramentas ativas no histórico
+    const ferramentasAtivas = historicoAtribuicoes.filter(atribuicao => 
+        atribuicao.colaboradorId === colaborador.id && 
+        !atribuicao.dataDevolucao
+    );
+    
+    const ferramentasCount = ferramentasAtivas.length;
+    const statusClass = ferramentasCount > 0 ? 'status-ontrack' : 'status-completed';
+    const statusText = ferramentasCount > 0 ? `${ferramentasCount} ferramentas` : 'Sem ferramentas';
+    
+    // Verificar permissões para ações
+    const canEdit = currentUser.role !== 'user';
+    
+    return `
+        <td><strong>${colaborador.nome}</strong></td>
+        <td>${colaborador.matricula}</td>
+        <td>${colaborador.setor || '-'}</td>
+        <td>${colaborador.cargo || '-'}</td>
+        <td>${colaborador.telefone || '-'}</td>
+        <td>${colaborador.email || '-'}</td>
+        <td><strong>${ferramentasCount}</strong></td>
+        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+        <td>
+            <div class="action-buttons">
+                <button class="action-btn action-btn-view" data-id="${colaborador.id}" title="Visualizar ferramentas">
+                    <i class="fas fa-tools"></i>
+                </button>
+                <button class="action-btn action-btn-view" data-id="${colaborador.id}" title="Selecionar para atribuição">
+                    <i class="fas fa-user-check"></i>
+                </button>
+                ${canEdit ? `
+                    <button class="action-btn action-btn-edit" data-id="${colaborador.id}" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn action-btn-delete" data-id="${colaborador.id}" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                ` : ''}
+            </div>
+        </td>
+    `;
+}
 
         // Adicionar event listeners às linhas de colaboradores
         function addColaboradorRowEventListeners() {
@@ -7813,17 +7819,53 @@ async function atribuirFerramenta() {
         
         showNotification(mensagem, cloudSaved ? 'success' : 'warning');
         
-    } catch (error) {
+        } catch (error) {
         console.error('Erro ao atribuir ferramenta:', error);
         showNotification('Erro ao atribuir ferramenta.', 'error');
+        }
     }
-}
         // FUNÇÃO PARA SINCRONIZAR ATRIBUIÇÕES PENDENTES
         async function syncPendingAtribuicoes() {
-    try {
-        if (!isOnlineMode || !supabaseClient) {
+            try {
+            if (!isOnlineMode || !supabaseClient) {
             showNotification('Não conectado à nuvem.', 'warning');
             return false;
+        }
+        
+        // Função para sincronizar ferramentasAtribuidas com o histórico
+        function syncFerramentasAtribuidas(colaboradorId) {
+            const colaborador = colaboradores.find(c => c.id === colaboradorId);
+            if (!colaborador) return;
+
+        // Buscar todas as atribuições ativas deste colaborador
+        const ferramentasAtivas = historicoAtribuicoes.filter(atribuicao => 
+            atribuicao.colaboradorId === colaboradorId && 
+            !atribuicao.dataDevolucao
+        );
+    
+        // Atualizar array de ferramentasAtribuidas
+        colaborador.ferramentasAtribuidas = ferramentasAtivas.map(atribuicao => atribuicao.toolId);
+    
+        return colaborador.ferramentasAtribuidas.length;
+        }
+
+        // Atualizar a função de atribuição para chamar a sincronização:
+        async function atribuirFerramenta() {
+    
+            // Depois de atribuir com sucesso, adicione:
+        syncFerramentasAtribuidas(colaboradorSelecionado.id);
+        await saveColaboradores();
+            
+        }
+
+        // Atualizar a função de devolução:
+        async function devolverFerramenta(colaboradorId, toolId) {
+
+            // Depois de devolver com sucesso, adicione:
+            syncFerramentasAtribuidas(colaboradorId);
+            await saveColaboradores();
+
+
         }
         
         // Encontrar atribuições pendentes de sincronização
@@ -7867,12 +7909,12 @@ async function atribuirFerramenta() {
             return false;
         }
         
-    } catch (error) {
-        console.error('❌ Erro na sincronização de atribuições pendentes:', error);
-        showNotification('Erro na sincronização.', 'error');
-        return false;
+        } catch (error) {
+            console.error('❌ Erro na sincronização de atribuições pendentes:', error);
+            showNotification('Erro na sincronização.', 'error');
+            return false;
+        }
     }
-}
         // ============================================
         // MÓDULO 3: FUNCIONALIDADES AVANÇADAS
         // ============================================
