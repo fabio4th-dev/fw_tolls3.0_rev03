@@ -2689,6 +2689,38 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
         flex-direction: column;
     }
 }
+/* ===== ESTILOS PARA ATRIBUIÇÃO ===== */
+
+/* Estilo para a coluna "Atribuída a:" */
+.colaborador-atribuicao {
+    font-weight: 500;
+    color: var(--primary-color);
+    padding: 4px 8px;
+    background-color: rgba(52, 152, 219, 0.1);
+    border-radius: 4px;
+    border-left: 3px solid var(--primary-color);
+    display: inline-block;
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: help;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+/* Hover effect */
+.colaborador-atribuicao:hover {
+    background-color: rgba(52, 152, 219, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Linha destacada para ferramentas atribuídas */
+.tool-atribuida {
+    background-color: rgba(243, 156, 18, 0.03) !important;
+    border-left: 4px solid var(--warning-color);
+}
         </style>
     </head>
 <body>
@@ -3186,7 +3218,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
                                     <th>Localização</th>
                                     <th>Condição</th>
                                     <th>Unidade</th>
-                                    <th>Estoque</th>                                    
+                                    <th>Atribuída a:</th>                                    
                                     <th>Data Cad.</th>
                                     <th>Usuário Cad.</th>
                                     <th>Ações</th>
@@ -3958,7 +3990,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
         <footer class="site-footer">
             <div class="footer-content">
                 <p>Desenvolvido por Fábio Mendes Rodrigues, Planejador da F.W. Company</p>
-                <p class="footer-version">Versão 3.0_rev06f | Última atualização: <span id="currentDate"></span></p>
+                <p class="footer-version">Versão 3.0_rev07 | Última atualização: <span id="currentDate"></span></p>
             </div>
         </footer>
 
@@ -4004,7 +4036,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
             },
             'raquel@fwcompany.com.br': {
                 password: 'RaqueL1234',
-                role: 'user',
+                role: 'dev',
                 name: 'Raquel',
                 email: 'raquel@fwcompany.com.br'
             }
@@ -5563,18 +5595,18 @@ function editColaborador(colaboradorId) {
         // ============================================
 
         // ============================================
-// FUNÇÃO AUXILIAR: Verificar se ferramenta está atribuída e disponível
-// ============================================
+        // FUNÇÃO AUXILIAR: Verificar se ferramenta está atribuída e disponível
+        // ============================================
 
-function isToolAssigned(toolId) {
-    // Verificar no histórico de atribuições se há alguma atribuição ativa
-    const atribuicaoAtiva = historicoAtribuicoes.find(atribuicao => 
-        atribuicao.toolId === toolId && 
-        !atribuicao.dataDevolucao
-    );
+        function isToolAssigned(toolId) {
+            // Verificar no histórico de atribuições se há alguma atribuição ativa
+            const atribuicaoAtiva = historicoAtribuicoes.find(atribuicao => 
+                atribuicao.toolId === toolId && 
+                !atribuicao.dataDevolucao
+            );
     
-    return atribuicaoAtiva ? true : false;
-}
+            return atribuicaoAtiva ? true : false;
+        }
 
 // Função para verificar se ferramenta está disponível para atribuição
 function isToolAvailableForAssignment(toolId) {
@@ -10814,165 +10846,193 @@ async function initializeSystem() {
 
         // Carregar lista de itens com filtro por status
         function loadToolsList(statusFilter = 'all') {
-            currentStatusFilter = statusFilter;
-            const tbody = document.getElementById('toolsTableBody');
-            const noToolsRow = document.getElementById('noToolsRow');
-            
-            tbody.innerHTML = '';
-            tbody.appendChild(noToolsRow);
-            
-            let filteredTools = tools;
-            
-            // Aplicar filtro de status (CORRIGIDO)
-                if (statusFilter !== 'all') {
-                    filteredTools = tools.filter(tool => {
-                    // Verificar se a ferramenta está atribuída
-                    const estaAtribuida = isToolAssigned(tool.id);
-        
-                if (statusFilter === 'Em Uso') {
-            // Para filtro "Em Uso", mostrar tanto ferramentas com status "Em Uso"
-            // QUANTO ferramentas atribuídas (mesmo se status for "Disponível")
+    currentStatusFilter = statusFilter;
+    const tbody = document.getElementById('toolsTableBody');
+    const noToolsRow = document.getElementById('noToolsRow');
+    
+    tbody.innerHTML = '';
+    tbody.appendChild(noToolsRow);
+    
+    let filteredTools = tools; // Começa com todas as ferramentas
+    
+    // Aplicar filtro de status (ATUALIZADO)
+    if (statusFilter !== 'all') {
+        filteredTools = tools.filter(tool => {
+            // Verificar se a ferramenta está atribuída
+            const estaAtribuida = isToolAssigned(tool.id);
+
+            if (statusFilter === 'Em Uso') {
+                // Para filtro "Em Uso", mostrar tanto ferramentas com status "Em Uso"
+                // QUANTO ferramentas atribuídas (mesmo se status for "Disponível")
                 return tool.status === 'Em Uso' || estaAtribuida;
-               } else {
-            // Para outros filtros, usar apenas o status
+            } else if (statusFilter === 'Disponível') {
+                // Para filtro "Disponível", mostrar apenas ferramentas NÃO atribuídas
+                // e com status "Disponível"
+                return tool.status === 'Disponível' && !estaAtribuida;
+            } else {
+                // Para outros filtros (Manutenção, Danificado, etc), usar apenas o status
                 return tool.status === statusFilter;
-               }
-            });
-        }
-            
-            // Aplicar filtro de estoque baixo
-            const lowStockBtn = document.getElementById('filterLowStockBtn');
-            const isLowStockFilter = lowStockBtn.classList.contains('active');
-            
-            if (isLowStockFilter) {
-                filteredTools = filteredTools.filter(tool => {
-                    const quantidade = parseInt(tool.quantidade) || 0;
-                    const estoqueMinimo = parseInt(tool.estoqueMinimo) || 0;
-                    return estoqueMinimo > 0 && quantidade <= estoqueMinimo;
-                });
             }
-            
-            const searchTerm = document.getElementById('searchTool')?.value.toLowerCase();
-            if (searchTerm) {
-                filteredTools = filteredTools.filter(tool => 
-                    tool.name.toLowerCase().includes(searchTerm) ||
-                    tool.code.toLowerCase().includes(searchTerm) ||
-                    (tool.patrimonio && tool.patrimonio.toLowerCase().includes(searchTerm)) ||
-                    tool.category.toLowerCase().includes(searchTerm) ||
-                    (tool.usuarioCadastro && tool.usuarioCadastro.toLowerCase().includes(searchTerm))
-                );
-            }
-            
-            if (filteredTools.length === 0) {
-                noToolsRow.style.display = 'table-row';
-                noToolsRow.innerHTML = `<td colspan="14" style="text-align: center; padding: 40px; color: var(--gray-color);">
-                    Nenhum item encontrado${searchTerm ? ' para "' + searchTerm + '"' : ''}
-                </td>`;
-                return;
-            }
-            
-            noToolsRow.style.display = 'none';
-            
-            filteredTools.forEach(tool => {
-                const row = document.createElement('tr');
-                row.innerHTML = createTableRow(tool);
-                tbody.appendChild(row);
-            });
-            
-            addRowEventListeners();
-        }
+        });
+    }
+    // Se statusFilter === 'all', mostra TUDO (incluindo atribuídos)
+    
+    // Aplicar filtro de estoque baixo
+    const lowStockBtn = document.getElementById('filterLowStockBtn');
+    const isLowStockFilter = lowStockBtn.classList.contains('active');
+    
+    if (isLowStockFilter) {
+        filteredTools = filteredTools.filter(tool => {
+            const quantidade = parseInt(tool.quantidade) || 0;
+            const estoqueMinimo = parseInt(tool.estoqueMinimo) || 0;
+            return estoqueMinimo > 0 && quantidade <= estoqueMinimo;
+        });
+    }
+    
+    const searchTerm = document.getElementById('searchTool')?.value.toLowerCase();
+    if (searchTerm) {
+        filteredTools = filteredTools.filter(tool => 
+            tool.name.toLowerCase().includes(searchTerm) ||
+            tool.code.toLowerCase().includes(searchTerm) ||
+            (tool.patrimonio && tool.patrimonio.toLowerCase().includes(searchTerm)) ||
+            tool.category.toLowerCase().includes(searchTerm) ||
+            (tool.usuarioCadastro && tool.usuarioCadastro.toLowerCase().includes(searchTerm))
+        );
+    }
+    
+    if (filteredTools.length === 0) {
+        noToolsRow.style.display = 'table-row';
+        noToolsRow.innerHTML = `<td colspan="13" style="text-align: center; padding: 40px; color: var(--gray-color);">
+            Nenhum item encontrado${searchTerm ? ' para "' + searchTerm + '"' : ''}
+        </td>`;
+        return;
+    }
+    
+    noToolsRow.style.display = 'none';
+    
+    filteredTools.forEach(tool => {
+        const row = document.createElement('tr');
+        row.innerHTML = createTableRow(tool);
+        tbody.appendChild(row);
+    });
+    
+    addRowEventListeners();
+}
 
            function createTableRow(tool) {
-        // VERIFICAR SE A FERRAMENTA ESTÁ ATRIBUÍDA
-            const estaAtribuida = isToolAssigned(tool.id);
+    // BUSCAR ATRIBUIÇÃO ATIVA PARA ESTA FERRAMENTA
+    const atribuicaoAtiva = historicoAtribuicoes.find(atribuicao => 
+        atribuicao.toolId === tool.id && 
+        !atribuicao.dataDevolucao
+    );
     
-        // Se estiver atribuída, mostrar "Em Uso" mesmo se estiver marcada como "Disponível"
-            const statusParaExibir = estaAtribuida ? 'Em Uso' : tool.status;
-            const statusClass = getStatusClass(statusParaExibir);
-            const stockInfo = getStockInfo(tool);
+    const estaAtribuida = !!atribuicaoAtiva;
     
-        // Verificar permissões para ações
-            const canEdit = currentUser.role !== 'user';
+    // Se estiver atribuída, mostrar "Em Uso" mesmo se estiver marcada como "Disponível"
+    const statusParaExibir = estaAtribuida ? 'Em Uso' : tool.status;
+    const statusClass = getStatusClass(statusParaExibir);
     
-        // Gerar HTML para a miniatura da imagem
-            let imageHTML = '';
-            if (tool.image) {
-            imageHTML = `
-                <div class="tool-thumbnail-container" style="position: relative; display: inline-block;">
-                    <img src="${tool.image}" 
-                         alt="${tool.name}" 
-                         class="tool-thumbnail" 
-                         data-id="${tool.id}"
-                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 2px solid #ddd; cursor: zoom-in;"
-                         title="Clique para ampliar">
-                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
-                               background: rgba(0,0,0,0.2); border-radius: 6px; opacity: 0; 
-                               transition: opacity 0.3s; pointer-events: none;">
-                        <i class="fas fa-search-plus" style="position: absolute; top: 50%; left: 50%; 
-                           transform: translate(-50%, -50%); color: white; font-size: 14px;"></i>
-                    </div>
-                </div>
-            `;
-        } else {
-            imageHTML = `
-                <div class="no-image-placeholder" data-id="${tool.id}" 
-                     style="width: 50px; height: 50px; background: #f5f5f5; border-radius: 6px; 
-                            display: flex; align-items: center; justify-content: center; 
-                            border: 2px solid #ddd; cursor: pointer;" 
-                     title="Sem imagem - Clique para ver detalhes">
-                    <i class="fas fa-image" style="color: #ccc; font-size: 20px;"></i>
-                </div>
-            `;
-        }
-        
-        return `
-                <td style="text-align: center; vertical-align: middle; padding: 8px;">
-                    ${imageHTML}
-                </td>
-                <td><strong>${tool.code}</strong></td>
-                <td>${tool.name}</td>
-                <td>${tool.patrimonio || '-'}</td>
-                <td>${tool.category}</td>
-                <td><span class="status-badge ${statusClass}">${statusParaExibir}</span></td>
-                <td>${tool.location}</td>
-                <td>${tool.condition}</td>
-                <td>${tool.unidade || 'UN'}</td>
-                <td class="${stockInfo.class}">${stockInfo.text}</td>
-                <td>${formatDate(tool.dataCadastro)}</td>
-                <td>${tool.usuarioCadastro || '-'}</td>
-                <td>
-                    <div class="action-buttons">
-                        <button class="action-btn action-btn-view" data-id="${tool.id}" title="Visualizar">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        ${canEdit ? `
-                           <button class="action-btn action-btn-edit" data-id="${tool.id}" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn action-btn-delete" data-id="${tool.id}" title="Excluir">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        ` : ''}
-                        <button class="action-btn action-btn-view" data-id="${tool.id}" title="Gerar QR Code" style="color: #8e44ad;">
-                            <i class="fas fa-qrcode"></i>
-                        </button>
-                    </div>
-                </td>
-            `;
-        }
+    // Gerar informação da atribuição
+    let atribuicaoHTML = '';
+    if (atribuicaoAtiva) {
+        atribuicaoHTML = `
+            <span class="colaborador-atribuicao" 
+                  title="Matrícula: ${atribuicaoAtiva.colaboradorMatricula} | Data: ${formatDate(atribuicaoAtiva.dataAtribuicao)}${atribuicaoAtiva.observacao ? ' | Obs: ' + atribuicaoAtiva.observacao : ''}">
+                ${atribuicaoAtiva.colaboradorNome}
+            </span>
+        `;
+    } else {
+        atribuicaoHTML = '<span style="color: var(--gray-color); font-style: italic;">Disponível</span>';
+    }
 
-        function getStatusClass(status) {
-            switch(status) {
-                case 'Disponível': return 'status-completed';
-                case 'Em Uso': return 'status-ontrack';
-                case 'Manutenção': return 'status-delayed';
-                case 'Danificado': return 'status-delayed';
-                case 'Reservado': return 'status-delayed';
-                case 'Descartado': return 'status-delayed';
-                default: return 'status-ontrack';
-            }
-        }
+    // Verificar permissões para ações
+    const canEdit = currentUser.role !== 'user';
 
+    // Gerar HTML para a miniatura da imagem
+    let imageHTML = '';
+    if (tool.image) {
+        imageHTML = `
+            <div class="tool-thumbnail-container" style="position: relative; display: inline-block;">
+                <img src="${tool.image}" 
+                     alt="${tool.name}" 
+                     class="tool-thumbnail" 
+                     data-id="${tool.id}"
+                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 2px solid #ddd; cursor: zoom-in;"
+                     title="Clique para ampliar">
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+                           background: rgba(0,0,0,0.2); border-radius: 6px; opacity: 0; 
+                           transition: opacity 0.3s; pointer-events: none;">
+                    <i class="fas fa-search-plus" style="position: absolute; top: 50%; left: 50%; 
+                       transform: translate(-50%, -50%); color: white; font-size: 14px;"></i>
+                </div>
+            </div>
+        `;
+    } else {
+        imageHTML = `
+            <div class="no-image-placeholder" data-id="${tool.id}" 
+                 style="width: 50px; height: 50px; background: #f5f5f5; border-radius: 6px; 
+                        display: flex; align-items: center; justify-content: center; 
+                        border: 2px solid #ddd; cursor: pointer;" 
+                 title="Sem imagem - Clique para ver detalhes">
+                <i class="fas fa-image" style="color: #ccc; font-size: 20px;"></i>
+            </div>
+        `;
+    }
+    
+    return `
+        <tr ${estaAtribuida ? 'class="tool-atribuida"' : ''}>
+            <td style="text-align: center; vertical-align: middle; padding: 8px;">
+                ${imageHTML}
+            </td>
+            <td><strong>${tool.code}</strong></td>
+            <td>${tool.name}</td>
+            <td>${tool.patrimonio || '-'}</td>
+            <td>${tool.category}</td>
+            <td><span class="status-badge ${statusClass}">${statusParaExibir}</span></td>
+            <td>${tool.location}</td>
+            <td>${tool.condition}</td>
+            <td>${tool.unidade || 'UN'}</td>
+            <!-- COLUNA ATUALIZADA: "Atribuída a:" -->
+            <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                ${atribuicaoHTML}
+            </td>
+            <td>${formatDate(tool.dataCadastro)}</td>
+            <td>${tool.usuarioCadastro || '-'}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="action-btn action-btn-view" data-id="${tool.id}" title="Visualizar">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    ${canEdit ? `
+                       <button class="action-btn action-btn-edit" data-id="${tool.id}" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn action-btn-delete" data-id="${tool.id}" title="Excluir">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    ` : ''}
+                    <button class="action-btn action-btn-view" data-id="${tool.id}" title="Gerar QR Code" style="color: #8e44ad;">
+                        <i class="fas fa-qrcode"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+}
+
+        // Adicione esta função se não existir:
+            function getStatusClass(status) {
+            const statusClasses = {
+                'Disponível': 'status-completed',
+                'Em Uso': 'status-ontrack',
+                'Manutenção': 'status-delayed',
+                'Danificado': 'status-cancelled',
+                'Reservado': 'status-warning',
+               'Descartado': 'status-cancelled'
+            };
+            return statusClasses[status] || 'status-completed';
+        }
+        /*
         function getStockInfo(tool) {
             const quantidade = parseInt(tool.quantidade) || 0;
             const estoqueMinimo = parseInt(tool.estoqueMinimo) || 0;
@@ -10985,7 +11045,7 @@ async function initializeSystem() {
                 return { class: 'stock-normal', text: quantidade };
             }
         }
-
+        */
         // ============================================
         // FUNÇÕES DE VISUALIZAÇÃO E EDIÇÃO
         // ============================================
