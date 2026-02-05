@@ -3186,8 +3186,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
                                     <th>Localização</th>
                                     <th>Condição</th>
                                     <th>Unidade</th>
-                                    <th>Estoque</th>
-                                    <th>Preço (R$)</th>
+                                    <th>Estoque</th>                                    
                                     <th>Data Cad.</th>
                                     <th>Usuário Cad.</th>
                                     <th>Ações</th>
@@ -3959,7 +3958,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
         <footer class="site-footer">
             <div class="footer-content">
                 <p>Desenvolvido por Fábio Mendes Rodrigues, Planejador da F.W. Company</p>
-                <p class="footer-version">Versão 3.0_rev06d | Última atualização: <span id="currentDate"></span></p>
+                <p class="footer-version">Versão 3.0_rev06e | Última atualização: <span id="currentDate"></span></p>
             </div>
         </footer>
 
@@ -4415,6 +4414,60 @@ function convertAtribuicaoToSupabaseFormat(atribuicao) {
         created_at: atribuicao.createdAt || new Date().toISOString(),
         updated_at: new Date().toISOString()
     };
+}
+// ============================================
+// FUNÇÃO PARA SINCRONIZAR ATRIBUIÇÕES PARA O SUPABASE
+// ============================================
+
+async function syncAtribuicoesToSupabase() {
+    try {
+        if (!isOnlineMode || !supabaseClient) {
+            showAtribuicoesStatus('error', '❌ Não conectado à nuvem');
+            return false;
+        }
+        
+        const atribuicoesAtivas = historicoAtribuicoes.filter(atribuicao => 
+            !atribuicao.dataDevolucao
+        );
+        
+        if (atribuicoesAtivas.length === 0) {
+            showAtribuicoesStatus('warning', '⚠️ Nenhuma atribuição ativa para enviar');
+            return false;
+        }
+        
+        console.log(`🔄 Sincronizando ${atribuicoesAtivas.length} atribuições para a nuvem...`);
+        showAtribuicoesStatus('info', `🔄 Enviando ${atribuicoesAtivas.length} atribuições para a nuvem...`);
+        
+        let successCount = 0;
+        let errorCount = 0;
+        
+        for (const atribuicao of atribuicoesAtivas) {
+            try {
+                const result = await saveAtribuicaoToSupabase(atribuicao);
+                if (result) successCount++;
+                else errorCount++;
+            } catch (error) {
+                errorCount++;
+                console.error(`Erro ao sincronizar atribuição ${atribuicao.id}:`, error);
+            }
+        }
+        
+        if (errorCount === 0) {
+            showAtribuicoesStatus('success', `✅ ${successCount} atribuições enviadas para a nuvem!`);
+            showNotification(`${successCount} atribuições sincronizadas!`, 'success');
+            return true;
+        } else {
+            showAtribuicoesStatus('warning', `⚠️ ${successCount} enviadas, ${errorCount} com erro`);
+            showNotification(`${successCount} sucessos, ${errorCount} erros na sincronização.`, 'warning');
+            return false;
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro na sincronização das atribuições:', error);
+        showAtribuicoesStatus('error', `❌ Erro: ${error.message}`);
+        showNotification('Erro na sincronização de atribuições.', 'error');
+        return false;
+    }
 }
 // ============================================
 // FUNÇÕES DE SINCRONIZAÇÃO DE COLABORADORES
@@ -8304,52 +8357,222 @@ async function checkAtribuicoesStatus() {
             document.getElementById('dataAtribuicao').value = new Date().toISOString().split('T')[0];
         }
 
-        // Carregar ferramentas disponíveis para atribuição (CORRIGIDA)
-           function loadFerramentasDisponiveis() {
-            const select = document.getElementById('ferramentaParaAtribuir');
-            select.innerHTML = '<option value="">Selecione uma ferramenta</option>';
+        // ============================================
+// ATUALIZADA: Função para carregar ferramentas disponíveis para atribuição COM PESQUISA
+// ============================================
+
+function loadFerramentasDisponiveis() {
+    // Encontre o container do seletor (provavelmente um div com id específico)
+    // Se não existir, criamos um novo container
     
-           if (!colaboradorSelecionado) return;
+    // Primeiro, tente encontrar o container existente
+    let container = document.getElementById('ferramentaParaAtribuirContainer');
     
-        // Identificar quais ferramentas já estão atribuídas a QUALQUER colaborador
-            const todasFerramentasAtribuidas = [];
+    // Se não existir, criamos um container dinâmico
+    if (!container) {
+        // Encontre o elemento pai do select atual
+        const selectOriginal = document.getElementById('ferramentaParaAtribuir');
+        if (!selectOriginal) return;
+        
+        const parentDiv = selectOriginal.parentNode;
+        
+        // Criar novo container
+        container = document.createElement('div');
+        container.id = 'ferramentaParaAtribuirContainer';
+        container.style.cssText = `
+            margin-bottom: 15px;
+        `;
+        
+        // Substituir o select original pelo novo container
+        parentDiv.replaceChild(container, selectOriginal);
+    } else {
+        // Limpar container existente
+        container.innerHTML = '';
+    }
     
-        colaboradores.forEach(colaborador => {
+    if (!colaboradorSelecionado) {
+        container.innerHTML = '<p class="text-muted">Selecione um colaborador primeiro</p>';
+        return;
+    }
+    
+    // 1. Adicionar campo de pesquisa
+    const searchDiv = document.createElement('div');
+    searchDiv.style.cssText = `
+        margin-bottom: 10px;
+        position: relative;
+    `;
+    
+    searchDiv.innerHTML = `
+        <div class="form-group">
+            <label for="searchFerramentaAtribuicao" style="font-size: 14px; font-weight: 500;">
+                <i class="fas fa-search"></i> Pesquisar ferramenta:
+            </label>
+            <div style="position: relative;">
+                <input type="text" 
+                       id="searchFerramentaAtribuicao" 
+                       class="form-control" 
+                       placeholder="Digite código, nome ou categoria..."
+                       style="padding-left: 35px; border-radius: 6px;">
+                <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #999;"></i>
+            </div>
+            <div style="font-size: 12px; color: var(--gray-color); margin-top: 5px;">
+                <i class="fas fa-info-circle"></i> Digite para filtrar a lista abaixo
+            </div>
+        </div>
+    `;
+    
+    // 2. Adicionar select com scroll
+    const selectWrapper = document.createElement('div');
+    selectWrapper.style.cssText = `
+        max-height: 250px;
+        overflow-y: auto;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background: white;
+    `;
+    
+    const select = document.createElement('select');
+    select.id = 'ferramentaParaAtribuir';
+    select.className = 'form-control';
+    select.style.cssText = `
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+    `;
+    select.innerHTML = '<option value="">Selecione uma ferramenta</option>';
+    
+    // 3. Identificar ferramentas disponíveis
+    const todasFerramentasAtribuidas = [];
+    
+    colaboradores.forEach(colaborador => {
         if (colaborador.ferramentasAtribuidas && colaborador.ferramentasAtribuidas.length > 0) {
             todasFerramentasAtribuidas.push(...colaborador.ferramentasAtribuidas);
         }
     });
     
-        // Filtrar ferramentas:
-            // 1. Que estão disponíveis OU em uso (porque se já está em uso, significa que está com alguém)
-        // 2. E que NÃO estão atribuídas a nenhum colaborador atualmente
-        tools
-        .filter(tool => {
-            // Verificar se a ferramenta NÃO está na lista de ferramentas atribuídas
-            const naoAtribuida = !todasFerramentasAtribuidas.includes(tool.id);
-            
-            // Verificar se está disponível ou reservada (não em uso)
-            const statusValido = tool.status === 'Disponível' || tool.status === 'Reservado';
-            
-            return naoAtribuida && statusValido;
-        })
-        .forEach(tool => {
-            const option = document.createElement('option');
-            option.value = tool.id;
-            option.textContent = `${tool.code} - ${tool.name} (${tool.category}) | ${tool.status}`;
-            select.appendChild(option);
-        });
+    // Filtrar ferramentas disponíveis
+    const ferramentasDisponiveis = tools.filter(tool => {
+        const naoAtribuida = !todasFerramentasAtribuidas.includes(tool.id);
+        const statusValido = tool.status === 'Disponível' || tool.status === 'Reservado';
+        return naoAtribuida && statusValido;
+    });
     
-        // Se não houver ferramentas disponíveis
-        if (select.options.length === 1) {
+    // Armazenar para uso no filtro
+    window.ferramentasDisponiveisAtribuicao = ferramentasDisponiveis;
+    
+    // 4. Adicionar opções ao select
+    ferramentasDisponiveis.forEach(tool => {
+        const option = document.createElement('option');
+        option.value = tool.id;
+        option.textContent = `${tool.code} - ${tool.name} (${tool.category}) | ${tool.status}`;
+        option.setAttribute('data-search', `${tool.code} ${tool.name} ${tool.category} ${tool.status}`.toLowerCase());
+        select.appendChild(option);
+    });
+    
+    // 5. Se não houver ferramentas disponíveis
+    if (ferramentasDisponiveis.length === 0) {
         const option = document.createElement('option');
         option.value = "";
         option.textContent = "Nenhuma ferramenta disponível para atribuição";
         option.disabled = true;
         option.selected = true;
         select.appendChild(option);
-        }
+        select.disabled = true;
     }
+    
+    selectWrapper.appendChild(select);
+    
+    // 6. Adicionar contador
+    const counterDiv = document.createElement('div');
+    counterDiv.id = 'ferramentaContador';
+    counterDiv.style.cssText = `
+        font-size: 12px;
+        color: var(--gray-color);
+        margin-top: 8px;
+        text-align: right;
+        padding: 0 5px;
+    `;
+    counterDiv.textContent = `${ferramentasDisponiveis.length} ferramentas disponíveis`;
+    
+    // 7. Montar o container
+    container.appendChild(searchDiv);
+    container.appendChild(selectWrapper);
+    container.appendChild(counterDiv);
+    
+    // 8. Adicionar event listeners
+    setTimeout(() => {
+        const searchInput = document.getElementById('searchFerramentaAtribuicao');
+        if (searchInput) {
+            searchInput.addEventListener('input', filterFerramentasAtribuicao);
+            
+            // Evento para seleção rápida com Enter
+            searchInput.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    const visibleOptions = Array.from(select.querySelectorAll('option:not([style*="display: none"])')).filter(opt => opt.value);
+                    if (visibleOptions.length === 1) {
+                        select.value = visibleOptions[0].value;
+                        const toolName = visibleOptions[0].textContent.split(' - ')[1]?.split(' (')[0] || 'Ferramenta';
+                        showNotification(`Selecionado: ${toolName}`, 'info');
+                    }
+                }
+            });
+        }
+    }, 100);
+}
+
+// ============================================
+// Função para filtrar ferramentas na atribuição
+// ============================================
+
+function filterFerramentasAtribuicao() {
+    const searchInput = document.getElementById('searchFerramentaAtribuicao');
+    const select = document.getElementById('ferramentaParaAtribuir');
+    const counter = document.getElementById('ferramentaContador');
+    
+    if (!searchInput || !select || !counter) return;
+    
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    const options = select.querySelectorAll('option');
+    
+    let visibleCount = 0;
+    
+    options.forEach(option => {
+        if (option.value === "") {
+            // Manter a opção padrão visível
+            option.style.display = 'block';
+            return;
+        }
+        
+        const searchData = option.getAttribute('data-search') || '';
+        
+        if (searchTerm === '' || searchData.includes(searchTerm)) {
+            option.style.display = 'block';
+            if (option.value) visibleCount++;
+        } else {
+            option.style.display = 'none';
+        }
+    });
+    
+    // Atualizar contador
+    if (searchTerm === '') {
+        counter.textContent = `${window.ferramentasDisponiveisAtribuicao?.length || 0} ferramentas disponíveis`;
+        counter.style.color = 'var(--gray-color)';
+    } else {
+        counter.textContent = `${visibleCount} ferramentas encontradas para "${searchTerm}"`;
+        counter.style.color = visibleCount > 0 ? 'var(--success-color)' : 'var(--danger-color)';
+    }
+    
+    // Selecionar automaticamente se houver apenas uma opção visível
+    const visibleOptions = Array.from(options).filter(opt => 
+        opt.style.display !== 'none' && opt.value
+    );
+    
+    if (visibleOptions.length === 1 && searchTerm !== '') {
+        select.value = visibleOptions[0].value;
+    } else if (visibleOptions.length === 0 && searchTerm !== '') {
+        select.value = "";
+    }
+}
 
 // ============================================
 // ATUALIZADA: Atribuir ferramenta ao colaborador
@@ -10675,7 +10898,6 @@ async function initializeSystem() {
                 <td>${tool.condition}</td>
                 <td>${tool.unidade || 'UN'}</td>
                 <td class="${stockInfo.class}">${stockInfo.text}</td>
-                <td>${tool.preco ? formatCurrency(tool.preco) : '-'}</td>
                 <td>${formatDate(tool.dataCadastro)}</td>
                 <td>${tool.usuarioCadastro || '-'}</td>
                 <td>
@@ -11656,10 +11878,24 @@ async function initializeSystem() {
             });
             
             document.getElementById('atribuirFerramentaBtn').addEventListener('click', atribuirFerramenta);
+           // Encontre onde está o event listener do botão limpar e atualize:
             document.getElementById('limparAtribuicaoBtn').addEventListener('click', function() {
-                document.getElementById('ferramentaParaAtribuir').value = '';
+                const select = document.getElementById('ferramentaParaAtribuir');
+                const searchInput = document.getElementById('searchFerramentaAtribuicao');
+    
+                if (select) select.value = '';
+                if (searchInput) {
+                    searchInput.value = '';
+                    // Chamar a função de filtro para resetar a lista
+                    if (typeof filterFerramentasAtribuicao === 'function') {
+                        filterFerramentasAtribuicao();
+                    }
+                }
+    
                 document.getElementById('observacaoAtribuicao').value = '';
                 document.getElementById('dataAtribuicao').value = new Date().toISOString().split('T')[0];
+    
+                showNotification('Formulário de atribuição limpo', 'info');
             });
             
             // ===== MODAIS =====
