@@ -2209,7 +2209,171 @@ body.dark-mode #controle-colaborador > .cards-container > .card:nth-child(2) > d
         body.dark-mode .image-modal {
             background-color: rgba(0, 0, 0, 0.98) !important;
         }
+/* ===== ESTILOS PARA EXPORTAÇÃO DE MOVIMENTAÇÕES ===== */
 
+/* Container do formulário na aba Exportar */
+#exportar .form-container {
+    padding: 20px;
+    background-color: var(--light-color);
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+/* Labels - modo claro e escuro */
+#exportar label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-color) !important;
+}
+
+/* Inputs e selects */
+#exportar .form-control {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: white;
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+/* Hover e focus */
+#exportar .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    outline: none;
+}
+
+/* Grupo de checkboxes */
+#exportar .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+#exportar .checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: normal;
+    color: var(--text-color);
+}
+
+#exportar .checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+}
+
+/* Container de informações */
+#exportar .stats-info {
+    background-color: var(--light-color);
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border-left: 4px solid var(--info-color);
+}
+
+#exportar .stats-info p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+#exportar .stats-info p:last-child {
+    margin-top: 5px;
+    font-size: 12px;
+    color: var(--gray-color);
+}
+
+/* Ajustes para modo escuro */
+.dark-mode #exportar .form-container {
+    background-color: var(--card-bg-dark);
+}
+
+.dark-mode #exportar .form-control {
+    background-color: #2d2d2d;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+.dark-mode #exportar .form-control:focus {
+    background-color: #333;
+    border-color: var(--primary-color);
+}
+
+.dark-mode #exportar .checkbox-group label {
+    color: #e0e0e0;
+}
+
+.dark-mode #exportar .stats-info {
+    background-color: #2d2d2d;
+    border-left-color: #3498db;
+}
+
+.dark-mode #exportar .stats-info p {
+    color: #e0e0e0;
+}
+
+/* Tabela de pré-visualização */
+#exportar #movimentacoesPreview {
+    margin-top: 25px;
+    padding: 15px;
+    background-color: var(--light-color);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.dark-mode #exportar #movimentacoesPreview {
+    background-color: var(--card-bg-dark);
+    border-color: #444;
+}
+
+#exportar #movimentacoesPreview h4 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+/* Tabela dentro da pré-visualização */
+#movimentacoesPreviewTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#movimentacoesPreviewTable th {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+#movimentacoesPreviewTable td {
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+#movimentacoesPreviewTable tr:hover {
+    background-color: rgba(52, 152, 219, 0.05);
+}
+
+.dark-mode #movimentacoesPreviewTable tr:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+/* Status badges na tabela */
+#movimentacoesPreviewTable .status-badge {
+    font-size: 12px;
+    padding: 3px 8px;
+}
 /* ============================================ */
 /* CORREÇÕES ESPECÍFICAS PARA MODO NOTURNO */
 /* ============================================ */
@@ -2871,10 +3035,10 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
                     <i class="fas fa-map"></i> Mapeamento
                 </button>
                 <button class="tab-button" data-tab="exportar">
-                    <i class="fas fa-file-excel"></i> Exportar
+                    <i class="fas fa-file-excel"></i> Relatórios
                 </button>
                 <button class="tab-button" data-tab="romaneio">
-                    <i class="fas fa-truck-loading"></i> Romaneio
+                    <i class="fas fa-truck-moving"></i> Romaneio
                 </button>
                 <button class="tab-button" data-tab="database" id="databaseTab">
                     <i class="fas fa-database"></i> Banco de Dados
@@ -3255,7 +3419,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
             <!-- Controle por Colaborador Tab -->
             <div id="controle-colaborador" class="tab-content">
             <h2 class="section-title" style="color: var(--primary-color) !important;">
-                <i class="fas fa-users"></i> Controle por Colaborador
+                <i class="fas fa-hard-hat"></i> Controle por Colaborador
             </h2>
     
             <!-- Lista de colaboradores em cima -->
@@ -3647,7 +3811,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
             
             <!-- Exportar Tab -->
             <div id="exportar" class="tab-content">
-                <h2 class="section-title"><i class="fas fa-file-excel"></i> Exportar Dados</h2>
+                <h2 class="section-title"><i class="fas fa-file-excel"></i> Exportar Relatório</h2>
                 
                 <div class="card">
                     <h3 class="card-title"><i class="fas fa-download"></i> Exportar Dados</h3>
@@ -3678,7 +3842,97 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
                         </button>
                     </div>
                 </div>
-                
+                <!-- Card para Exportar Movimentações -->
+<div class="card">
+    <h3 class="card-title"><i class="fas fa-truck-moving"></i> Exportar Movimentações</h3>
+    
+    <div class="form-container">
+        <p>Exporte o histórico completo de movimentações de ferramentas entre localizações.</p>
+        
+        <div class="form-group">
+            <label for="movimentacoesDateRange">Período:</label>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="date" id="movimentacoesDateFrom" class="form-control">
+                <span>até</span>
+                <input type="date" id="movimentacoesDateTo" class="form-control">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="movimentacoesFilterType">Filtrar por:</label>
+            <select id="movimentacoesFilterType" class="form-control">
+                <option value="all">Todas as movimentações</option>
+                <option value="romaneio">Apenas por romaneio</option>
+                <option value="manual">Apenas manuais</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Incluir informações:</label>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" id="includeToolDetails" checked>
+                    <span>Detalhes da ferramenta</span>
+                </label>
+                <label>
+                    <input type="checkbox" id="includeUserInfo" checked>
+                    <span>Informações do usuário</span>
+                </label>
+                <label>
+                    <input type="checkbox" id="includeRomaneioDetails" checked>
+                    <span>Detalhes do romaneio</span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="stats-info" style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid var(--info-color);">
+            <p style="margin: 0; font-size: 14px;">
+                <i class="fas fa-info-circle"></i> 
+                <strong>Total de registros:</strong> 
+                <span id="movimentacoesCount">Carregando...</span>
+            </p>
+            <p style="margin: 5px 0 0 0; font-size: 12px; color: var(--gray-color);">
+                Última movimentação: <span id="lastMovimentacaoDate">-</span>
+            </p>
+        </div>
+        
+        <div class="btn-group" style="margin-top: 20px;">
+            <button type="button" class="btn btn-success" id="exportMovimentacoesExcelBtn">
+                <i class="fas fa-file-excel"></i> Exportar para Excel
+            </button>
+            <button type="button" class="btn btn-primary" id="previewMovimentacoesBtn">
+                <i class="fas fa-eye"></i> Visualizar
+            </button>
+            <button type="button" class="btn btn-info" id="refreshMovimentacoesBtn">
+                <i class="fas fa-sync-alt"></i> Atualizar
+            </button>
+        </div>
+        
+        <!-- Pré-visualização -->
+        <div id="movimentacoesPreview" style="margin-top: 25px; display: none;">
+            <h4 style="color: var(--primary-color); margin-bottom: 15px;">
+                <i class="fas fa-eye"></i> Pré-visualização
+            </h4>
+            <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+                <table id="movimentacoesPreviewTable" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Ferramenta</th>
+                            <th>De</th>
+                            <th>Para</th>
+                            <th>Romaneio</th>
+                            <th>Usuário</th>
+                        </tr>
+                    </thead>
+                    <tbody id="movimentacoesPreviewBody">
+                        <!-- Conteúdo será preenchido via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
                 <div class="card">
                     <h3 class="card-title"><i class="fas fa-history"></i> Histórico de Exportações</h3>
                     <div class="export-history" id="exportHistory">
@@ -3688,6 +3942,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
                     </div>
                 </div>
             </div>
+            
                         <!-- Romaneio Tab -->
             <div id="romaneio" class="tab-content">
                 <h2 class="section-title"><i class="fas fa-truck-loading"></i> Gerar Romaneio</h2>
@@ -3802,7 +4057,27 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
                         </div>
                     </div>
                 </div>
-                
+                <div class="form-row">
+    <div class="form-group">
+        <label for="romaneioUpdateLocation">Atualizar Localização para:</label>
+        <select id="romaneioUpdateLocation" class="form-control">
+            <option value="">Não alterar localização</option>
+            <option value="Almoxarifado Central">Almoxarifado Central</option>
+            <option value="Container Elétrico">Container Elétrico</option>
+            <option value="Container Mecânica">Container Mecânica</option>
+            <option value="Oficina">Oficina</option>
+            <option value="Campo">Campo</option>
+            <option value="Transporte">Transporte</option>
+            <option value="OUTRO">Outro (especificar abaixo)</option>
+        </select>
+    </div>
+    
+    <div class="form-group" id="otherLocationContainer" style="display: none;">
+        <label for="romaneioOtherLocation">Especificar Localização:</label>
+        <input type="text" id="romaneioOtherLocation" class="form-control" 
+               placeholder="Digite a nova localização...">
+    </div>
+</div>
                 <!-- Botões de Ação -->
                 <div style="text-align: center; margin-top: 30px;">
                     <div class="btn-group">
@@ -3990,7 +4265,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
         <footer class="site-footer">
             <div class="footer-content">
                 <p>Desenvolvido por Fábio Mendes Rodrigues, Planejador da F.W. Company</p>
-                <p class="footer-version">Versão 3.0_rev07 | Última atualização: <span id="currentDate"></span></p>
+                <p class="footer-version">Versão 3.0_rev08 | Última atualização: <span id="currentDate"></span></p>
             </div>
         </footer>
 
@@ -5796,6 +6071,392 @@ async function initializeSystem() {
     }
 }
 // ============================================
+// FUNÇÕES PARA EXPORTAR MOVIMENTAÇÕES
+// ============================================
+
+// Inicializar eventos da aba de movimentações
+function initializeMovimentacoesExport() {
+    // Botão Exportar Excel
+    document.getElementById('exportMovimentacoesExcelBtn')?.addEventListener('click', exportMovimentacoesExcel);
+    
+    // Botão Visualizar
+    document.getElementById('previewMovimentacoesBtn')?.addEventListener('click', previewMovimentacoes);
+    
+    // Botão Atualizar
+    document.getElementById('refreshMovimentacoesBtn')?.addEventListener('click', updateMovimentacoesStats);
+    
+    // Atualizar estatísticas ao carregar a aba
+    document.querySelector('[data-tab="exportar"]')?.addEventListener('click', function() {
+        setTimeout(updateMovimentacoesStats, 300);
+    });
+    
+    // Atualizar contagem ao alterar filtros
+    document.getElementById('movimentacoesDateFrom')?.addEventListener('change', updateMovimentacoesStats);
+    document.getElementById('movimentacoesDateTo')?.addEventListener('change', updateMovimentacoesStats);
+    document.getElementById('movimentacoesFilterType')?.addEventListener('change', updateMovimentacoesStats);
+}
+
+// Atualizar estatísticas das movimentações
+function updateMovimentacoesStats() {
+    const historico = loadMovimentacoesHistory();
+    
+    if (historico.length === 0) {
+        document.getElementById('movimentacoesCount').textContent = '0 registros';
+        document.getElementById('lastMovimentacaoDate').textContent = '-';
+        return;
+    }
+    
+    // Aplicar filtros
+    const dateFrom = document.getElementById('movimentacoesDateFrom')?.value;
+    const dateTo = document.getElementById('movimentacoesDateTo')?.value;
+    const filterType = document.getElementById('movimentacoesFilterType')?.value;
+    
+    let filtered = historico;
+    
+    // Filtrar por data
+    if (dateFrom) {
+        filtered = filtered.filter(m => new Date(m.date) >= new Date(dateFrom));
+    }
+    if (dateTo) {
+        filtered = filtered.filter(m => new Date(m.date) <= new Date(dateTo + 'T23:59:59'));
+    }
+    
+    // Filtrar por tipo
+    if (filterType === 'romaneio') {
+        filtered = filtered.filter(m => m.romaneioNum);
+    } else if (filterType === 'manual') {
+        filtered = filtered.filter(m => !m.romaneioNum);
+    }
+    
+    // Atualizar contador
+    document.getElementById('movimentacoesCount').textContent = `${filtered.length} registros`;
+    
+    // Data da última movimentação
+    if (filtered.length > 0) {
+        const lastDate = new Date(Math.max(...filtered.map(m => new Date(m.date))));
+        document.getElementById('lastMovimentacaoDate').textContent = formatDate(lastDate);
+    }
+}
+
+// Pré-visualizar movimentações
+function previewMovimentacoes() {
+    const historico = loadMovimentacoesHistory();
+    
+    if (historico.length === 0) {
+        showNotification('Nenhuma movimentação registrada.', 'info');
+        return;
+    }
+    
+    // Aplicar filtros
+    const dateFrom = document.getElementById('movimentacoesDateFrom')?.value;
+    const dateTo = document.getElementById('movimentacoesDateTo')?.value;
+    const filterType = document.getElementById('movimentacoesFilterType')?.value;
+    
+    let filtered = historico;
+    
+    // Filtrar por data
+    if (dateFrom) {
+        filtered = filtered.filter(m => new Date(m.date) >= new Date(dateFrom));
+    }
+    if (dateTo) {
+        filtered = filtered.filter(m => new Date(m.date) <= new Date(dateTo + 'T23:59:59'));
+    }
+    
+    // Filtrar por tipo
+    if (filterType === 'romaneio') {
+        filtered = filtered.filter(m => m.romaneioNum);
+    } else if (filterType === 'manual') {
+        filtered = filtered.filter(m => !m.romaneioNum);
+    }
+    
+    // Ordenar por data (mais recente primeiro)
+    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    // Limitar a 50 registros na pré-visualização
+    const previewData = filtered.slice(0, 50);
+    
+    // Gerar HTML da pré-visualização
+    let html = '';
+    previewData.forEach(mov => {
+        html += `
+            <tr>
+                <td>${formatDate(mov.date)}</td>
+                <td>
+                    <strong>${mov.toolCode}</strong><br>
+                    <small style="color: var(--gray-color);">${mov.toolName}</small>
+                </td>
+                <td>${mov.oldLocation}</td>
+                <td><strong style="color: var(--success-color);">${mov.newLocation}</strong></td>
+                <td>
+                    ${mov.romaneioNum ? 
+                        `<span class="status-badge status-completed">${mov.romaneioNum}</span><br>
+                         <small>${mov.romaneioTitle || ''}</small>` 
+                        : '<span style="color: var(--gray-color); font-style: italic;">Manual</span>'}
+                </td>
+                <td>${mov.user}</td>
+            </tr>
+        `;
+    });
+    
+    document.getElementById('movimentacoesPreviewBody').innerHTML = html;
+    document.getElementById('movimentacoesPreview').style.display = 'block';
+    
+    // Mostrar mensagem se houver mais registros
+    if (filtered.length > 50) {
+        const previewDiv = document.getElementById('movimentacoesPreview');
+        const infoDiv = document.createElement('div');
+        infoDiv.style.cssText = 'margin-top: 10px; padding: 10px; background-color: #fff3cd; border-radius: 6px; font-size: 14px;';
+        infoDiv.innerHTML = `<i class="fas fa-info-circle"></i> Mostrando 50 de ${filtered.length} registros. Todos serão incluídos na exportação.`;
+        previewDiv.appendChild(infoDiv);
+    }
+    
+    showNotification(`Pré-visualizando ${previewData.length} movimentações`, 'info');
+}
+
+// Exportar movimentações para Excel
+async function exportMovimentacoesExcel() {
+    try {
+        const historico = loadMovimentacoesHistory();
+        
+        if (historico.length === 0) {
+            showNotification('Nenhuma movimentação para exportar.', 'info');
+            return;
+        }
+        
+        // Mostrar loader
+        const exportBtn = document.getElementById('exportMovimentacoesExcelBtn');
+        const originalText = exportBtn.innerHTML;
+        exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+        exportBtn.disabled = true;
+        
+        // Aplicar filtros
+        const dateFrom = document.getElementById('movimentacoesDateFrom')?.value;
+        const dateTo = document.getElementById('movimentacoesDateTo')?.value;
+        const filterType = document.getElementById('movimentacoesFilterType')?.value;
+        const includeToolDetails = document.getElementById('includeToolDetails')?.checked;
+        const includeUserInfo = document.getElementById('includeUserInfo')?.checked;
+        const includeRomaneioDetails = document.getElementById('includeRomaneioDetails')?.checked;
+        
+        let filtered = historico;
+        
+        // Filtrar por data
+        if (dateFrom) {
+            filtered = filtered.filter(m => new Date(m.date) >= new Date(dateFrom));
+        }
+        if (dateTo) {
+            filtered = filtered.filter(m => new Date(m.date) <= new Date(dateTo + 'T23:59:59'));
+        }
+        
+        // Filtrar por tipo
+        if (filterType === 'romaneio') {
+            filtered = filtered.filter(m => m.romaneioNum);
+        } else if (filterType === 'manual') {
+            filtered = filtered.filter(m => !m.romaneioNum);
+        }
+        
+        if (filtered.length === 0) {
+            showNotification('Nenhuma movimentação encontrada com os filtros aplicados.', 'warning');
+            exportBtn.innerHTML = originalText;
+            exportBtn.disabled = false;
+            return;
+        }
+        
+        // Criar workbook
+        const workbook = new ExcelJS.Workbook();
+        workbook.creator = 'Sistema de Controle de Ferramentas';
+        workbook.lastModifiedBy = currentUser?.name || 'Sistema';
+        workbook.created = new Date();
+        workbook.modified = new Date();
+        
+        // Worksheet principal
+        const worksheet = workbook.addWorksheet('Movimentações', {
+            pageSetup: {
+                paperSize: 9, // A4
+                orientation: 'landscape',
+                margins: { left: 0.5, right: 0.5, top: 0.5, bottom: 0.5 }
+            }
+        });
+        
+        // Definir colunas
+        const columns = [
+            { header: 'Data', key: 'date', width: 12 },
+            { header: 'Hora', key: 'time', width: 10 },
+            { header: 'Código', key: 'toolCode', width: 15 },
+            { header: 'Nome da Ferramenta', key: 'toolName', width: 30 },
+            { header: 'Localização Anterior', key: 'oldLocation', width: 20 },
+            { header: 'Nova Localização', key: 'newLocation', width: 20 },
+            { header: 'Tipo', key: 'type', width: 12 }
+        ];
+        
+        // Adicionar colunas condicionais
+        if (includeRomaneioDetails) {
+            columns.push(
+                { header: 'Nº Romaneio', key: 'romaneioNum', width: 15 },
+                { header: 'Título Romaneio', key: 'romaneioTitle', width: 25 },
+                { header: 'Destino Romaneio', key: 'romaneioDestino', width: 20 }
+            );
+        }
+        
+        if (includeUserInfo) {
+            columns.push(
+                { header: 'Usuário', key: 'user', width: 20 },
+                { header: 'Responsável', key: 'responsible', width: 20 }
+            );
+        }
+        
+        if (includeToolDetails) {
+            columns.push(
+                { header: 'Categoria', key: 'category', width: 15 },
+                { header: 'Patrimônio', key: 'patrimonio', width: 15 }
+            );
+        }
+        
+        worksheet.columns = columns;
+        
+        // Cabeçalho do relatório
+        worksheet.mergeCells('A1:' + String.fromCharCode(65 + columns.length - 1) + '1');
+        const titleRow = worksheet.getRow(1);
+        const titleCell = worksheet.getCell('A1');
+        titleCell.value = 'RELATÓRIO DE MOVIMENTAÇÕES DE FERRAMENTAS';
+        titleCell.style = {
+            font: { bold: true, size: 16, color: { argb: 'FFFFFFFF' } },
+            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2C3E50' } },
+            alignment: { horizontal: 'center', vertical: 'middle' }
+        };
+        titleRow.height = 30;
+        
+        // Informações do relatório
+        worksheet.mergeCells('A2:' + String.fromCharCode(65 + columns.length - 1) + '2');
+        const infoRow = worksheet.getRow(2);
+        const infoCell = worksheet.getCell('A2');
+        infoCell.value = `Período: ${dateFrom ? formatDate(dateFrom) : 'Início'} a ${dateTo ? formatDate(dateTo) : 'Fim'} | Total: ${filtered.length} registros | Emitido em: ${new Date().toLocaleDateString('pt-BR')}`;
+        infoCell.style = {
+            font: { size: 10, italic: true },
+            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8F9FA' } },
+            alignment: { horizontal: 'center' }
+        };
+        
+        // Cabeçalhos das colunas
+        const headerRow = worksheet.getRow(3);
+        headerRow.eachCell((cell, colNumber) => {
+            cell.style = {
+                font: { bold: true, color: { argb: 'FFFFFFFF' } },
+                fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF3498DB' } },
+                alignment: { horizontal: 'center', vertical: 'middle' },
+                border: {
+                    top: { style: 'thin', color: { argb: 'FF2980B9' } },
+                    bottom: { style: 'thin', color: { argb: 'FF2980B9' } },
+                    left: { style: 'thin', color: { argb: 'FF2980B9' } },
+                    right: { style: 'thin', color: { argb: 'FF2980B9' } }
+                }
+            };
+        });
+        headerRow.height = 25;
+        
+        // Adicionar dados
+        filtered.forEach((mov, index) => {
+            const rowNumber = index + 4;
+            const dateObj = new Date(mov.date);
+            
+            const rowData = {
+                date: formatDate(mov.date),
+                time: dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                toolCode: mov.toolCode,
+                toolName: mov.toolName,
+                oldLocation: mov.oldLocation,
+                newLocation: mov.newLocation,
+                type: mov.romaneioNum ? 'Romaneio' : 'Manual'
+            };
+            
+            // Adicionar dados condicionais
+            if (includeRomaneioDetails) {
+                rowData.romaneioNum = mov.romaneioNum || '';
+                rowData.romaneioTitle = mov.romaneioTitle || '';
+                rowData.romaneioDestino = mov.romaneioDestino || '';
+            }
+            
+            if (includeUserInfo) {
+                rowData.user = mov.user || '';
+                rowData.responsible = mov.responsible || '';
+            }
+            
+            if (includeToolDetails) {
+                // Buscar informações adicionais da ferramenta
+                const tool = tools.find(t => t.id === mov.toolId);
+                rowData.category = tool?.category || '';
+                rowData.patrimonio = tool?.patrimonio || '';
+            }
+            
+            const row = worksheet.addRow(rowData);
+            
+            // Estilo alternado para linhas
+            if (index % 2 === 0) {
+                row.eachCell(cell => {
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: 'FFFFFFFF' }
+                    };
+                });
+            } else {
+                row.eachCell(cell => {
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: 'FFF8F9FA' }
+                    };
+                });
+            }
+            
+            // Destacar a coluna de nova localização
+            const newLocationCell = worksheet.getCell(`F${rowNumber}`);
+            newLocationCell.font = { bold: true, color: { argb: 'FF27AE60' } };
+        });
+        
+        // Auto-filter
+        worksheet.autoFilter = {
+            from: { row: 3, column: 1 },
+            to: { row: 3, column: columns.length }
+        };
+        
+        // Congelar cabeçalhos
+        worksheet.views = [
+            { state: 'frozen', ySplit: 3 }
+        ];
+        
+        // Gerar nome do arquivo
+        const fileName = `Movimentacoes_${dateFrom || 'inicio'}_${dateTo || 'fim'}_${new Date().getTime()}.xlsx`;
+        
+        // Salvar arquivo
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { 
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+        });
+        
+        saveAs(blob, fileName);
+        
+        // Registrar no histórico de exportações
+        addToExportHistory('Movimentações', filtered.length, 'Excel');
+        
+        // Restaurar botão
+        exportBtn.innerHTML = originalText;
+        exportBtn.disabled = false;
+        
+        showNotification(`Exportação concluída: ${filtered.length} movimentações em ${fileName}`, 'success');
+        
+    } catch (error) {
+        console.error('Erro ao exportar movimentações:', error);
+        showNotification(`Erro na exportação: ${error.message}`, 'error');
+        
+        // Restaurar botão em caso de erro
+        const exportBtn = document.getElementById('exportMovimentacoesExcelBtn');
+        if (exportBtn) {
+            exportBtn.innerHTML = '<i class="fas fa-file-excel"></i> Exportar para Excel';
+            exportBtn.disabled = false;
+        }
+    }
+}
+// ============================================
 // ADICIONAR BOTÕES DE SINCRONIZAÇÃO DE ATRIBUIÇÕES
 // ============================================
 
@@ -6538,6 +7199,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // ... (restante do código) ...
 });
 
+// Inicializar exportação de movimentações
+initializeMovimentacoesExport();
+
+
 // ============================================
 // FUNÇÃO PARA ATUALIZAR CONTAGEM NO CABEÇALHO
 // ============================================
@@ -7094,7 +7759,15 @@ document.getElementById('testarConexaoBtn')?.addEventListener('click', debugAtri
         const responsible = document.getElementById('romaneioResponsible').value || '';
         const romaneioDate = document.getElementById('romaneioDate').value || new Date().toISOString().split('T')[0];
         const observations = document.getElementById('romaneioObservations').value || '';
-        
+        // ADICIONE ESTAS LINHAS PARA LOCALIZAÇÃO:
+        const updateLocation = document.getElementById('romaneioUpdateLocation').value;
+        let newLocation = '';
+
+        if (updateLocation === 'OUTRO') {
+            newLocation = document.getElementById('romaneioOtherLocation').value.trim();
+        } else if (updateLocation) {
+            newLocation = updateLocation;
+        }
         // Gerar número do romaneio
         const romaneioNum = 'RM-' + new Date().getFullYear() + '-' + 
                            String(new Date().getTime()).slice(-6);
@@ -7103,7 +7776,47 @@ document.getElementById('testarConexaoBtn')?.addEventListener('click', debugAtri
         const selectedTools = tools.filter(tool => 
             romaneioSelectedTools.includes(tool.id)
         );
+        // ATUALIZAR LOCALIZAÇÃO DAS FERRAMENTAS (se especificado)
+if (newLocation && selectedTools.length > 0) {
+    // Confirmar com o usuário
+    if (confirm(`Deseja atualizar a localização de ${selectedTools.length} ferramenta(s) para "${newLocation}"?`)) {
         
+        // Registrar histórico de movimentação
+        const movimentacoes = [];
+        
+        selectedTools.forEach(tool => {
+            const oldLocation = tool.location || 'Sem localização';
+            
+            // Atualizar ferramenta
+            tool.location = newLocation;
+            tool.updatedAt = new Date().toISOString();
+            
+            // Registrar no histórico
+            movimentacoes.push({
+                toolId: tool.id,
+                toolCode: tool.code,
+                toolName: tool.name,
+                oldLocation: oldLocation,
+                newLocation: newLocation,
+                romaneioNum: romaneioNum,
+                romaneioTitle: title,
+                responsible: responsible,
+                date: new Date().toISOString(),
+                user: currentUser?.name || 'Sistema'
+            });
+            
+            console.log(`📍 Localização atualizada: ${tool.code} de "${oldLocation}" para "${newLocation}"`);
+        });
+        
+        // Salvar alterações
+        await saveTools();
+        
+        // Salvar histórico de movimentações
+        saveMovimentacoesHistory(movimentacoes);
+        
+        showNotification(`Localização de ${selectedTools.length} ferramenta(s) atualizada para "${newLocation}"`, 'success');
+    }
+}
         // Criar um NOVO workbook (em vez de carregar template)
         // Isso dá mais controle sobre a formatação
         const workbook = new ExcelJS.Workbook();
@@ -7127,13 +7840,15 @@ document.getElementById('testarConexaoBtn')?.addEventListener('click', debugAtri
             left: 0.50, right: 0.50,
             top: 0.50, bottom: 0.50,
             header: 0.5, footer: 0.5
+            }
+        
+            },
+    
+            properties: {
+            defaultColWidth: 10,
+            defaultRowHeight: 20
         }
-    },
-    properties: {
-        defaultColWidth: 10,
-        defaultRowHeight: 20
-    }
-});
+    });
 
         // ============================================
         // CONFIGURAR LARGURAS DAS COLUNAS (A-R)
@@ -7161,7 +7876,8 @@ document.getElementById('testarConexaoBtn')?.addEventListener('click', debugAtri
 }
 worksheet.columns = columnWidths;
 
-        // ============================================
+
+// ============================================
 // DEFINIÇÃO DE ESTILOS (CORES E FONTES)
 // ============================================
 const styles = {
@@ -8067,23 +8783,62 @@ toolsData.forEach((tool, index) => {
             
             addColaboradorRowEventListeners();
         }
+// ============================================
+// HISTÓRICO DE MOVIMENTAÇÕES VIA ROMANEIO
+// ============================================
 
+// Salvar histórico de movimentações
+function saveMovimentacoesHistory(movimentacoes) {
+    try {
+        // Carregar histórico existente
+        let historicoMovimentacoes = JSON.parse(localStorage.getItem('historicoMovimentacoes') || '[]');
+        
+        // Adicionar novas movimentações
+        historicoMovimentacoes = [...historicoMovimentacoes, ...movimentacoes];
+        
+        // Manter apenas os últimos 1000 registros
+        if (historicoMovimentacoes.length > 1000) {
+            historicoMovimentacoes = historicoMovimentacoes.slice(-1000);
+        }
+        
+        // Salvar no localStorage
+        localStorage.setItem('historicoMovimentacoes', JSON.stringify(historicoMovimentacoes));
+        
+        console.log(`📋 Histórico de movimentações salvo: ${movimentacoes.length} registros`);
+        return true;
+        
+    } catch (error) {
+        console.error('Erro ao salvar histórico de movimentações:', error);
+        return false;
+    }
+}
+
+// Carregar histórico de movimentações
+function loadMovimentacoesHistory() {
+    try {
+        const historico = localStorage.getItem('historicoMovimentacoes');
+        return historico ? JSON.parse(historico) : [];
+    } catch (error) {
+        console.error('Erro ao carregar histórico de movimentações:', error);
+        return [];
+    }
+}
         // Criar linha da tabela de colaboradores
         function createColaboradorTableRow(colaborador) {
-    // CONTAGEM CORRIGIDA: Buscar ferramentas ativas no histórico
-    const ferramentasAtivas = historicoAtribuicoes.filter(atribuicao => 
-        atribuicao.colaboradorId === colaborador.id && 
-        !atribuicao.dataDevolucao
-    );
+        // CONTAGEM CORRIGIDA: Buscar ferramentas ativas no histórico
+        const ferramentasAtivas = historicoAtribuicoes.filter(atribuicao => 
+            atribuicao.colaboradorId === colaborador.id && 
+            !atribuicao.dataDevolucao
+        );
     
-    const ferramentasCount = ferramentasAtivas.length;
-    const statusClass = ferramentasCount > 0 ? 'status-ontrack' : 'status-completed';
-    const statusText = ferramentasCount > 0 ? `${ferramentasCount} ferramentas` : 'Sem ferramentas';
+        const ferramentasCount = ferramentasAtivas.length;
+        const statusClass = ferramentasCount > 0 ? 'status-ontrack' : 'status-completed';
+        const statusText = ferramentasCount > 0 ? `${ferramentasCount} ferramentas` : 'Sem ferramentas';
     
-    // Verificar permissões para ações
-    const canEdit = currentUser.role !== 'user';
+        // Verificar permissões para ações
+        const canEdit = currentUser.role !== 'user';
     
-    return `
+        return `
         <td><strong>${colaborador.nome}</strong></td>
         <td>${colaborador.matricula}</td>
         <td>${colaborador.setor || '-'}</td>
@@ -11697,6 +12452,19 @@ async function initializeSystem() {
             } finally {
                 document.getElementById('exportLoader').style.display = 'none';
             }
+            if (type === 'Movimentações') {
+        exportHistory.unshift({
+            type: 'Movimentações',
+            count: count,
+            format: format,
+            date: new Date().toISOString(),
+            filters: {
+                dateFrom: document.getElementById('movimentacoesDateFrom')?.value,
+                dateTo: document.getElementById('movimentacoesDateTo')?.value,
+                filterType: document.getElementById('movimentacoesFilterType')?.value
+            }
+        });
+    }
         }
 
         function addToExportHistory(range, count) {
