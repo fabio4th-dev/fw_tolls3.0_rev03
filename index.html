@@ -2841,7 +2841,91 @@ body.dark-mode #colaboradoresSyncButtons .btn {
 body.dark-mode #colaboradoresSyncButtons .btn:hover {
     opacity: 1;
 }
+/* ===== ESTILOS PARA O RECIBO DE ENTREGA ===== */
+#reciboToolsList tr:hover {
+    background-color: rgba(52, 152, 219, 0.05);
+}
 
+.dark-mode #reciboToolsList tr:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+/* Linha de assinatura */
+.assinatura-line {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.assinatura-line hr {
+    width: 300px;
+    margin: 0 auto 5px;
+    border: none;
+    border-top: 1px solid #000;
+}
+
+.assinatura-line span {
+    font-size: 12px;
+    color: #666;
+}
+
+/* Tabela do recibo */
+.recibo-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.recibo-table th {
+    background-color: #f5f5f5;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+    font-weight: bold;
+}
+
+.recibo-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.recibo-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Modal de pré-visualização do recibo */
+#reciboPreviewModal .modal-content {
+    max-width: 1000px;
+}
+
+#reciboPreviewBody {
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Responsividade */
+@media print {
+    .recibo-print {
+        margin: 0;
+        padding: 20px;
+    }
+    
+    .no-print {
+        display: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .assinatura-line hr {
+        width: 200px;
+    }
+    
+    .recibo-table th,
+    .recibo-table td {
+        padding: 6px;
+        font-size: 12px;
+    }
+}
 /* Responsividade */
 @media (max-width: 768px) {
     #colaboradoresSyncButtons .btn {
@@ -3933,6 +4017,146 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
         </div>
     </div>
 </div>
+<!-- Recibo de Entrega de Ferramentas -->
+<div class="card">
+    <h3 class="card-title"><i class="fas fa-file-contract"></i> Recibo de Entrega de Ferramentas</h3>
+    
+    <div class="form-container">
+        <p>Gere um recibo de entrega de ferramentas com declaração de responsabilidade.</p>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="reciboObra" class="required">Obra/Local</label>
+                <input type="text" id="reciboObra" class="form-control" 
+                       placeholder="Ex: Obra Centro, Imperatriz-MA" required>
+            </div>
+            <div class="form-group">
+                <label for="reciboFuncionario" class="required">Funcionário</label>
+                <input type="text" id="reciboFuncionario" class="form-control" 
+                       placeholder="Nome completo do funcionário" required>
+            </div>
+            <div class="form-group">
+                <label for="reciboFuncao" class="required">Função</label>
+                <input type="text" id="reciboFuncao" class="form-control" 
+                       placeholder="Ex: Técnico de Elétrica" required>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="reciboData" class="required">Data da Entrega</label>
+                <input type="date" id="reciboData" class="form-control" 
+                       value="<?php echo date('Y-m-d'); ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="reciboResponsavel">Responsável pela Entrega</label>
+                <input type="text" id="reciboResponsavel" class="form-control" 
+                       placeholder="Nome do almoxarife" value="Almoxarifado">
+            </div>
+            <div class="form-group">
+                <label for="reciboValidade">Validade (dias)</label>
+                <input type="number" id="reciboValidade" class="form-control" 
+                       min="1" max="365" value="30" placeholder="30">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Selecionar Ferramentas para o Recibo:</label>
+            <div class="search-box" style="margin: 10px 0;">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchRecibo" 
+                       placeholder="Buscar ferramentas para o recibo...">
+            </div>
+            
+            <div style="border: 1px solid var(--border-color); border-radius: 8px; 
+                       max-height: 300px; overflow-y: auto; margin-top: 10px;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="background-color: var(--light-color); position: sticky; top: 0;">
+                        <tr>
+                            <th style="padding: 10px; text-align: center; width: 50px;">
+                                <input type="checkbox" id="checkAllRecibo">
+                            </th>
+                            <th style="padding: 10px; text-align: left;">Código</th>
+                            <th style="padding: 10px; text-align: left;">Nome</th>
+                            <th style="padding: 10px; text-align: left;">Categoria</th>
+                            <th style="padding: 10px; text-align: left;">Patrimônio</th>
+                            <th style="padding: 10px; text-align: center;">Quantidade</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reciboToolsList">
+                        <!-- Lista de ferramentas será preenchida aqui -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="text-align: center; padding: 10px; margin-top: 10px;">
+                <p style="color: var(--gray-color);" id="reciboSelectionCount">
+                    Nenhuma ferramenta selecionada
+                </p>
+            </div>
+        </div>
+        
+        <!-- Declaração pré-definida -->
+        <div class="form-group">
+            <label>Declaração de Responsabilidade:</label>
+            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; 
+                        border-left: 4px solid var(--warning-color); margin: 10px 0;">
+                <p style="margin: 0; font-style: italic; color: var(--text-color);">
+                    <strong>DECLARAÇÃO</strong><br>
+                    DECLARO PARA TODOS OS EFEITOS LEGAIS QUE RECEBI AS FERRAMENTAS DISCRIMINADAS 
+                    NESTA FICHA, FICANDO RESPONSÁVEL PELO USO, GUARDA E CONSERVAÇÃO DAS MESMAS, 
+                    DEVENDO INDENIZÁ-LAS À EMPRESA, CASO OCORRAM DANOS POR COMPROVADA NEGLIGÊNCIA 
+                    OU EXTRAVIO.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Configurações adicionais -->
+        <div class="form-group">
+            <label>Incluir no documento:</label>
+            <div style="display: flex; gap: 20px; margin-top: 10px; flex-wrap: wrap;">
+                <label style="display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" id="reciboIncludeQR" checked>
+                    <span>Códigos QR das ferramentas</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" id="reciboIncludeImages" checked>
+                    <span>Imagens das ferramentas</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" id="reciboIncludePrices" checked>
+                    <span>Valores das ferramentas</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" id="reciboIncludeObservation" checked>
+                    <span>Observações individuais</span>
+                </label>
+            </div>
+        </div>
+        
+        <!-- Botões de ação -->
+        <div class="btn-group" style="margin-top: 20px; justify-content: center;">
+            <button type="button" class="btn btn-success" id="generateReciboBtn">
+                <i class="fas fa-file-excel"></i> Gerar Recibo Excel
+            </button>
+            <button type="button" class="btn btn-primary" id="previewReciboBtn">
+                <i class="fas fa-eye"></i> Visualizar Recibo
+            </button>
+            <button type="button" class="btn btn-warning" id="clearReciboBtn">
+                <i class="fas fa-eraser"></i> Limpar Seleção
+            </button>
+            <button type="button" class="btn btn-info" id="printReciboBtn">
+                <i class="fas fa-print"></i> Imprimir
+            </button>
+        </div>
+        
+        <!-- Status e informações -->
+        <div id="reciboInfo" style="margin-top: 15px; padding: 10px; 
+                                     border-radius: 6px; display: none;">
+            <!-- Informações serão mostradas aqui -->
+        </div>
+    </div>
+</div>
                 <div class="card">
                     <h3 class="card-title"><i class="fas fa-history"></i> Histórico de Exportações</h3>
                     <div class="export-history" id="exportHistory">
@@ -3945,7 +4169,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
             
                         <!-- Romaneio Tab -->
             <div id="romaneio" class="tab-content">
-                <h2 class="section-title"><i class="fas fa-truck-loading"></i> Gerar Romaneio</h2>
+                <h2 class="section-title"><i class="fas fa-truck-moving"></i> Gerar Romaneio</h2>
                 
                 <div class="cards-container">
                     <!-- Card de Seleção de Ferramentas -->
@@ -4265,7 +4489,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
         <footer class="site-footer">
             <div class="footer-content">
                 <p>Desenvolvido por Fábio Mendes Rodrigues, Planejador da F.W. Company</p>
-                <p class="footer-version">Versão 3.0_rev08 | Última atualização: <span id="currentDate"></span></p>
+                <p class="footer-version">Versão 3.0_rev08b | Última atualização: <span id="currentDate"></span></p>
             </div>
         </footer>
 
@@ -14202,28 +14426,28 @@ document.querySelector('[data-tab="saida-ferramentas"]')?.addEventListener('clic
                 itemCount: itemCount,
                 totalValue: totalValue,
                 tools: romaneioSelectedTools.slice()
-            };
+        };
             
-            // Adicionar ao início do array
-            romaneioTemplates.unshift(historyItem);
+        // Adicionar ao início do array
+        romaneioTemplates.unshift(historyItem);
             
-            // Manter apenas os últimos 10
-            if (romaneioTemplates.length > 10) {
-                romaneioTemplates = romaneioTemplates.slice(0, 10);
-            }
+        // Manter apenas os últimos 10
+        if (romaneioTemplates.length > 10) {
+            romaneioTemplates = romaneioTemplates.slice(0, 10);
+        }
             
-            saveRomaneioTemplates();
+        saveRomaneioTemplates();
         }
 
         // Salvar como template
         function saveRomaneioTemplate() {
             if (romaneioSelectedTools.length === 0) {
-                showNotification('Selecione ferramentas primeiro!', 'error');
-                return;
-            }
+            showNotification('Selecione ferramentas primeiro!', 'error');
+            return;
+        }
             
-            const title = document.getElementById('romaneioTitle').value || 'Romaneio de Ferramentas';
-            const templateName = prompt('Nome para este template:', title);
+        const title = document.getElementById('romaneioTitle').value || 'Romaneio de Ferramentas';
+        const templateName = prompt('Nome para este template:', title);
             
             if (!templateName) return;
             
@@ -14247,11 +14471,11 @@ document.querySelector('[data-tab="saida-ferramentas"]')?.addEventListener('clic
             saveRomaneioTemplates();
             
             showNotification(`Template "${templateName}" salvo!`, 'success');
-        }
+            }
 
-        // Carregar template
-        function loadRomaneioTemplate(templateId) {
-            const template = romaneioTemplates.find(t => t.id === templateId);
+            // Carregar template
+            function loadRomaneioTemplate(templateId) {
+                const template = romaneioTemplates.find(t => t.id === templateId);
             if (!template) {
                 showNotification('Template não encontrado!', 'error');
                 return;
@@ -14281,12 +14505,12 @@ document.querySelector('[data-tab="saida-ferramentas"]')?.addEventListener('clic
             showNotification(`Template "${template.name}" carregado!`, 'success');
         }
 
-                // ============================================
-        // EVENT LISTENERS PARA ROMANEIO
-        // ============================================
+            // ============================================
+            // EVENT LISTENERS PARA ROMANEIO
+            // ============================================
 
-        // Função para inicializar event listeners do romaneio
-        function initializeRomaneioListeners() {
+            // Função para inicializar event listeners do romaneio
+            function initializeRomaneioListeners() {
             // Botão "Selecionar Todas"
             const selectAllBtn = document.getElementById('selectAllToolsBtn');
             if (selectAllBtn) {
@@ -14338,12 +14562,12 @@ document.querySelector('[data-tab="saida-ferramentas"]')?.addEventListener('clic
             }
         }
 
-        // Função para carregar dados do romaneio quando a aba for aberta
-        function loadRomaneioData() {
-            loadRomaneioToolsList();
-            loadRomaneioTemplates();
-            updateRomaneioSelectionCount();
-            hideRomaneioPreview();
+            // Função para carregar dados do romaneio quando a aba for aberta
+            function loadRomaneioData() {
+                loadRomaneioToolsList();
+                loadRomaneioTemplates();
+                updateRomaneioSelectionCount();
+                hideRomaneioPreview();
             
             // Configurar data atual
             const romaneioDateInput = document.getElementById('romaneioDate');
