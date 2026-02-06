@@ -4157,6 +4157,133 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
         </div>
     </div>
 </div>
+<!-- Recibo de Devolução - Nova Seção -->
+<div class="card" style="margin-top: 30px;">
+    <h3 class="card-title"><i class="fas fa-file-invoice"></i> Recibo de Devolução</h3>
+    <div class="form-container">
+        
+        <!-- Seleção de Colaborador -->
+        <div class="form-group">
+            <label for="reciboColaborador" class="required">Colaborador</label>
+            <select id="reciboColaborador" class="form-control">
+                <option value="">Selecione um colaborador</option>
+                <!-- Preenchido dinamicamente -->
+            </select>
+            <div class="error-message" id="reciboColaboradorError" style="display: none;">
+                Selecione um colaborador
+            </div>
+        </div>
+        
+        <!-- Informações do Recibo -->
+        <div class="form-row">
+            <div class="form-group">
+                <label for="reciboNumero">Número do Recibo</label>
+                <input type="text" id="reciboNumero" class="form-control" readonly 
+                       value="RCB-2024-0001">
+            </div>
+            <div class="form-group">
+                <label for="reciboData">Data do Recibo</label>
+                <input type="date" id="reciboData" class="form-control" 
+                       value="<?php echo date('Y-m-d'); ?>">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="reciboObservacoes">Observações</label>
+            <textarea id="reciboObservacoes" rows="3" class="form-control" 
+                      placeholder="Observações sobre a devolução..."></textarea>
+        </div>
+        
+        <!-- Lista de Ferramentas do Colaborador -->
+        <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <label><strong>Ferramentas em posse do colaborador:</strong></label>
+                <div>
+                    <button type="button" class="btn btn-sm btn-info" id="selectAllReciboBtn">
+                        <i class="fas fa-check-square"></i> Selecionar Todas
+                    </button>
+                    <button type="button" class="btn btn-sm btn-warning" id="deselectAllReciboBtn">
+                        <i class="fas fa-times-circle"></i> Desmarcar Todas
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">
+                                <input type="checkbox" id="checkAllRecibo">
+                            </th>
+                            <th>Código</th>
+                            <th>Nome</th>
+                            <th>Categoria</th>
+                            <th>Data Atribuição</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reciboFerramentasList">
+                        <tr id="noReciboFerramentasRow">
+                            <td colspan="6" style="text-align: center; padding: 40px; color: var(--gray-color);">
+                                Selecione um colaborador para ver as ferramentas
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="reciboSelectionCount" style="margin-top: 10px; font-style: italic; color: var(--gray-color);">
+                Nenhuma ferramenta selecionada
+            </div>
+        </div>
+        
+        <!-- Botões de Ação -->
+        <div style="text-align: center; margin-top: 30px;">
+            <div class="btn-group">
+                <button type="button" class="btn btn-success" id="generateReciboExcelBtn">
+                    <i class="fas fa-file-excel"></i> Gerar Recibo Excel
+                </button>
+                <button type="button" class="btn btn-primary" id="previewReciboBtn">
+                    <i class="fas fa-eye"></i> Visualizar Recibo
+                </button>
+                <button type="button" class="btn btn-warning" id="clearReciboSelectionBtn">
+                    <i class="fas fa-eraser"></i> Limpar Seleção
+                </button>
+                <button type="button" class="btn btn-info" id="printReciboBtn">
+                    <i class="fas fa-print"></i> Imprimir
+                </button>
+            </div>
+        </div>
+        
+        <!-- Pré-visualização do Recibo -->
+        <div class="card" style="margin-top: 30px; display: none;" id="reciboPreviewCard">
+            <h4 class="card-title"><i class="fas fa-eye"></i> Pré-visualização do Recibo</h4>
+            <div class="table-container">
+                <table id="reciboPreviewTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Código</th>
+                            <th>Nome</th>
+                            <th>Categoria</th>
+                            <th>Quantidade</th>
+                            <th>Data Atribuição</th>
+                            <th>Condição</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reciboPreviewBody">
+                        <!-- Pré-visualização será preenchida aqui -->
+                    </tbody>
+                </table>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button type="button" class="btn btn-success" id="exportReciboBtn">
+                    <i class="fas fa-download"></i> Exportar Este Recibo
+                </button>
+            </div>
+        </div>
+        
+    </div>
+</div>
                 <div class="card">
                     <h3 class="card-title"><i class="fas fa-history"></i> Histórico de Exportações</h3>
                     <div class="export-history" id="exportHistory">
@@ -4489,7 +4616,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
         <footer class="site-footer">
             <div class="footer-content">
                 <p>Desenvolvido por Fábio Mendes Rodrigues, Planejador da F.W. Company</p>
-                <p class="footer-version">Versão 3.0_rev08b | Última atualização: <span id="currentDate"></span></p>
+                <p class="footer-version">Versão 3.0_rev08c | Última atualização: <span id="currentDate"></span></p>
             </div>
         </footer>
 
@@ -4571,6 +4698,770 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
 
         // Array para histórico de atribuições
         let historicoAtribuicoes = [];
+
+// ============================================
+// SISTEMA DE RECIBO DE DEVOLUÇÃO
+// ============================================
+
+// Variáveis para controle do recibo
+let reciboSelectedTools = [];
+let reciboColaboradorSelecionado = null;
+
+// Função para inicializar o sistema de recibo
+function initializeReciboSystem() {
+    console.log('🔄 Inicializando sistema de recibo...');
+    
+    // Carregar lista de colaboradores no select
+    loadColaboradoresReciboSelect();
+    
+    // Configurar data atual
+    document.getElementById('reciboData').value = new Date().toISOString().split('T')[0];
+    
+    // Gerar número do recibo
+    generateReciboNumber();
+}
+
+// Carregar colaboradores no select do recibo
+function loadColaboradoresReciboSelect() {
+    const select = document.getElementById('reciboColaborador');
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">Selecione um colaborador</option>';
+    
+    // Filtrar apenas colaboradores com ferramentas atribuídas
+    const colaboradoresComFerramentas = colaboradores.filter(colaborador => {
+        // Usar o histórico para verificar se há ferramentas ativas
+        const ferramentasAtivas = historicoAtribuicoes.filter(atribuicao => 
+            atribuicao.colaboradorId === colaborador.id && 
+            !atribuicao.dataDevolucao
+        );
+        return ferramentasAtivas.length > 0;
+    });
+    
+    if (colaboradoresComFerramentas.length === 0) {
+        select.innerHTML += '<option value="" disabled>Nenhum colaborador com ferramentas atribuídas</option>';
+        select.disabled = true;
+        return;
+    }
+    
+    // Ordenar por nome
+    colaboradoresComFerramentas.sort((a, b) => a.nome.localeCompare(b.nome));
+    
+    // Adicionar opções
+    colaboradoresComFerramentas.forEach(colaborador => {
+        const ferramentasAtivas = historicoAtribuicoes.filter(atribuicao => 
+            atribuicao.colaboradorId === colaborador.id && 
+            !atribuicao.dataDevolucao
+        ).length;
+        
+        const option = document.createElement('option');
+        option.value = colaborador.id;
+        option.textContent = `${colaborador.nome} (${colaborador.matricula}) - ${ferramentasAtivas} ferramenta${ferramentasAtivas !== 1 ? 's' : ''}`;
+        select.appendChild(option);
+    });
+}
+
+// Gerar número automático do recibo
+function generateReciboNumber() {
+    const reciboNumInput = document.getElementById('reciboNumero');
+    if (!reciboNumInput) return;
+    
+    const year = new Date().getFullYear();
+    const month = String(new Date().getMonth() + 1).padStart(2, '0');
+    const day = String(new Date().getDate()).padStart(2, '0');
+    const random = String(Math.floor(Math.random() * 9000) + 1000);
+    
+    reciboNumInput.value = `RCB-${year}${month}${day}-${random}`;
+}
+
+// Carregar ferramentas do colaborador selecionado
+function loadFerramentasColaboradorRecibo(colaboradorId) {
+    const tbody = document.getElementById('reciboFerramentasList');
+    const noFerramentasRow = document.getElementById('noReciboFerramentasRow');
+    
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    tbody.appendChild(noFerramentasRow);
+    
+    if (!colaboradorId) {
+        noFerramentasRow.style.display = 'table-row';
+        noFerramentasRow.innerHTML = '<td colspan="6" style="text-align: center; padding: 40px; color: var(--gray-color);">Selecione um colaborador para ver as ferramentas</td>';
+        reciboSelectedTools = [];
+        updateReciboSelectionCount();
+        return;
+    }
+    
+    // Buscar colaborador
+    const colaborador = colaboradores.find(c => c.id === colaboradorId);
+    if (!colaborador) return;
+    
+    reciboColaboradorSelecionado = colaborador;
+    
+    // Buscar ferramentas atribuídas ativas deste colaborador
+    const ferramentasAtivas = historicoAtribuicoes.filter(atribuicao => 
+        atribuicao.colaboradorId === colaboradorId && 
+        !atribuicao.dataDevolucao
+    );
+    
+    if (ferramentasAtivas.length === 0) {
+        noFerramentasRow.style.display = 'table-row';
+        noFerramentasRow.innerHTML = `<td colspan="6" style="text-align: center; padding: 40px; color: var(--gray-color);">
+            ${colaborador.nome} não possui ferramentas para devolução
+        </td>`;
+        reciboSelectedTools = [];
+        updateReciboSelectionCount();
+        return;
+    }
+    
+    noFerramentasRow.style.display = 'none';
+    
+    // Adicionar cada ferramenta à lista
+    ferramentasAtivas.forEach((atribuicao, index) => {
+        const tool = tools.find(t => t.id === atribuicao.toolId);
+        if (!tool) return;
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td style="text-align: center;">
+                <input type="checkbox" class="recibo-tool-checkbox" 
+                       data-id="${tool.id}" 
+                       data-atribuicao-id="${atribuicao.id}">
+            </td>
+            <td><strong>${tool.code}</strong></td>
+            <td>${tool.name}</td>
+            <td>${tool.category}</td>
+            <td>${formatDate(atribuicao.dataAtribuicao)}</td>
+            <td><span class="status-badge status-ontrack">Em Uso</span></td>
+        `;
+        tbody.appendChild(row);
+    });
+    
+    // Resetar seleção
+    reciboSelectedTools = [];
+    updateReciboSelectionCount();
+    
+    // Adicionar listeners aos checkboxes
+    addReciboCheckboxListeners();
+}
+
+// Adicionar listeners aos checkboxes do recibo
+function addReciboCheckboxListeners() {
+    // Checkbox "Selecionar Todos"
+    const checkAll = document.getElementById('checkAllRecibo');
+    if (checkAll) {
+        checkAll.onclick = function() {
+            const checkboxes = document.querySelectorAll('.recibo-tool-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = this.checked;
+                const toolId = parseInt(cb.getAttribute('data-id'));
+                const atribuicaoId = parseInt(cb.getAttribute('data-atribuicao-id'));
+                updateReciboSelection(toolId, atribuicaoId, this.checked);
+            });
+            updateReciboSelectionCount();
+        };
+    }
+    
+    // Checkboxes individuais
+    document.querySelectorAll('.recibo-tool-checkbox').forEach(checkbox => {
+        checkbox.onclick = function() {
+            const toolId = parseInt(this.getAttribute('data-id'));
+            const atribuicaoId = parseInt(this.getAttribute('data-atribuicao-id'));
+            updateReciboSelection(toolId, atribuicaoId, this.checked);
+            updateReciboSelectionCount();
+            
+            // Atualizar "Selecionar Todos"
+            const allCheckboxes = document.querySelectorAll('.recibo-tool-checkbox');
+            const allChecked = Array.from(allCheckboxes).every(cb => cb.checked);
+            const anyChecked = Array.from(allCheckboxes).some(cb => cb.checked);
+            
+            const checkAll = document.getElementById('checkAllRecibo');
+            if (checkAll) {
+                checkAll.checked = allChecked;
+                checkAll.indeterminate = !allChecked && anyChecked;
+            }
+        };
+    });
+}
+
+// Atualizar seleção de ferramentas no recibo
+function updateReciboSelection(toolId, atribuicaoId, isSelected) {
+    if (isSelected) {
+        if (!reciboSelectedTools.some(item => item.toolId === toolId)) {
+            reciboSelectedTools.push({
+                toolId: toolId,
+                atribuicaoId: atribuicaoId
+            });
+        }
+    } else {
+        const index = reciboSelectedTools.findIndex(item => item.toolId === toolId);
+        if (index > -1) {
+            reciboSelectedTools.splice(index, 1);
+        }
+    }
+}
+
+// Atualizar contagem de seleção do recibo
+function updateReciboSelectionCount() {
+    const countElement = document.getElementById('reciboSelectionCount');
+    if (!countElement) return;
+    
+    const count = reciboSelectedTools.length;
+    if (count === 0) {
+        countElement.textContent = 'Nenhuma ferramenta selecionada';
+        countElement.style.color = 'var(--gray-color)';
+    } else {
+        countElement.textContent = `${count} ferramenta${count !== 1 ? 's' : ''} selecionada${count !== 1 ? 's' : ''} para devolução`;
+        countElement.style.color = 'var(--success-color)';
+    }
+}
+
+// Selecionar todas as ferramentas no recibo
+function selectAllReciboTools() {
+    const checkAll = document.getElementById('checkAllRecibo');
+    if (checkAll) {
+        checkAll.checked = true;
+        checkAll.click();
+    }
+}
+
+// Desmarcar todas as ferramentas no recibo
+function deselectAllReciboTools() {
+    const checkAll = document.getElementById('checkAllRecibo');
+    if (checkAll) {
+        checkAll.checked = false;
+        checkAll.click();
+    }
+}
+
+// Limpar seleção do recibo
+function clearReciboSelection() {
+    reciboSelectedTools = [];
+    const checkAll = document.getElementById('checkAllRecibo');
+    if (checkAll) {
+        checkAll.checked = false;
+        checkAll.indeterminate = false;
+    }
+    
+    document.querySelectorAll('.recibo-tool-checkbox').forEach(cb => {
+        cb.checked = false;
+    });
+    
+    updateReciboSelectionCount();
+    hideReciboPreview();
+    
+    showNotification('Seleção de ferramentas limpa', 'info');
+}
+
+// Mostrar pré-visualização do recibo
+function showReciboPreview() {
+    const previewCard = document.getElementById('reciboPreviewCard');
+    if (previewCard) {
+        previewCard.style.display = 'block';
+    }
+}
+
+// Ocultar pré-visualização do recibo
+function hideReciboPreview() {
+    const previewCard = document.getElementById('reciboPreviewCard');
+    if (previewCard) {
+        previewCard.style.display = 'none';
+    }
+}
+// ============================================
+// EVENT LISTENERS PARA O SISTEMA DE RECIBO
+// ============================================
+
+// Função para adicionar event listeners do recibo
+function addReciboEventListeners() {
+    console.log('🔧 Adicionando event listeners do recibo...');
+    
+    // Seleção de colaborador
+    const colaboradorSelect = document.getElementById('reciboColaborador');
+    if (colaboradorSelect) {
+        colaboradorSelect.addEventListener('change', function() {
+            const colaboradorId = parseInt(this.value);
+            loadFerramentasColaboradorRecibo(colaboradorId);
+            clearReciboSelection();
+        });
+    }
+    
+    // Botão: Selecionar Todas
+    const selectAllBtn = document.getElementById('selectAllReciboBtn');
+    if (selectAllBtn) {
+        selectAllBtn.addEventListener('click', selectAllReciboTools);
+    }
+    
+    // Botão: Desmarcar Todas
+    const deselectAllBtn = document.getElementById('deselectAllReciboBtn');
+    if (deselectAllBtn) {
+        deselectAllBtn.addEventListener('click', deselectAllReciboTools);
+    }
+    
+    // Botão: Visualizar Recibo
+    const previewBtn = document.getElementById('previewReciboBtn');
+    if (previewBtn) {
+        previewBtn.addEventListener('click', generateReciboPreview);
+    }
+    
+    // Botão: Limpar Seleção
+    const clearBtn = document.getElementById('clearReciboSelectionBtn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', clearReciboSelection);
+    }
+    
+    // Botão: Gerar Recibo Excel
+    const generateBtn = document.getElementById('generateReciboExcelBtn');
+    if (generateBtn) {
+        generateBtn.addEventListener('click', generateReciboExcel);
+    }
+    
+    // Botão: Imprimir
+    const printBtn = document.getElementById('printReciboBtn');
+    if (printBtn) {
+        printBtn.addEventListener('click', printRecibo);
+    }
+    
+    // Botão: Exportar Recibo (na pré-visualização)
+    const exportBtn = document.getElementById('exportReciboBtn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', generateReciboExcel);
+    }
+    
+    // Configurar data atual quando abrir a aba
+    document.querySelector('[data-tab="exportar"]')?.addEventListener('click', function() {
+        setTimeout(() => {
+            document.getElementById('reciboData').value = new Date().toISOString().split('T')[0];
+        }, 100);
+    });
+}
+
+// Gerar pré-visualização do recibo
+function generateReciboPreview() {
+    if (!reciboColaboradorSelecionado) {
+        showNotification('Selecione um colaborador primeiro!', 'error');
+        return;
+    }
+    
+    if (reciboSelectedTools.length === 0) {
+        showNotification('Selecione pelo menos uma ferramenta para devolução!', 'error');
+        return;
+    }
+    
+    const previewBody = document.getElementById('reciboPreviewBody');
+    if (!previewBody) return;
+    
+    previewBody.innerHTML = '';
+    
+    let totalFerramentas = 0;
+    
+    reciboSelectedTools.forEach((item, index) => {
+        const tool = tools.find(t => t.id === item.toolId);
+        const atribuicao = historicoAtribuicoes.find(a => a.id === item.atribuicaoId);
+        
+        if (!tool || !atribuicao) return;
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td><strong>${tool.code}</strong></td>
+            <td>${tool.name}</td>
+            <td>${tool.category}</td>
+            <td>${tool.quantidade || 1}</td>
+            <td>${formatDate(atribuicao.dataAtribuicao)}</td>
+            <td>
+                <select class="form-control-sm recibo-condicao" style="width: 100%;" 
+                        data-tool-id="${tool.id}">
+                    <option value="Bom">Bom</option>
+                    <option value="Regular">Regular</option>
+                    <option value="Precisa de Reparo" selected>Precisa de Reparo</option>
+                    <option value="Danificado">Danificado</option>
+                </select>
+            </td>
+        `;
+        previewBody.appendChild(row);
+        
+        totalFerramentas += parseInt(tool.quantidade) || 1;
+    });
+    
+    // Adicionar linha de resumo
+    const summaryRow = document.createElement('tr');
+    summaryRow.style.backgroundColor = '#f8f9fa';
+    summaryRow.style.fontWeight = 'bold';
+    summaryRow.innerHTML = `
+        <td colspan="4" style="text-align: right;">TOTAL:</td>
+        <td>${totalFerramentas}</td>
+        <td colspan="2"></td>
+    `;
+    previewBody.appendChild(summaryRow);
+    
+    // Adicionar informações do recibo no cabeçalho da pré-visualização
+    const previewCard = document.getElementById('reciboPreviewCard');
+    const previewTitle = previewCard.querySelector('.card-title');
+    
+    if (previewTitle) {
+        previewTitle.innerHTML = `
+            <i class="fas fa-eye"></i> Pré-visualização do Recibo
+            <div style="font-size: 14px; font-weight: normal; color: var(--gray-color); margin-top: 5px;">
+                Colaborador: ${reciboColaboradorSelecionado.nome} (${reciboColaboradorSelecionado.matricula}) | 
+                Nº: ${document.getElementById('reciboNumero').value} | 
+                Data: ${document.getElementById('reciboData').value}
+            </div>
+        `;
+    }
+    
+    showReciboPreview();
+    showNotification(`Pré-visualizando ${reciboSelectedTools.length} ferramentas para devolução`, 'success');
+}
+
+// Gerar recibo Excel
+async function generateReciboExcel() {
+    if (!reciboColaboradorSelecionado) {
+        showNotification('Selecione um colaborador primeiro!', 'error');
+        return;
+    }
+    
+    if (reciboSelectedTools.length === 0) {
+        showNotification('Selecione pelo menos uma ferramenta para devolução!', 'error');
+        return;
+    }
+    
+    try {
+        // Mostrar loader
+        const generateBtn = document.getElementById('generateReciboExcelBtn');
+        const originalText = generateBtn.innerHTML;
+        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
+        generateBtn.disabled = true;
+        
+        // Obter dados do formulário
+        const reciboNumero = document.getElementById('reciboNumero').value;
+        const reciboData = document.getElementById('reciboData').value;
+        const observacoes = document.getElementById('reciboObservacoes').value.trim();
+        
+        // Criar workbook do Excel
+        const workbook = new ExcelJS.Workbook();
+        workbook.creator = 'Sistema de Controle de Ferramentas';
+        workbook.lastModifiedBy = currentUser?.name || 'Sistema';
+        workbook.created = new Date();
+        workbook.modified = new Date();
+        
+        // Worksheet principal
+        const worksheet = workbook.addWorksheet('RECIBO', {
+            pageSetup: {
+                paperSize: 9, // A4
+                orientation: 'portrait',
+                margins: { left: 0.7, right: 0.7, top: 0.7, bottom: 0.7 }
+            },
+            properties: {
+                defaultColWidth: 15
+            }
+        });
+        
+        // ============================================
+        // CABEÇALHO DO RECIBO
+        // ============================================
+        
+        // Título principal
+        worksheet.mergeCells('A1:H1');
+        const titleRow = worksheet.getRow(1);
+        const titleCell = worksheet.getCell('A1');
+        titleCell.value = 'RECIBO DE DEVOLUÇÃO DE FERRAMENTAS';
+        titleCell.style = {
+            font: { bold: true, size: 18, color: { argb: 'FFFFFFFF' } },
+            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2C3E50' } },
+            alignment: { horizontal: 'center', vertical: 'middle' }
+        };
+        titleRow.height = 40;
+        
+        // Informações do Recibo
+        worksheet.mergeCells('A2:D2');
+        const info1 = worksheet.getCell('A2');
+        info1.value = `Número: ${reciboNumero}`;
+        info1.style = {
+            font: { bold: true, size: 11 },
+            alignment: { horizontal: 'left' }
+        };
+        
+        worksheet.mergeCells('E2:H2');
+        const info2 = worksheet.getCell('E2');
+        info2.value = `Data: ${formatDate(reciboData)}`;
+        info2.style = {
+            font: { bold: true, size: 11 },
+            alignment: { horizontal: 'right' }
+        };
+        
+        // Linha em branco
+        worksheet.getRow(3).height = 10;
+        
+        // ============================================
+        // INFORMAÇÕES DO COLABORADOR
+        // ============================================
+        
+        worksheet.mergeCells('A4:H4');
+        const colaboradorTitle = worksheet.getCell('A4');
+        colaboradorTitle.value = 'INFORMAÇÕES DO COLABORADOR';
+        colaboradorTitle.style = {
+            font: { bold: true, size: 12, color: { argb: 'FFFFFFFF' } },
+            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF3498DB' } },
+            alignment: { horizontal: 'center', vertical: 'middle' }
+        };
+        
+        // Dados do colaborador
+        const colaboradorData = [
+            ['Nome:', reciboColaboradorSelecionado.nome, 'Matrícula:', reciboColaboradorSelecionado.matricula],
+            ['Setor:', reciboColaboradorSelecionado.setor || '-', 'Cargo:', reciboColaboradorSelecionado.cargo || '-'],
+            ['Telefone:', reciboColaboradorSelecionado.telefone || '-', 'Email:', reciboColaboradorSelecionado.email || '-']
+        ];
+        
+        colaboradorData.forEach((rowData, rowIndex) => {
+            const rowNum = 5 + rowIndex;
+            rowData.forEach((cellData, colIndex) => {
+                const colLetter = String.fromCharCode(65 + colIndex * 2); // A, C, E, G
+                const cell = worksheet.getCell(`${colLetter}${rowNum}`);
+                cell.value = cellData;
+                
+                if (colIndex % 2 === 0) {
+                    cell.style = { font: { bold: true } };
+                }
+            });
+        });
+        
+        // Linha em branco
+        worksheet.getRow(8).height = 15;
+        
+        // ============================================
+        // LISTA DE FERRAMENTAS
+        // ============================================
+        
+        worksheet.mergeCells('A9:H9');
+        const ferramentasTitle = worksheet.getCell('A9');
+        ferramentasTitle.value = 'FERRAMENTAS DEVOLVIDAS';
+        ferramentasTitle.style = {
+            font: { bold: true, size: 12, color: { argb: 'FFFFFFFF' } },
+            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF27AE60' } },
+            alignment: { horizontal: 'center', vertical: 'middle' }
+        };
+        
+        // Cabeçalho da tabela
+        const headers = ['#', 'Código', 'Nome da Ferramenta', 'Categoria', 'Quantidade', 'Data Atribuição', 'Data Devolução', 'Condição'];
+        const headerRow = worksheet.getRow(10);
+        
+        headers.forEach((header, index) => {
+            const cell = headerRow.getCell(index + 1);
+            cell.value = header;
+            cell.style = {
+                font: { bold: true, color: { argb: 'FFFFFFFF' } },
+                fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2C3E50' } },
+                alignment: { horizontal: 'center', vertical: 'middle' },
+                border: {
+                    top: { style: 'thin', color: { argb: 'FF1C2C3C' } },
+                    bottom: { style: 'thin', color: { argb: 'FF1C2C3C' } },
+                    left: { style: 'thin', color: { argb: 'FF1C2C3C' } },
+                    right: { style: 'thin', color: { argb: 'FF1C2C3C' } }
+                }
+            };
+        });
+        headerRow.height = 25;
+        
+        // Dados das ferramentas
+        let startDataRow = 11;
+        let totalQuantidade = 0;
+        
+        reciboSelectedTools.forEach((item, index) => {
+            const tool = tools.find(t => t.id === item.toolId);
+            const atribuicao = historicoAtribuicoes.find(a => a.id === item.atribuicaoId);
+            
+            if (!tool || !atribuicao) return;
+            
+            const rowNum = startDataRow + index;
+            const row = worksheet.getRow(rowNum);
+            
+            // Obter condição selecionada na pré-visualização
+            const condicaoSelect = document.querySelector(`.recibo-condicao[data-tool-id="${tool.id}"]`);
+            const condicao = condicaoSelect ? condicaoSelect.value : 'Bom';
+            
+            const rowData = [
+                index + 1,
+                tool.code,
+                tool.name,
+                tool.category,
+                tool.quantidade || 1,
+                formatDate(atribuicao.dataAtribuicao),
+                formatDate(new Date().toISOString().split('T')[0]),
+                condicao
+            ];
+            
+            rowData.forEach((cellData, colIndex) => {
+                const cell = row.getCell(colIndex + 1);
+                cell.value = cellData;
+                
+                // Estilo para linhas alternadas
+                if (index % 2 === 0) {
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: 'FFFFFFFF' }
+                    };
+                } else {
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: 'FFF8F9FA' }
+                    };
+                }
+                
+                // Centralizar algumas colunas
+                if (colIndex === 0 || colIndex === 4) {
+                    cell.alignment = { horizontal: 'center' };
+                }
+            });
+            
+            totalQuantidade += parseInt(tool.quantidade) || 1;
+        });
+        
+        // Linha de total
+        const totalRowNum = startDataRow + reciboSelectedTools.length;
+        worksheet.mergeCells(`A${totalRowNum}:D${totalRowNum}`);
+        const totalLabel = worksheet.getCell(`A${totalRowNum}`);
+        totalLabel.value = 'TOTAL DE FERRAMENTAS DEVOLVIDAS:';
+        totalLabel.style = {
+            font: { bold: true, size: 11 },
+            alignment: { horizontal: 'right' }
+        };
+        
+        const totalCell = worksheet.getCell(`E${totalRowNum}`);
+        totalCell.value = totalQuantidade;
+        totalCell.style = {
+            font: { bold: true, size: 11, color: { argb: 'FF27AE60' } },
+            alignment: { horizontal: 'center' }
+        };
+        
+        // ============================================
+        // OBSERVAÇÕES E ASSINATURAS
+        // ============================================
+        
+        const obsRowNum = totalRowNum + 2;
+        if (observacoes) {
+            worksheet.mergeCells(`A${obsRowNum}:H${obsRowNum}`);
+            const obsCell = worksheet.getCell(`A${obsRowNum}`);
+            obsCell.value = `OBSERVAÇÕES: ${observacoes}`;
+            obsCell.style = {
+                font: { italic: true, size: 10 },
+                alignment: { horizontal: 'left' }
+            };
+        }
+        
+        // Assinaturas
+        const assinaturaRowNum = obsRowNum + 4;
+        worksheet.mergeCells(`A${assinaturaRowNum}:D${assinaturaRowNum}`);
+        const recebidoPor = worksheet.getCell(`A${assinaturaRowNum}`);
+        recebidoPor.value = 'Recebido por: _________________________________';
+        recebidoPor.style = {
+            font: { size: 11 },
+            alignment: { horizontal: 'center' }
+        };
+        
+        worksheet.mergeCells(`E${assinaturaRowNum}:H${assinaturaRowNum}`);
+        const entreguePor = worksheet.getCell(`E${assinaturaRowNum}`);
+        entreguePor.value = 'Entregue por: _________________________________';
+        entreguePor.style = {
+            font: { size: 11 },
+            alignment: { horizontal: 'center' }
+        };
+        
+        // Nomes
+        const nomeRowNum = assinaturaRowNum + 2;
+        worksheet.mergeCells(`A${nomeRowNum}:D${nomeRowNum}`);
+        const recebidoNome = worksheet.getCell(`A${nomeRowNum}`);
+        recebidoNome.value = currentUser?.name || 'Responsável do Almoxarifado';
+        recebidoNome.style = {
+            font: { size: 10 },
+            alignment: { horizontal: 'center' }
+        };
+        
+        worksheet.mergeCells(`E${nomeRowNum}:H${nomeRowNum}`);
+        const entregueNome = worksheet.getCell(`E${nomeRowNum}`);
+        entregueNome.value = reciboColaboradorSelecionado.nome;
+        entregueNome.style = {
+            font: { size: 10 },
+            alignment: { horizontal: 'center' }
+        };
+        
+        // ============================================
+        // AJUSTAR LARGURAS DAS COLUNAS
+        // ============================================
+        
+        const columnWidths = [5, 15, 30, 20, 12, 15, 15, 15];
+        columnWidths.forEach((width, index) => {
+            const colLetter = String.fromCharCode(65 + index);
+            worksheet.getColumn(colLetter).width = width;
+        });
+        
+        // ============================================
+        // SALVAR ARQUIVO
+        // ============================================
+        
+        const fileName = `RECIBO_${reciboNumero}_${reciboColaboradorSelecionado.nome.replace(/[^a-z0-9]/gi, '_')}.xlsx`;
+        
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { 
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+        });
+        
+        saveAs(blob, fileName);
+        
+        // Registrar devolução no histórico
+        await registrarDevolucaoFerramentas();
+        
+        // Restaurar botão
+        generateBtn.innerHTML = originalText;
+        generateBtn.disabled = false;
+        
+        showNotification(`Recibo gerado com ${reciboSelectedTools.length} ferramentas!`, 'success');
+        
+    } catch (error) {
+        console.error('Erro ao gerar recibo:', error);
+        
+        // Restaurar botão em caso de erro
+        const generateBtn = document.getElementById('generateReciboExcelBtn');
+        if (generateBtn) {
+            generateBtn.innerHTML = '<i class="fas fa-file-excel"></i> Gerar Recibo Excel';
+            generateBtn.disabled = false;
+        }
+        
+        showNotification(`Erro ao gerar recibo: ${error.message}`, 'error');
+    }
+}
+
+// Função para imprimir recibo
+function printRecibo() {
+    if (!reciboColaboradorSelecionado) {
+        showNotification('Selecione um colaborador primeiro!', 'error');
+        return;
+    }
+    
+    if (reciboSelectedTools.length === 0) {
+        showNotification('Selecione pelo menos uma ferramenta para devolução!', 'error');
+        return;
+    }
+    
+    // Gerar conteúdo HTML para impressão
+    const printContent = generatePrintContent();
+    
+    // Abrir janela de impressão
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    
+    // Aguardar carregamento e imprimir
+    setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+    }, 500);
+    
+    showNotification('Preparando para impressão...', 'info');
+}
 // ============================================
 // GERADOR DE CÓDIGO AUTOMÁTICO PARA COLABORADORES
 // ============================================
@@ -5575,6 +6466,7 @@ async function processMergeAtribuicoes(cloudAtribuicoes) {
         throw error;
     }
 }
+
 // =============================================
 // NOVA FUNÇÃO PARA SINCRONIZAÇÃO DE ATRIBUIÇÕES
 // =============================================
@@ -5624,7 +6516,126 @@ async function mergeAtribuicoes(atribuicoesDaNuvem) {
                 added++;
             }
         }
+        // ============================================
+// MODIFICAÇÃO NA FUNÇÃO initializeSystem
+// ============================================
+
+async function initializeSystem() {
+    try {
+        console.log('🔧 INICIALIZANDO SISTEMA para:', currentUser?.email);
         
+        // 1. Adicionar campo oculto para usuário
+        const usuarioField = document.createElement('input');
+        usuarioField.type = 'hidden';
+        usuarioField.id = 'usuarioCadastroField';
+        usuarioField.value = currentUser ? currentUser.name : 'Sistema';
+        document.getElementById('toolForm').appendChild(usuarioField);
+        
+        // 2. Carregar dados locais
+        await loadInitialTools();
+        console.log('📁 Dados locais carregados:', tools.length, 'itens');
+        
+        // 3. Carregar colaboradores LOCAIS primeiro
+        loadColaboradores();
+        console.log('👥 Colaboradores locais:', colaboradores ? colaboradores.length : 0);
+        
+        // 4. Verificar status do IndexedDB
+        await updateIndexedDBStatus();
+        
+        // 5. ATUALIZAR INTERFACE INICIAL
+        updateHeaderStats();
+        updateStatistics();
+        loadToolsList();
+        updateColaboradoresList();
+        
+        // 6. Inicializar sistema de romaneio
+        initializeRomaneioListeners();
+        loadRomaneioTemplates();
+        
+        // 7. Inicializar sistema de recibo (NOVO)
+        initializeReciboSystem();
+        addReciboEventListeners();
+        
+        // 8. Configurar data atual
+        document.getElementById('dataCadastro').value = new Date().toISOString().split('T')[0];
+        document.getElementById('dataAtribuicao').value = new Date().toISOString().split('T')[0];
+        
+        // 9. INICIALIZAR GERADOR DE CÓDIGO PARA COLABORADORES
+        inicializarGeradorCodigoColaborador();
+        
+        // 10. SEMPRE tentar conectar ao Supabase com credenciais fixas
+        console.log('☁️ Conectando automaticamente ao Supabase...');
+        console.log('URL:', FIXED_SUPABASE_CONFIG.url);
+        
+        const connected = await setupSupabaseClient();
+        
+        if (connected) {
+            console.log('✅ Conectado ao Supabase! Buscando dados...');
+            
+            // 11. BUSCA AUTOMÁTICA DE COLABORADORES DA NUVEM (com delay)
+            setTimeout(async () => {
+                try {
+                    console.log('🔄 Buscando colaboradores da nuvem...');
+                    
+                    // Primeiro, buscar colaboradores da nuvem
+                    const fetchedColabs = await fetchColaboradoresFromSupabase();
+                    
+                    // Depois, buscar ferramentas da nuvem
+                    const fetchedTools = await fetchFromSupabase();
+                    
+                    if (fetchedColabs || fetchedTools) {
+                        console.log('✅ Dados sincronizados da nuvem');
+                        lastSyncTime = new Date();
+                        updateConnectionStatus();
+                        
+                        // Atualizar contagem de colaboradores na interface
+                        updateColaboradoresCountUI();
+                    }
+                } catch (syncError) {
+                    console.error('❌ Erro na sincronização automática:', syncError);
+                    showNotification('Erro na sincronização automática da nuvem.', 'warning');
+                }
+            }, 1000); // Delay de 1.0 segundos para não sobrecarregar
+            
+        } else {
+            console.log('⚠️ Modo local ativo');
+            showNotification('Modo local ativo.', 'info');
+        }
+        
+        // 12. Mostrar botão de enviar para nuvem (se tiver permissão)
+        showCloudUploadButton();
+        
+        // 13. Atualizar status da conexão
+        updateConnectionStatus();
+        
+        // 14. Inicializar sistema de atribuições
+        setTimeout(async () => {
+            try {
+                console.log('🔄 Inicializando sistema de atribuições...');
+                initializeAtribuicoesSystem();
+                
+                // Verificar atribuições pendentes
+                const atribuicoesPendentes = historicoAtribuicoes.filter(a => !a.dataDevolucao);
+                console.log(`📊 Atribuições ativas: ${atribuicoesPendentes.length}`);
+                
+                // Atualizar status das ferramentas baseado nas atribuições
+                updateFerramentasFromAtribuicoes();
+            } catch (error) {
+                console.error('❌ Erro ao inicializar sistema de atribuições:', error);
+            }
+        }, 2000);
+        
+        // 15. Inicializar modo noturno
+        initializeDarkMode();
+        
+        showNotification('Sistema inicializado!', 'success');
+        console.log('✅ Sistema inicializado com sucesso');
+        
+    } catch (error) {
+        console.error('❌ Erro na inicialização:', error);
+        showNotification('Erro ao inicializar.', 'error');
+    }
+}
         // Remover duplicatas (manter apenas a mais recente por tool+colaborador)
         const uniqueAtribuicoes = [];
         const seen = new Set();
@@ -5913,7 +6924,20 @@ function updateFerramentasFromAtribuicoes() {
 // ============================================
 // MODIFICAÇÕES NA FUNÇÃO DE VALIDAÇÃO
 // ============================================
+// ============================================
+// EVENT LISTENER PARA A ABA EXPORTAR
+// ============================================
 
+document.querySelector('[data-tab="exportar"]')?.addEventListener('click', function() {
+    // Carregar dados das movimentações
+    updateMovimentacoesStats();
+    
+    // Inicializar sistema de recibo
+    setTimeout(() => {
+        initializeReciboSystem();
+        addReciboEventListeners();
+    }, 100);
+});
 // Atualize a função validateColaboradorForm() para incluir validação do formato:
 function validateColaboradorForm() {
     let isValid = true;
@@ -14579,5 +15603,3 @@ document.querySelector('[data-tab="saida-ferramentas"]')?.addEventListener('clic
     </script>
 </body>
 </html>
-
-
