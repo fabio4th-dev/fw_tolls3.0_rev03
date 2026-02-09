@@ -4031,9 +4031,9 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
                        placeholder="Ex: Obra Centro, Imperatriz-MA" required>
             </div>
             <div class="form-group">
-                <label for="reciboFuncionario" class="required">Funcionário</label>
+                <label for="reciboFuncionario" class="required">Colaborador</label>
                 <input type="text" id="reciboFuncionario" class="form-control" 
-                       placeholder="Nome completo do funcionário" required>
+                       placeholder="Nome completo do Colaborador" required>
             </div>
             <div class="form-group">
                 <label for="reciboFuncao" class="required">Função</label>
@@ -4616,7 +4616,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
         <footer class="site-footer">
             <div class="footer-content">
                 <p>Desenvolvido por Fábio Mendes Rodrigues, Planejador da F.W. Company</p>
-                <p class="footer-version">Versão 3.0_rev08c | Última atualização: <span id="currentDate"></span></p>
+                <p class="footer-version">Versão 3.0_d | Última atualização: <span id="currentDate"></span></p>
             </div>
         </footer>
 
@@ -4721,34 +4721,38 @@ function initializeReciboSystem() {
     generateReciboNumber();
 }
 
-// Carregar colaboradores no select do recibo
+// Função corrigida para carregar colaboradores no select do recibo
 function loadColaboradoresReciboSelect() {
     const select = document.getElementById('reciboColaborador');
     if (!select) return;
     
     select.innerHTML = '<option value="">Selecione um colaborador</option>';
     
-    // Filtrar apenas colaboradores com ferramentas atribuídas
-    const colaboradoresComFerramentas = colaboradores.filter(colaborador => {
-        // Usar o histórico para verificar se há ferramentas ativas
-        const ferramentasAtivas = historicoAtribuicoes.filter(atribuicao => 
-            atribuicao.colaboradorId === colaborador.id && 
-            !atribuicao.dataDevolucao
-        );
-        return ferramentasAtivas.length > 0;
-    });
+    // VERIFICAÇÃO DE DEPURAÇÃO
+    console.log('👥 Total de colaboradores cadastrados:', colaboradores.length);
+    console.log('📋 Lista de colaboradores:', colaboradores.map(c => ({ id: c.id, nome: c.nome, matricula: c.matricula })));
     
-    if (colaboradoresComFerramentas.length === 0) {
-        select.innerHTML += '<option value="" disabled>Nenhum colaborador com ferramentas atribuídas</option>';
+    if (colaboradores.length === 0) {
+        select.innerHTML += '<option value="" disabled>Nenhum colaborador cadastrado</option>';
         select.disabled = true;
+        console.warn('⚠️ Nenhum colaborador cadastrado no sistema');
         return;
     }
     
+    // Verificar histórico de atribuições
+    console.log('📊 Histórico de atribuições:', historicoAtribuicoes.length);
+    console.log('🔍 Atribuições ativas:', historicoAtribuicoes.filter(a => !a.dataDevolucao).length);
+    
+    // MUDANÇA AQUI: Mostrar TODOS os colaboradores, não apenas os com ferramentas
+    // Isso permite que o usuário selecione qualquer colaborador para criar um recibo
+    const colaboradoresParaMostrar = [...colaboradores];
+    
     // Ordenar por nome
-    colaboradoresComFerramentas.sort((a, b) => a.nome.localeCompare(b.nome));
+    colaboradoresParaMostrar.sort((a, b) => a.nome.localeCompare(b.nome));
     
     // Adicionar opções
-    colaboradoresComFerramentas.forEach(colaborador => {
+    colaboradoresParaMostrar.forEach(colaborador => {
+        // Contar ferramentas ativas deste colaborador
         const ferramentasAtivas = historicoAtribuicoes.filter(atribuicao => 
             atribuicao.colaboradorId === colaborador.id && 
             !atribuicao.dataDevolucao
@@ -4756,10 +4760,205 @@ function loadColaboradoresReciboSelect() {
         
         const option = document.createElement('option');
         option.value = colaborador.id;
-        option.textContent = `${colaborador.nome} (${colaborador.matricula}) - ${ferramentasAtivas} ferramenta${ferramentasAtivas !== 1 ? 's' : ''}`;
+        option.textContent = `${colaborador.nome} (${colaborador.matricula})`;
+        
+        // Adicionar informação sobre ferramentas se houver
+        if (ferramentasAtivas > 0) {
+            option.textContent += ` - ${ferramentasAtivas} ferramenta${ferramentasAtivas !== 1 ? 's' : ''} em uso`;
+            option.style.fontWeight = 'bold';
+        } else {
+            option.textContent += ' - Sem ferramentas';
+            option.style.color = 'var(--gray-color)';
+        }
+        
         select.appendChild(option);
     });
+    
+    console.log(`✅ ${colaboradoresParaMostrar.length} colaboradores carregados no select`);
 }
+
+// Função melhorada para carregar ferramentas do colaborador
+function loadFerramentasColaboradorRecibo(colaboradorId) {
+    const tbody = document.getElementById('reciboFerramentasList');
+    const noFerramentasRow = document.getElementById('noReciboFerramentasRow');
+    
+    if (!tbody) {
+        console.error('❌ TBody do recibo não encontrado');
+        return;
+    }
+    
+    tbody.innerHTML = '';
+    tbody.appendChild(noFerramentasRow);
+    
+    if (!colaboradorId) {
+        noFerramentasRow.style.display = 'table-row';
+        noFerramentasRow.innerHTML = '<td colspan="6" style="text-align: center; padding: 40px; color: var(--gray-color);">Selecione um colaborador para ver as ferramentas</td>';
+        reciboSelectedTools = [];
+        updateReciboSelectionCount();
+        return;
+    }
+    
+    // Buscar colaborador
+    const colaborador = colaboradores.find(c => c.id === colaboradorId);
+    if (!colaborador) {
+        console.error('❌ Colaborador não encontrado ID:', colaboradorId);
+        return;
+    }
+    
+    reciboColaboradorSelecionado = colaborador;
+    console.log(`👤 Colaborador selecionado: ${colaborador.nome} (ID: ${colaborador.id})`);
+    
+    // Buscar TODAS as ferramentas do sistema (para mostrar opções disponíveis)
+    const todasFerramentas = tools;
+    
+    if (todasFerramentas.length === 0) {
+        noFerramentasRow.style.display = 'table-row';
+        noFerramentasRow.innerHTML = `<td colspan="6" style="text-align: center; padding: 40px; color: var(--gray-color);">
+            Nenhuma ferramenta cadastrada no sistema
+        </td>`;
+        reciboSelectedTools = [];
+        updateReciboSelectionCount();
+        return;
+    }
+    
+    // Buscar ferramentas atribuídas ativas deste colaborador
+    const ferramentasAtivas = historicoAtribuicoes.filter(atribuicao => 
+        atribuicao.colaboradorId === colaboradorId && 
+        !atribuicao.dataDevolucao
+    );
+    
+    console.log(`🛠️ Ferramentas ativas do colaborador: ${ferramentasAtivas.length}`);
+    
+    // MUDANÇA AQUI: Mostrar TODAS as ferramentas disponíveis para seleção
+    // não apenas as que estão atribuídas ao colaborador
+    const ferramentasParaMostrar = [...todasFerramentas];
+    
+    // Ordenar por código
+    ferramentasParaMostrar.sort((a, b) => a.code.localeCompare(b.code));
+    
+    noFerramentasRow.style.display = 'none';
+    
+    // Adicionar cada ferramenta à lista
+    ferramentasParaMostrar.forEach((tool, index) => {
+        // Verificar se está atribuída a este colaborador
+        const atribuicaoAtiva = ferramentasAtivas.find(atribuicao => atribuicao.toolId === tool.id);
+        const estaAtribuida = !!atribuicaoAtiva;
+        
+        const row = document.createElement('tr');
+        row.style.backgroundColor = estaAtribuida ? '#e8f5e9' : '#fff3e0';
+        
+        row.innerHTML = `
+            <td style="text-align: center;">
+                <input type="checkbox" class="recibo-tool-checkbox" 
+                       data-id="${tool.id}" 
+                       data-atribuicao-id="${atribuicaoAtiva ? atribuicaoAtiva.id : ''}"
+                       ${estaAtribuida ? 'checked' : ''}>
+            </td>
+            <td><strong>${tool.code}</strong></td>
+            <td>${tool.name}</td>
+            <td>${tool.category}</td>
+            <td>${atribuicaoAtiva ? formatDate(atribuicaoAtiva.dataAtribuicao) : 'Não atribuída'}</td>
+            <td>
+                <span class="status-badge ${estaAtribuida ? 'status-ontrack' : 'status-completed'}">
+                    ${estaAtribuida ? 'Em Uso' : 'Disponível'}
+                </span>
+            </td>
+        `;
+        tbody.appendChild(row);
+        
+        // Se estiver atribuída, adicionar automaticamente à seleção
+        if (estaAtribuida && atribuicaoAtiva) {
+            if (!reciboSelectedTools.some(item => item.toolId === tool.id)) {
+                reciboSelectedTools.push({
+                    toolId: tool.id,
+                    atribuicaoId: atribuicaoAtiva.id
+                });
+            }
+        }
+    });
+    
+    // Atualizar contagem
+    updateReciboSelectionCount();
+    
+    // Adicionar listeners aos checkboxes
+    addReciboCheckboxListeners();
+    
+    console.log(`✅ ${ferramentasParaMostrar.length} ferramentas carregadas para seleção`);
+}
+
+// Adicionar função para forçar recarregamento do select
+function refreshReciboColaboradoresList() {
+    console.log('🔄 Recarregando lista de colaboradores para recibo...');
+    loadColaboradoresReciboSelect();
+}
+
+// Adicionar botão de atualização (opcional)
+function addRefreshButton() {
+    const formGroup = document.querySelector('#reciboColaborador').closest('.form-group');
+    if (!formGroup || document.getElementById('refreshColaboradoresBtn')) return;
+    
+    const refreshButton = document.createElement('button');
+    refreshButton.id = 'refreshColaboradoresBtn';
+    refreshButton.type = 'button';
+    refreshButton.className = 'btn btn-sm btn-info';
+    refreshButton.style.marginLeft = '10px';
+    refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
+    refreshButton.title = 'Atualizar lista de colaboradores';
+    
+    refreshButton.addEventListener('click', function() {
+        refreshReciboColaboradoresList();
+        showNotification('Lista de colaboradores atualizada', 'info');
+    });
+    
+    // Adicionar depois do select
+    const select = document.getElementById('reciboColaborador');
+    select.parentNode.insertBefore(refreshButton, select.nextSibling);
+}
+
+// Modificar a função initializeReciboSystem para incluir o botão de refresh
+function initializeReciboSystem() {
+    console.log('🔄 Inicializando sistema de recibo...');
+    
+    // Carregar lista de colaboradores no select
+    loadColaboradoresReciboSelect();
+    
+    // Configurar data atual
+    document.getElementById('reciboData').value = new Date().toISOString().split('T')[0];
+    
+    // Gerar número do recibo
+    generateReciboNumber();
+    
+    // Adicionar botão de refresh (opcional)
+    addRefreshButton();
+    
+    // Adicionar evento para debug
+    const select = document.getElementById('reciboColaborador');
+    if (select) {
+        select.addEventListener('focus', function() {
+            console.log('🔍 Debug - Total colaboradores:', colaboradores.length);
+            console.log('🔍 Debug - Colaboradores:', colaboradores);
+        });
+    }
+}
+
+// Adicionar verificação automática quando o sistema carrega
+document.addEventListener('DOMContentLoaded', function() {
+    // Verificar se a aba exportar está ativa
+    setTimeout(() => {
+        const exportarTab = document.querySelector('[data-tab="exportar"]');
+        if (exportarTab && exportarTab.classList.contains('active')) {
+            console.log('🔍 Verificando sistema de recibo...');
+            
+            // Verificar se há colaboradores
+            if (colaboradores.length === 0) {
+                console.warn('⚠️ Sistema de recibo: Nenhum colaborador cadastrado');
+                showNotification('Cadastre colaboradores primeiro para usar o sistema de recibos', 'warning');
+            } else {
+                console.log(`✅ Sistema de recibo: ${colaboradores.length} colaboradores disponíveis`);
+            }
+        }
+    }, 1000);
+});
 
 // Gerar número automático do recibo
 function generateReciboNumber() {
@@ -5114,7 +5313,10 @@ function generateReciboPreview() {
     showNotification(`Pré-visualizando ${reciboSelectedTools.length} ferramentas para devolução`, 'success');
 }
 
-// Gerar recibo Excel
+// ============================================
+// FUNÇÃO CORRIGIDA: Gerar Recibo Excel com formatação igual ao Romaneio
+// ============================================
+
 async function generateReciboExcel() {
     if (!reciboColaboradorSelecionado) {
         showNotification('Selecione um colaborador primeiro!', 'error');
@@ -5145,126 +5347,374 @@ async function generateReciboExcel() {
         workbook.created = new Date();
         workbook.modified = new Date();
         
-        // Worksheet principal
+        // ============================================
+        // CONFIGURAR WORKSHEET NO ESTILO ROMANEIO
+        // ============================================
+        
         const worksheet = workbook.addWorksheet('RECIBO', {
             pageSetup: {
                 paperSize: 9, // A4
                 orientation: 'portrait',
-                margins: { left: 0.7, right: 0.7, top: 0.7, bottom: 0.7 }
+                margins: {
+                    left: 0.30, right: 0.30,
+                    top: 0.30, bottom: 0.30,
+                    header: 0.3, footer: 0.3
+                }
             },
             properties: {
-                defaultColWidth: 15
+                defaultColWidth: 10,
+                defaultRowHeight: 20
             }
         });
         
         // ============================================
-        // CABEÇALHO DO RECIBO
+        // CONFIGURAR LARGURAS DAS COLUNAS (A-R) - IDÊNTICO AO ROMANEIO
         // ============================================
-        
-        // Título principal
-        worksheet.mergeCells('A1:H1');
-        const titleRow = worksheet.getRow(1);
-        const titleCell = worksheet.getCell('A1');
-        titleCell.value = 'RECIBO DE DEVOLUÇÃO DE FERRAMENTAS';
-        titleCell.style = {
-            font: { bold: true, size: 18, color: { argb: 'FFFFFFFF' } },
-            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2C3E50' } },
-            alignment: { horizontal: 'center', vertical: 'middle' }
-        };
-        titleRow.height = 40;
-        
-        // Informações do Recibo
-        worksheet.mergeCells('A2:D2');
-        const info1 = worksheet.getCell('A2');
-        info1.value = `Número: ${reciboNumero}`;
-        info1.style = {
-            font: { bold: true, size: 11 },
-            alignment: { horizontal: 'left' }
-        };
-        
-        worksheet.mergeCells('E2:H2');
-        const info2 = worksheet.getCell('E2');
-        info2.value = `Data: ${formatDate(reciboData)}`;
-        info2.style = {
-            font: { bold: true, size: 11 },
-            alignment: { horizontal: 'right' }
-        };
-        
-        // Linha em branco
-        worksheet.getRow(3).height = 10;
+        const columnWidths = [];
+        for (let i = 0; i < 18; i++) {
+            const colLetter = String.fromCharCode(65 + i); // A a R
+            let width = 5; // largura padrão
+    
+            // Configurar larguras específicas baseadas no novo Excel
+            switch (colLetter) {
+                case 'A': width = 1; break;   // Coluna A vazia
+                case 'B': width = 4; break;   // Nº
+                case 'C': width = 12; break;  // DESCRIÇÃO DE MATERIAL
+                case 'D': width = 3; break;
+                case 'E': width = 3; break;
+                case 'F': width = 3; break;
+                case 'G': width = 3; break;
+                case 'H': width = 3; break;
+                case 'I': width = 2; break;
+                case 'J': width = 2; break;
+                case 'K': width = 2; break;  // FINAL DA DESCRIÇÃO
+                case 'L': width = 10; break;  // N.C.M.
+                case 'M': width = 10; break;  // Nº PATR.
+                case 'N': width = 5; break;   // QTD.
+                case 'O': width = 12; break;  // DESCRIÇÃO
+                case 'R': width = 11; break;  // VAL. UNIT
+                default: width = 5; break;
+            }
+            columnWidths.push({ key: colLetter, width });
+        }
+        worksheet.columns = columnWidths;
         
         // ============================================
-        // INFORMAÇÕES DO COLABORADOR
+        // DEFINIÇÃO DE ESTILOS (MESMO DO ROMANEIO)
         // ============================================
-        
-        worksheet.mergeCells('A4:H4');
-        const colaboradorTitle = worksheet.getCell('A4');
-        colaboradorTitle.value = 'INFORMAÇÕES DO COLABORADOR';
-        colaboradorTitle.style = {
-            font: { bold: true, size: 12, color: { argb: 'FFFFFFFF' } },
-            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF3498DB' } },
-            alignment: { horizontal: 'center', vertical: 'middle' }
-        };
-        
-        // Dados do colaborador
-        const colaboradorData = [
-            ['Nome:', reciboColaboradorSelecionado.nome, 'Matrícula:', reciboColaboradorSelecionado.matricula],
-            ['Setor:', reciboColaboradorSelecionado.setor || '-', 'Cargo:', reciboColaboradorSelecionado.cargo || '-'],
-            ['Telefone:', reciboColaboradorSelecionado.telefone || '-', 'Email:', reciboColaboradorSelecionado.email || '-']
-        ];
-        
-        colaboradorData.forEach((rowData, rowIndex) => {
-            const rowNum = 5 + rowIndex;
-            rowData.forEach((cellData, colIndex) => {
-                const colLetter = String.fromCharCode(65 + colIndex * 2); // A, C, E, G
-                const cell = worksheet.getCell(`${colLetter}${rowNum}`);
-                cell.value = cellData;
-                
-                if (colIndex % 2 === 0) {
-                    cell.style = { font: { bold: true } };
-                }
-            });
-        });
-        
-        // Linha em branco
-        worksheet.getRow(8).height = 15;
-        
-        // ============================================
-        // LISTA DE FERRAMENTAS
-        // ============================================
-        
-        worksheet.mergeCells('A9:H9');
-        const ferramentasTitle = worksheet.getCell('A9');
-        ferramentasTitle.value = 'FERRAMENTAS DEVOLVIDAS';
-        ferramentasTitle.style = {
-            font: { bold: true, size: 12, color: { argb: 'FFFFFFFF' } },
-            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF27AE60' } },
-            alignment: { horizontal: 'center', vertical: 'middle' }
-        };
-        
-        // Cabeçalho da tabela
-        const headers = ['#', 'Código', 'Nome da Ferramenta', 'Categoria', 'Quantidade', 'Data Atribuição', 'Data Devolução', 'Condição'];
-        const headerRow = worksheet.getRow(10);
-        
-        headers.forEach((header, index) => {
-            const cell = headerRow.getCell(index + 1);
-            cell.value = header;
-            cell.style = {
-                font: { bold: true, color: { argb: 'FFFFFFFF' } },
-                fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2C3E50' } },
-                alignment: { horizontal: 'center', vertical: 'middle' },
+        const styles = {
+            headerMain: {
+                font: {
+                    name: 'Arial',
+                    size: 16,
+                    bold: true,
+                    color: { argb: 'FFFFFF' }
+                },
+                fill: {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FF2C3E50' }
+                },
+                alignment: {
+                    horizontal: 'center',
+                    vertical: 'middle'
+                },
                 border: {
-                    top: { style: 'thin', color: { argb: 'FF1C2C3C' } },
-                    bottom: { style: 'thin', color: { argb: 'FF1C2C3C' } },
-                    left: { style: 'thin', color: { argb: 'FF1C2C3C' } },
-                    right: { style: 'thin', color: { argb: 'FF1C2C3C' } }
+                    top: { style: 'thin', color: { argb: '1C2C3C' } },
+                    bottom: { style: 'thin', color: { argb: '1C2C3C' } },
+                    left: { style: 'thin', color: { argb: '1C2C3C' } },
+                    right: { style: 'thin', color: { argb: '1C2C3C' } }
                 }
-            };
-        });
-        headerRow.height = 25;
+            },
+            
+            sectionTitle: {
+                font: {
+                    name: 'Arial',
+                    size: 10,
+                    bold: true,
+                    color: { argb: '2C3E50' }
+                },
+                fill: {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'ECF0F1' }
+                },
+                alignment: {
+                    vertical: 'middle'
+                }
+            },
+            
+            fieldLabel: {
+                font: {
+                    name: 'Arial',
+                    size: 10,
+                    bold: true,
+                    color: { argb: '34495E' }
+                }
+            },
+            
+            fieldValue: {
+                font: {
+                    name: 'Arial',
+                    size: 10,
+                    color: { argb: '2C3E50' }
+                },
+                fill: {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'F8F9FA' }
+                }
+            },
+            
+            tableHeader: {
+                font: {
+                    name: 'Arial',
+                    size: 10,
+                    bold: true,
+                    color: { argb: 'FFFFFF' }
+                },
+                fill: {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: '3498DB' }
+                },
+                alignment: {
+                    horizontal: 'center',
+                    vertical: 'middle'
+                },
+                border: {
+                    top: { style: 'thin', color: { argb: '2980B9' } },
+                    bottom: { style: 'thin', color: { argb: '2980B9' } },
+                    left: { style: 'thin', color: { argb: '2980B9' } },
+                    right: { style: 'thin', color: { argb: '2980B9' } }
+                }
+            },
+            
+            tableRowEven: {
+                font: {
+                    name: 'Arial',
+                    size: 10,
+                    color: { argb: '2C3E50' }
+                },
+                fill: {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FFFFFF' }
+                },
+                border: {
+                    bottom: { style: 'thin', color: { argb: 'ECF0F1' } }
+                }
+            },
+            
+            tableRowOdd: {
+                font: {
+                    name: 'Arial',
+                    size: 10,
+                    color: { argb: '2C3E50' }
+                },
+                fill: {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'F8F9FA' }
+                },
+                border: {
+                    bottom: { style: 'thin', color: { argb: 'ECF0F1' } }
+                }
+            },
+            
+            currency: {
+                font: {
+                    name: 'Arial',
+                    size: 10,
+                    color: { argb: '27AE60' }
+                },
+                numFmt: '"R$" #,##0.00'
+            },
+            
+            total: {
+                font: {
+                    name: 'Arial',
+                    size: 11,
+                    bold: true,
+                    color: { argb: 'FFFFFF' }
+                },
+                fill: {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FF2C3E50' }
+                }
+            },
+            
+            observations: {
+                font: {
+                    name: 'Arial',
+                    size: 10,
+                    italic: true,
+                    color: { argb: '7F8C8D' }
+                }
+            }
+        };
         
-        // Dados das ferramentas
-        let startDataRow = 11;
+        // ============================================
+        // CABEÇALHO DO RECIBO - ESTILO ROMANEIO
+        // ============================================
+        
+        // Linha 2: Título (mesclar B2:R2)
+        worksheet.mergeCells('B2:R2');
+        const titleCell = worksheet.getCell('B2');
+        titleCell.value = 'RECIBO DE DEVOLUÇÃO DE FERRAMENTAS';
+        Object.assign(titleCell, styles.headerMain);
+        worksheet.getRow(2).height = 30;
+        
+        // Linha 3: Número do recibo e data
+        worksheet.mergeCells('B3:C3');
+        const numLabelCell = worksheet.getCell('B3');
+        numLabelCell.value = 'Nº RECIBO:';
+        Object.assign(numLabelCell, styles.fieldLabel);
+        numLabelCell.alignment = { horizontal: 'left', vertical: 'middle' };
+        
+        worksheet.mergeCells('D3:M3');
+        const numValueCell = worksheet.getCell('D3');
+        numValueCell.value = reciboNumero;
+        Object.assign(numValueCell, styles.fieldValue);
+        
+        // DATA (coluna P)
+        const dateLabelCell = worksheet.getCell('P3');
+        dateLabelCell.value = 'DATA:';
+        Object.assign(dateLabelCell, styles.fieldLabel);
+        dateLabelCell.alignment = { horizontal: 'left', vertical: 'middle' };
+        
+        const dateValueCell = worksheet.getCell('R3');
+        dateValueCell.value = new Date(reciboData);
+        dateValueCell.numFmt = 'DD/MM/YYYY';
+        Object.assign(dateValueCell, styles.fieldValue);
+        
+        // Linha 5: COLABORADOR
+        worksheet.mergeCells('B5:C5');
+        const colaboradorLabel = worksheet.getCell('B5');
+        colaboradorLabel.value = 'COLABORADOR:';
+        Object.assign(colaboradorLabel, styles.sectionTitle);
+        colaboradorLabel.alignment = { horizontal: 'left', vertical: 'middle' };
+        
+        worksheet.mergeCells('D5:M5');
+        const colaboradorValue = worksheet.getCell('D5');
+        colaboradorValue.value = reciboColaboradorSelecionado.nome;
+        Object.assign(colaboradorValue, styles.fieldValue);
+        colaboradorValue.alignment = { horizontal: 'left', vertical: 'middle' };
+        
+        // Linha 6: MATRÍCULA e SETOR
+        worksheet.mergeCells('B6:C6');
+        const matriculaLabel = worksheet.getCell('B6');
+        matriculaLabel.value = 'MATRÍCULA:';
+        Object.assign(matriculaLabel, styles.fieldLabel);
+        matriculaLabel.alignment = { horizontal: 'left', vertical: 'middle' };
+        
+        worksheet.mergeCells('D6:K6');
+        const matriculaValue = worksheet.getCell('D6');
+        matriculaValue.value = reciboColaboradorSelecionado.matricula;
+        Object.assign(matriculaValue, styles.fieldValue);
+        
+        worksheet.mergeCells('L6:M6');
+        const setorLabel = worksheet.getCell('L6');
+        setorLabel.value = 'SETOR:';
+        Object.assign(setorLabel, styles.fieldLabel);
+        setorLabel.alignment = { horizontal: 'left', vertical: 'middle' };
+        
+        worksheet.mergeCells('N6:R6');
+        const setorValue = worksheet.getCell('N6');
+        setorValue.value = reciboColaboradorSelecionado.setor || 'Não informado';
+        Object.assign(setorValue, styles.fieldValue);
+        
+        // Linha 7: CARGO e DATA DEVOLUÇÃO
+        worksheet.mergeCells('B7:C7');
+        const cargoLabel = worksheet.getCell('B7');
+        cargoLabel.value = 'CARGO:';
+        Object.assign(cargoLabel, styles.fieldLabel);
+        cargoLabel.alignment = { horizontal: 'left', vertical: 'middle' };
+        
+        worksheet.mergeCells('D7:K7');
+        const cargoValue = worksheet.getCell('D7');
+        cargoValue.value = reciboColaboradorSelecionado.cargo || 'Não informado';
+        Object.assign(cargoValue, styles.fieldValue);
+        
+        worksheet.mergeCells('L7:M7');
+        const devolucaoLabel = worksheet.getCell('L7');
+        devolucaoLabel.value = 'DEVOLUÇÃO:';
+        Object.assign(devolucaoLabel, styles.fieldLabel);
+        devolucaoLabel.alignment = { horizontal: 'left', vertical: 'middle' };
+        
+        worksheet.mergeCells('N7:R7');
+        const devolucaoValue = worksheet.getCell('N7');
+        devolucaoValue.value = new Date();
+        devolucaoValue.numFmt = 'DD/MM/YYYY';
+        Object.assign(devolucaoValue, styles.fieldValue);
+        devolucaoValue.alignment = { horizontal: 'left', vertical: 'middle' };
+        
+        // Linha 9: RESPONSÁVEL
+        worksheet.mergeCells('B9:C9');
+        const responsavelLabel = worksheet.getCell('B9');
+        responsavelLabel.value = 'RECEBIDO POR:';
+        Object.assign(responsavelLabel, styles.fieldLabel);
+        responsavelLabel.alignment = { horizontal: 'left', vertical: 'middle' };
+        
+        worksheet.mergeCells('D9:M9');
+        const responsavelValue = worksheet.getCell('D9');
+        responsavelValue.value = currentUser?.name || 'Responsável do Almoxarifado';
+        Object.assign(responsavelValue, styles.fieldValue);
+        
+        // ============================================
+        // CABEÇALHO DA TABELA (mesmo layout do romaneio)
+        // ============================================
+        worksheet.getRow(11).height = 25;
+        
+        // Nº (B11)
+        const headerNum = worksheet.getCell('B11');
+        headerNum.value = 'Nº';
+        Object.assign(headerNum, styles.tableHeader);
+        headerNum.alignment = { horizontal: 'center', vertical: 'middle' };
+        
+        // DESCRIÇÃO DE MATERIAL (C11)
+        worksheet.mergeCells('C11:K11');
+        const headerDesc = worksheet.getCell('C11');
+        headerDesc.value = 'FERRAMENTA DEVOLVIDA';
+        Object.assign(headerDesc, styles.tableHeader);
+        headerDesc.alignment = { horizontal: 'center', vertical: 'middle' };
+        
+        // N.C.M. (L11)
+        const headerNCM = worksheet.getCell('L11');
+        headerNCM.value = 'N.C.M.';
+        Object.assign(headerNCM, styles.tableHeader);
+        headerNCM.alignment = { horizontal: 'center', vertical: 'middle' };
+        
+        // Nº PATR. (M11)
+        const headerPatrimonio = worksheet.getCell('M11');
+        headerPatrimonio.value = 'PATR.';
+        Object.assign(headerPatrimonio, styles.tableHeader);
+        headerPatrimonio.alignment = { horizontal: 'center', vertical: 'middle' };
+        
+        // QTD. (N11)
+        const headerQtd = worksheet.getCell('N11');
+        headerQtd.value = 'QTD.';
+        Object.assign(headerQtd, styles.tableHeader);
+        headerQtd.alignment = { horizontal: 'center', vertical: 'middle' };
+        
+        // CONDIÇÃO (O11)
+        worksheet.mergeCells('O11:Q11');
+        const headerCondicao = worksheet.getCell('O11');
+        headerCondicao.value = 'CONDIÇÃO';
+        Object.assign(headerCondicao, styles.tableHeader);
+        headerCondicao.alignment = { horizontal: 'center', vertical: 'middle' };
+        
+        // VALOR UNIT (R11) - alterado para "DATA ATRIBUIÇÃO"
+        const headerDataAtrib = worksheet.getCell('R11');
+        headerDataAtrib.value = 'ATRIB.';
+        Object.assign(headerDataAtrib, styles.tableHeader);
+        headerDataAtrib.alignment = { horizontal: 'center', vertical: 'middle' };
+        
+        // ============================================
+        // DADOS DAS FERRAMENTAS DEVOLVIDAS
+        // ============================================
+        let currentRow = 12;
         let totalQuantidade = 0;
         
         reciboSelectedTools.forEach((item, index) => {
@@ -5273,135 +5723,213 @@ async function generateReciboExcel() {
             
             if (!tool || !atribuicao) return;
             
-            const rowNum = startDataRow + index;
-            const row = worksheet.getRow(rowNum);
+            const row = worksheet.getRow(currentRow);
+            row.height = 20;
+            
+            // Alternar cores das linhas (zebrado)
+            const rowStyle = index % 2 === 0 ? styles.tableRowEven : styles.tableRowOdd;
+            
+            // Nº sequencial (B)
+            const cellNum = worksheet.getCell(`B${currentRow}`);
+            cellNum.value = index + 1;
+            Object.assign(cellNum, rowStyle);
+            cellNum.alignment = { horizontal: 'center', vertical: 'middle' };
+            
+            // DESCRIÇÃO DE MATERIAL (C-K)
+            worksheet.mergeCells(`C${currentRow}:K${currentRow}`);
+            const cellDesc = worksheet.getCell(`C${currentRow}`);
+            cellDesc.value = tool.name;
+            Object.assign(cellDesc, rowStyle);
+            cellDesc.alignment = { horizontal: 'left', vertical: 'middle' };
+
+            // N.C.M. (L)
+            const cellNCM = worksheet.getCell(`L${currentRow}`);
+            cellNCM.value = tool.ncm || '';
+            Object.assign(cellNCM, rowStyle);
+            cellNCM.alignment = { horizontal: 'left', vertical: 'middle' };
+            
+            // Nº PATR. (M)
+            const cellPatrimonio = worksheet.getCell(`M${currentRow}`);
+            cellPatrimonio.value = tool.patrimonio || '';
+            Object.assign(cellPatrimonio, rowStyle);
+            cellPatrimonio.alignment = { horizontal: 'left', vertical: 'middle' };
+            
+            // QTD. (N)
+            const cellQtd = worksheet.getCell(`N${currentRow}`);
+            const quantidade = tool.quantidade || 1;
+            cellQtd.value = quantidade;
+            Object.assign(cellQtd, rowStyle);
+            cellQtd.alignment = { horizontal: 'center', vertical: 'middle' };
+            totalQuantidade += quantidade;
+            
+            // CONDIÇÃO (O-Q)
+            worksheet.mergeCells(`O${currentRow}:Q${currentRow}`);
+            const cellCondicao = worksheet.getCell(`O${currentRow}`);
             
             // Obter condição selecionada na pré-visualização
             const condicaoSelect = document.querySelector(`.recibo-condicao[data-tool-id="${tool.id}"]`);
             const condicao = condicaoSelect ? condicaoSelect.value : 'Bom';
+            cellCondicao.value = condicao;
+            Object.assign(cellCondicao, rowStyle);
+            cellCondicao.alignment = { horizontal: 'center', vertical: 'middle' };
             
-            const rowData = [
-                index + 1,
-                tool.code,
-                tool.name,
-                tool.category,
-                tool.quantidade || 1,
-                formatDate(atribuicao.dataAtribuicao),
-                formatDate(new Date().toISOString().split('T')[0]),
-                condicao
-            ];
+            // DATA ATRIBUIÇÃO (R) - em vez de valor unitário
+            const cellDataAtrib = worksheet.getCell(`R${currentRow}`);
+            cellDataAtrib.value = new Date(atribuicao.dataAtribuicao);
+            cellDataAtrib.numFmt = 'DD/MM/YYYY';
+            Object.assign(cellDataAtrib, rowStyle);
+            cellDataAtrib.alignment = { horizontal: 'center', vertical: 'middle' };
             
-            rowData.forEach((cellData, colIndex) => {
-                const cell = row.getCell(colIndex + 1);
-                cell.value = cellData;
-                
-                // Estilo para linhas alternadas
-                if (index % 2 === 0) {
-                    cell.fill = {
-                        type: 'pattern',
-                        pattern: 'solid',
-                        fgColor: { argb: 'FFFFFFFF' }
-                    };
-                } else {
-                    cell.fill = {
-                        type: 'pattern',
-                        pattern: 'solid',
-                        fgColor: { argb: 'FFF8F9FA' }
-                    };
-                }
-                
-                // Centralizar algumas colunas
-                if (colIndex === 0 || colIndex === 4) {
-                    cell.alignment = { horizontal: 'center' };
-                }
-            });
-            
-            totalQuantidade += parseInt(tool.quantidade) || 1;
+            currentRow++;
         });
         
-        // Linha de total
-        const totalRowNum = startDataRow + reciboSelectedTools.length;
-        worksheet.mergeCells(`A${totalRowNum}:D${totalRowNum}`);
-        const totalLabel = worksheet.getCell(`A${totalRowNum}`);
-        totalLabel.value = 'TOTAL DE FERRAMENTAS DEVOLVIDAS:';
-        totalLabel.style = {
-            font: { bold: true, size: 11 },
-            alignment: { horizontal: 'right' }
-        };
+        // ============================================
+        // LINHA DE TOTAL
+        // ============================================
+        const totalRow = currentRow;
+        worksheet.getRow(totalRow).height = 25;
         
-        const totalCell = worksheet.getCell(`E${totalRowNum}`);
-        totalCell.value = totalQuantidade;
-        totalCell.style = {
-            font: { bold: true, size: 11, color: { argb: 'FF27AE60' } },
-            alignment: { horizontal: 'center' }
-        };
+        // Mesclar células para o rótulo TOTAL (B-M)
+        worksheet.mergeCells(`B${totalRow}:M${totalRow}`);
+        const totalLabel = worksheet.getCell(`B${totalRow}`);
+        totalLabel.value = 'TOTAL DE FERRAMENTAS DEVOLVIDAS:';
+        Object.assign(totalLabel, styles.total);
+        totalLabel.alignment = { horizontal: 'right', vertical: 'middle' };
+        
+        // Total quantidade (N)
+        const totalQtdCell = worksheet.getCell(`N${totalRow}`);
+        totalQtdCell.value = totalQuantidade;
+        Object.assign(totalQtdCell, styles.total);
+        totalQtdCell.alignment = { horizontal: 'center', vertical: 'middle' };
         
         // ============================================
         // OBSERVAÇÕES E ASSINATURAS
         // ============================================
-        
-        const obsRowNum = totalRowNum + 2;
+        const obsRow = totalRow + 2;
         if (observacoes) {
-            worksheet.mergeCells(`A${obsRowNum}:H${obsRowNum}`);
-            const obsCell = worksheet.getCell(`A${obsRowNum}`);
+            worksheet.mergeCells(`B${obsRow}:R${obsRow}`);
+            const obsCell = worksheet.getCell(`B${obsRow}`);
             obsCell.value = `OBSERVAÇÕES: ${observacoes}`;
-            obsCell.style = {
-                font: { italic: true, size: 10 },
-                alignment: { horizontal: 'left' }
-            };
+            obsCell.style = styles.observations;
         }
         
         // Assinaturas
-        const assinaturaRowNum = obsRowNum + 4;
-        worksheet.mergeCells(`A${assinaturaRowNum}:D${assinaturaRowNum}`);
-        const recebidoPor = worksheet.getCell(`A${assinaturaRowNum}`);
-        recebidoPor.value = 'Recebido por: _________________________________';
+        const assinaturaRow = obsRow + 4;
+        
+        // Responsável pelo recebimento
+        worksheet.mergeCells(`B${assinaturaRow}:K${assinaturaRow}`);
+        const recebidoPor = worksheet.getCell(`B${assinaturaRow}`);
+        recebidoPor.value = 'Responsável pelo Recebimento:';
         recebidoPor.style = {
-            font: { size: 11 },
-            alignment: { horizontal: 'center' }
+            font: {
+                name: 'Arial',
+                size: 10,
+                bold: true,
+                color: { argb: '2C3E50' }
+            }
         };
         
-        worksheet.mergeCells(`E${assinaturaRowNum}:H${assinaturaRowNum}`);
-        const entreguePor = worksheet.getCell(`E${assinaturaRowNum}`);
-        entreguePor.value = 'Entregue por: _________________________________';
+        // Linha para assinatura
+        const linhaAssinatura = assinaturaRow + 2;
+        worksheet.mergeCells(`B${linhaAssinatura}:K${linhaAssinatura}`);
+        const linhaCell = worksheet.getCell(`B${linhaAssinatura}`);
+        linhaCell.value = '________________________________________';
+        linhaCell.style = {
+            font: {
+                name: 'Arial',
+                size: 10,
+                color: { argb: '95A5A6' }
+            }
+        };
+        
+        // Nome do responsável
+        const nomeRespRow = linhaAssinatura + 1;
+        worksheet.mergeCells(`B${nomeRespRow}:K${nomeRespRow}`);
+        const nomeRespCell = worksheet.getCell(`B${nomeRespRow}`);
+        nomeRespCell.value = currentUser?.name || 'Responsável do Almoxarifado';
+        nomeRespCell.style = {
+            font: {
+                name: 'Arial',
+                size: 10,
+                color: { argb: '2C3E50' }
+            }
+        };
+        
+        // Colaborador que devolveu
+        worksheet.mergeCells(`M${assinaturaRow}:R${assinaturaRow}`);
+        const entreguePor = worksheet.getCell(`M${assinaturaRow}`);
+        entreguePor.value = 'Colaborador que Devolveu:';
         entreguePor.style = {
-            font: { size: 11 },
-            alignment: { horizontal: 'center' }
+            font: {
+                name: 'Arial',
+                size: 10,
+                bold: true,
+                color: { argb: '2C3E50' }
+            }
         };
         
-        // Nomes
-        const nomeRowNum = assinaturaRowNum + 2;
-        worksheet.mergeCells(`A${nomeRowNum}:D${nomeRowNum}`);
-        const recebidoNome = worksheet.getCell(`A${nomeRowNum}`);
-        recebidoNome.value = currentUser?.name || 'Responsável do Almoxarifado';
-        recebidoNome.style = {
-            font: { size: 10 },
-            alignment: { horizontal: 'center' }
+        // Linha para assinatura do colaborador
+        worksheet.mergeCells(`M${linhaAssinatura}:R${linhaAssinatura}`);
+        const linhaColabCell = worksheet.getCell(`M${linhaAssinatura}`);
+        linhaColabCell.value = '________________________________________';
+        linhaColabCell.style = {
+            font: {
+                name: 'Arial',
+                size: 10,
+                color: { argb: '95A5A6' }
+            }
         };
         
-        worksheet.mergeCells(`E${nomeRowNum}:H${nomeRowNum}`);
-        const entregueNome = worksheet.getCell(`E${nomeRowNum}`);
-        entregueNome.value = reciboColaboradorSelecionado.nome;
-        entregueNome.style = {
-            font: { size: 10 },
-            alignment: { horizontal: 'center' }
+        // Nome do colaborador
+        worksheet.mergeCells(`M${nomeRespRow}:R${nomeRespRow}`);
+        const nomeColabCell = worksheet.getCell(`M${nomeRespRow}`);
+        nomeColabCell.value = reciboColaboradorSelecionado.nome;
+        nomeColabCell.style = {
+            font: {
+                name: 'Arial',
+                size: 10,
+                color: { argb: '2C3E50' }
+            }
         };
         
         // ============================================
-        // AJUSTAR LARGURAS DAS COLUNAS
+        // ADICIONAR LOGOTIPO (OPCIONAL)
         // ============================================
-        
-        const columnWidths = [5, 15, 30, 20, 12, 15, 15, 15];
-        columnWidths.forEach((width, index) => {
-            const colLetter = String.fromCharCode(65 + index);
-            worksheet.getColumn(colLetter).width = width;
-        });
+        try {
+            // Adicionar logo da FW Company (canto superior esquerdo)
+            const logoFWResponse = await fetch('FW Logo.png');
+            const logoFWBuffer = await logoFWResponse.arrayBuffer();
+            
+            const imageIdFW = workbook.addImage({
+                buffer: logoFWBuffer,
+                extension: 'png'
+            });
+            
+            // Posicionar logo FW (coluna B, linha 2)
+            worksheet.addImage(imageIdFW, {
+                tl: { col: 1, row: 1 }, // B2
+                ext: { width: 90, height: 40 }
+            });
+            
+        } catch (logoError) {
+            console.log('Logo não encontrado, continuando sem ele...');
+            // Caso não encontre o logo, podemos adicionar texto alternativo
+            const fwTextCell = worksheet.getCell('A1');
+            fwTextCell.value = 'FW COMPANY';
+            fwTextCell.style = {
+                font: {
+                    name: 'Arial',
+                    size: 12,
+                    bold: true,
+                    color: { argb: '2C3E50' }
+                }
+            };
+        }
         
         // ============================================
         // SALVAR ARQUIVO
         // ============================================
-        
-        const fileName = `RECIBO_${reciboNumero}_${reciboColaboradorSelecionado.nome.replace(/[^a-z0-9]/gi, '_')}.xlsx`;
+        const fileName = `RECIBO_DEVOLUCAO_${reciboNumero}_${reciboColaboradorSelecionado.nome.replace(/[^a-z0-9]/gi, '_')}.xlsx`;
         
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], { 
@@ -5417,7 +5945,7 @@ async function generateReciboExcel() {
         generateBtn.innerHTML = originalText;
         generateBtn.disabled = false;
         
-        showNotification(`Recibo gerado com ${reciboSelectedTools.length} ferramentas!`, 'success');
+        showNotification(`Recibo de devolução gerado com ${reciboSelectedTools.length} ferramentas!`, 'success');
         
     } catch (error) {
         console.error('Erro ao gerar recibo:', error);
@@ -9315,8 +9843,8 @@ const numValueCell = worksheet.getCell('C3');
 numValueCell.value = romaneioNum || 'RM-2026-798754';
 Object.assign(numValueCell, styles.fieldValue);
 
-// DATA (coluna Q)
-const dateLabelCell = worksheet.getCell('Q3');
+// DATA (coluna P)
+const dateLabelCell = worksheet.getCell('P3');
 dateLabelCell.value = 'DATA:';
 Object.assign(dateLabelCell, styles.fieldLabel);
 // Adicionar alinhamento à esquerda:
@@ -15592,7 +16120,7 @@ document.querySelector('[data-tab="saida-ferramentas"]')?.addEventListener('clic
                 loadRomaneioTemplates();
                 updateRomaneioSelectionCount();
                 hideRomaneioPreview();
-            
+        
             // Configurar data atual
             const romaneioDateInput = document.getElementById('romaneioDate');
             if (romaneioDateInput && !romaneioDateInput.value) {
@@ -15603,3 +16131,5 @@ document.querySelector('[data-tab="saida-ferramentas"]')?.addEventListener('clic
     </script>
 </body>
 </html>
+
+
