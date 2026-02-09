@@ -4017,144 +4017,131 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
         </div>
     </div>
 </div>
-<!-- Recibo de Entrega de Ferramentas -->
-<div class="card">
-    <h3 class="card-title"><i class="fas fa-file-contract"></i> Recibo de Entrega de Ferramentas</h3>
-    
+<!-- Recibo de Entrega de Ferramentas - Nova Seção -->
+<div class="card" style="margin-top: 30px;">
+    <h3 class="card-title"><i class="fas fa-toolbox"></i> Recibo de Entrega de Ferramentas</h3>
     <div class="form-container">
-        <p>Gere um recibo de entrega de ferramentas com declaração de responsabilidade.</p>
         
-        <div class="form-row">
-            <div class="form-group">
-                <label for="reciboObra" class="required">Obra/Local</label>
-                <input type="text" id="reciboObra" class="form-control" 
-                       placeholder="Ex: Obra Centro, Imperatriz-MA" required>
-            </div>
-            <div class="form-group">
-                <label for="reciboFuncionario" class="required">Colaborador</label>
-                <input type="text" id="reciboFuncionario" class="form-control" 
-                       placeholder="Nome completo do Colaborador" required>
-            </div>
-            <div class="form-group">
-                <label for="reciboFuncao" class="required">Função</label>
-                <input type="text" id="reciboFuncao" class="form-control" 
-                       placeholder="Ex: Técnico de Elétrica" required>
+        <!-- Seleção de Colaborador -->
+        <div class="form-group">
+            <label for="entregaColaborador" class="required">Colaborador</label>
+            <select id="entregaColaborador" class="form-control">
+                <option value="">Selecione um colaborador</option>
+                <!-- Preenchido dinamicamente -->
+            </select>
+            <div class="error-message" id="entregaColaboradorError" style="display: none;">
+                Selecione um colaborador
             </div>
         </div>
         
+        <!-- Informações do Recibo -->
         <div class="form-row">
             <div class="form-group">
-                <label for="reciboData" class="required">Data da Entrega</label>
-                <input type="date" id="reciboData" class="form-control" 
-                       value="<?php echo date('Y-m-d'); ?>" required>
+                <label for="entregaNumero">Número do Recibo</label>
+                <input type="text" id="entregaNumero" class="form-control" readonly 
+                       value="ENT-2024-0001">
             </div>
             <div class="form-group">
-                <label for="reciboResponsavel">Responsável pela Entrega</label>
-                <input type="text" id="reciboResponsavel" class="form-control" 
-                       placeholder="Nome do almoxarife" value="Almoxarifado">
-            </div>
-            <div class="form-group">
-                <label for="reciboValidade">Validade (dias)</label>
-                <input type="number" id="reciboValidade" class="form-control" 
-                       min="1" max="365" value="30" placeholder="30">
+                <label for="entregaData">Data da Entrega</label>
+                <input type="date" id="entregaData" class="form-control" 
+                       value="<?php echo date('Y-m-d'); ?>">
             </div>
         </div>
         
         <div class="form-group">
-            <label>Selecionar Ferramentas para o Recibo:</label>
-            <div class="search-box" style="margin: 10px 0;">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchRecibo" 
-                       placeholder="Buscar ferramentas para o recibo...">
+            <label for="entregaObservacoes">Observações</label>
+            <textarea id="entregaObservacoes" rows="3" class="form-control" 
+                      placeholder="Observações sobre a entrega..."></textarea>
+        </div>
+        
+        <!-- Lista de Ferramentas para Entrega -->
+        <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <label><strong>Selecionar Ferramentas para Entrega:</strong></label>
+                <div>
+                    <button type="button" class="btn btn-sm btn-info" id="selectAllEntregaBtn">
+                        <i class="fas fa-check-square"></i> Selecionar Todas
+                    </button>
+                    <button type="button" class="btn btn-sm btn-warning" id="deselectAllEntregaBtn">
+                        <i class="fas fa-times-circle"></i> Desmarcar Todas
+                    </button>
+                </div>
             </div>
             
-            <div style="border: 1px solid var(--border-color); border-radius: 8px; 
-                       max-height: 300px; overflow-y: auto; margin-top: 10px;">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead style="background-color: var(--light-color); position: sticky; top: 0;">
+            <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+                <table>
+                    <thead>
                         <tr>
-                            <th style="padding: 10px; text-align: center; width: 50px;">
-                                <input type="checkbox" id="checkAllRecibo">
+                            <th style="width: 50px;">
+                                <input type="checkbox" id="checkAllEntrega">
                             </th>
-                            <th style="padding: 10px; text-align: left;">Código</th>
-                            <th style="padding: 10px; text-align: left;">Nome</th>
-                            <th style="padding: 10px; text-align: left;">Categoria</th>
-                            <th style="padding: 10px; text-align: left;">Patrimônio</th>
-                            <th style="padding: 10px; text-align: center;">Quantidade</th>
+                            <th>Código</th>
+                            <th>Nome</th>
+                            <th>Categoria</th>
+                            <th>Status</th>
+                            <th>Localização</th>
                         </tr>
                     </thead>
-                    <tbody id="reciboToolsList">
-                        <!-- Lista de ferramentas será preenchida aqui -->
+                    <tbody id="entregaFerramentasList">
+                        <tr id="noEntregaFerramentasRow">
+                            <td colspan="6" style="text-align: center; padding: 40px; color: var(--gray-color);">
+                                Selecione um colaborador para ver as ferramentas disponíveis
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-            
-            <div style="text-align: center; padding: 10px; margin-top: 10px;">
-                <p style="color: var(--gray-color);" id="reciboSelectionCount">
-                    Nenhuma ferramenta selecionada
-                </p>
+            <div id="entregaSelectionCount" style="margin-top: 10px; font-style: italic; color: var(--gray-color);">
+                Nenhuma ferramenta selecionada
             </div>
         </div>
         
-        <!-- Declaração pré-definida -->
-        <div class="form-group">
-            <label>Declaração de Responsabilidade:</label>
-            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; 
-                        border-left: 4px solid var(--warning-color); margin: 10px 0;">
-                <p style="margin: 0; font-style: italic; color: var(--text-color);">
-                    <strong>DECLARAÇÃO</strong><br>
-                    DECLARO PARA TODOS OS EFEITOS LEGAIS QUE RECEBI AS FERRAMENTAS DISCRIMINADAS 
-                    NESTA FICHA, FICANDO RESPONSÁVEL PELO USO, GUARDA E CONSERVAÇÃO DAS MESMAS, 
-                    DEVENDO INDENIZÁ-LAS À EMPRESA, CASO OCORRAM DANOS POR COMPROVADA NEGLIGÊNCIA 
-                    OU EXTRAVIO.
-                </p>
+        <!-- Botões de Ação -->
+        <div style="text-align: center; margin-top: 30px;">
+            <div class="btn-group">
+                <button type="button" class="btn btn-success" id="generateEntregaExcelBtn">
+                    <i class="fas fa-file-excel"></i> Gerar Recibo Excel
+                </button>
+                <button type="button" class="btn btn-primary" id="previewEntregaBtn">
+                    <i class="fas fa-eye"></i> Visualizar Recibo
+                </button>
+                <button type="button" class="btn btn-warning" id="clearEntregaSelectionBtn">
+                    <i class="fas fa-eraser"></i> Limpar Seleção
+                </button>
+                <button type="button" class="btn btn-info" id="printEntregaBtn">
+                    <i class="fas fa-print"></i> Imprimir
+                </button>
             </div>
         </div>
         
-        <!-- Configurações adicionais -->
-        <div class="form-group">
-            <label>Incluir no documento:</label>
-            <div style="display: flex; gap: 20px; margin-top: 10px; flex-wrap: wrap;">
-                <label style="display: flex; align-items: center; gap: 5px;">
-                    <input type="checkbox" id="reciboIncludeQR" checked>
-                    <span>Códigos QR das ferramentas</span>
-                </label>
-                <label style="display: flex; align-items: center; gap: 5px;">
-                    <input type="checkbox" id="reciboIncludeImages" checked>
-                    <span>Imagens das ferramentas</span>
-                </label>
-                <label style="display: flex; align-items: center; gap: 5px;">
-                    <input type="checkbox" id="reciboIncludePrices" checked>
-                    <span>Valores das ferramentas</span>
-                </label>
-                <label style="display: flex; align-items: center; gap: 5px;">
-                    <input type="checkbox" id="reciboIncludeObservation" checked>
-                    <span>Observações individuais</span>
-                </label>
+        <!-- Pré-visualização do Recibo -->
+        <div class="card" style="margin-top: 30px; display: none;" id="entregaPreviewCard">
+            <h4 class="card-title"><i class="fas fa-eye"></i> Pré-visualização do Recibo de Entrega</h4>
+            <div class="table-container">
+                <table id="entregaPreviewTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Código</th>
+                            <th>Nome</th>
+                            <th>Categoria</th>
+                            <th>Quantidade</th>
+                            <th>Localização Atual</th>
+                            <th>Condição</th>
+                        </tr>
+                    </thead>
+                    <tbody id="entregaPreviewBody">
+                        <!-- Pré-visualização será preenchida aqui -->
+                    </tbody>
+                </table>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button type="button" class="btn btn-success" id="exportEntregaBtn">
+                    <i class="fas fa-download"></i> Exportar Este Recibo
+                </button>
             </div>
         </div>
         
-        <!-- Botões de ação -->
-        <div class="btn-group" style="margin-top: 20px; justify-content: center;">
-            <button type="button" class="btn btn-success" id="generateReciboBtn">
-                <i class="fas fa-file-excel"></i> Gerar Recibo Excel
-            </button>
-            <button type="button" class="btn btn-primary" id="previewReciboBtn">
-                <i class="fas fa-eye"></i> Visualizar Recibo
-            </button>
-            <button type="button" class="btn btn-warning" id="clearReciboBtn">
-                <i class="fas fa-eraser"></i> Limpar Seleção
-            </button>
-            <button type="button" class="btn btn-info" id="printReciboBtn">
-                <i class="fas fa-print"></i> Imprimir
-            </button>
-        </div>
-        
-        <!-- Status e informações -->
-        <div id="reciboInfo" style="margin-top: 15px; padding: 10px; 
-                                     border-radius: 6px; display: none;">
-            <!-- Informações serão mostradas aqui -->
-        </div>
     </div>
 </div>
 <!-- Recibo de Devolução - Nova Seção -->
@@ -4616,7 +4603,7 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
         <footer class="site-footer">
             <div class="footer-content">
                 <p>Desenvolvido por Fábio Mendes Rodrigues, Planejador da F.W. Company</p>
-                <p class="footer-version">Versão 3.0_d | Última atualização: <span id="currentDate"></span></p>
+                <p class="footer-version">Versão 3.0_rev09 | Última atualização: <span id="currentDate"></span></p>
             </div>
         </footer>
 
@@ -4698,6 +4685,353 @@ body.dark-mode #colaboradoresSyncButtons .btn:hover {
 
         // Array para histórico de atribuições
         let historicoAtribuicoes = [];
+
+// ============================================
+// SISTEMA DE RECIBO DE ENTREGA
+// ============================================
+
+// Variáveis para controle do recibo de entrega
+let entregaSelectedTools = [];
+let entregaColaboradorSelecionado = null;
+
+// Função para inicializar o sistema de recibo de entrega
+function initializeEntregaSystem() {
+    console.log('🔄 Inicializando sistema de recibo de entrega...');
+    
+    // Carregar lista de colaboradores no select
+    loadColaboradoresEntregaSelect();
+    
+    // Configurar data atual
+    document.getElementById('entregaData').value = new Date().toISOString().split('T')[0];
+    
+    // Gerar número do recibo
+    generateEntregaNumber();    
+}
+// Função para carregar colaboradores no select do recibo de entrega
+function loadColaboradoresEntregaSelect() {
+    const select = document.getElementById('entregaColaborador');
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">Selecione um colaborador</option>';
+    
+    if (colaboradores.length === 0) {
+        select.innerHTML += '<option value="" disabled>Nenhum colaborador cadastrado</option>';
+        select.disabled = true;
+        console.warn('⚠️ Nenhum colaborador cadastrado no sistema');
+        return;
+    }
+const colaboradoresParaMostrar = [...colaboradores];
+    
+    // Ordenar por nome
+    colaboradoresParaMostrar.sort((a, b) => a.nome.localeCompare(b.nome));
+    
+    // Adicionar opções
+    colaboradoresParaMostrar.forEach(colaborador => {
+        // Contar ferramentas ativas deste colaborador
+        const ferramentasAtivas = historicoAtribuicoes.filter(atribuicao => 
+            atribuicao.colaboradorId === colaborador.id && 
+            !atribuicao.dataDevolucao
+        ).length;
+        
+        const option = document.createElement('option');
+        option.value = colaborador.id;
+        option.textContent = `${colaborador.nome} (${colaborador.matricula})`;
+        
+        // Adicionar informação sobre ferramentas
+        option.textContent += ` - ${ferramentasAtivas} ferramenta${ferramentasAtivas !== 1 ? 's' : ''} em uso`;
+        option.style.fontWeight = 'bold';
+        
+        select.appendChild(option);
+    });
+    
+    console.log(`✅ ${colaboradoresParaMostrar.length} colaboradores carregados no select de entrega`);
+}
+// Função para carregar ferramentas disponíveis para entrega
+function loadFerramentasDisponiveisEntrega(colaboradorId) {
+    const tbody = document.getElementById('entregaFerramentasList');
+    const noFerramentasRow = document.getElementById('noEntregaFerramentasRow');
+    
+    if (!tbody) {
+        console.error('❌ TBody do recibo de entrega não encontrado');
+        return;
+    }
+    
+    tbody.innerHTML = '';
+    tbody.appendChild(noFerramentasRow);
+    
+    if (!colaboradorId) {
+        noFerramentasRow.style.display = 'table-row';
+        noFerramentasRow.innerHTML = '<td colspan="6" style="text-align: center; padding: 40px; color: var(--gray-color);">Selecione um colaborador para ver as ferramentas disponíveis</td>';
+        entregaSelectedTools = [];
+        updateEntregaSelectionCount();
+        return;
+    }
+    
+    // Buscar colaborador
+    const colaborador = colaboradores.find(c => c.id === colaboradorId);
+    if (!colaborador) {
+        console.error('❌ Colaborador não encontrado ID:', colaboradorId);
+        return;
+    }
+    
+    entregaColaboradorSelecionado = colaborador;
+    console.log(`👤 Colaborador selecionado para entrega: ${colaborador.nome} (ID: ${colaborador.id})`);
+    
+    // Buscar ferramentas DISPONÍVEIS para entrega (status "Disponível")
+    const ferramentasDisponiveis = tools.filter(tool => 
+        tool.status === 'Disponível' &&
+        !historicoAtribuicoes.some(atribuicao => 
+            atribuicao.toolId === tool.id && 
+            !atribuicao.dataDevolucao
+        )
+    );
+    
+    console.log(`🛠️ Ferramentas disponíveis para entrega: ${ferramentasDisponiveis.length}`);
+    
+    if (ferramentasDisponiveis.length === 0) {
+        noFerramentasRow.style.display = 'table-row';
+        noFerramentasRow.innerHTML = `<td colspan="6" style="text-align: center; padding: 40px; color: var(--gray-color);">
+            Nenhuma ferramenta disponível para entrega
+        </td>`;
+        entregaSelectedTools = [];
+        updateEntregaSelectionCount();
+        return;
+    }
+    
+    // Ordenar por código
+    ferramentasDisponiveis.sort((a, b) => a.code.localeCompare(b.code));
+    
+    noFerramentasRow.style.display = 'none';
+    
+    // Adicionar cada ferramenta à lista
+    ferramentasDisponiveis.forEach((tool, index) => {
+        const row = document.createElement('tr');
+        
+        row.innerHTML = `
+            <td style="text-align: center;">
+                <input type="checkbox" class="entrega-tool-checkbox" 
+                       data-id="${tool.id}">
+            </td>
+            <td><strong>${tool.code}</strong></td>
+            <td>${tool.name}</td>
+            <td>${tool.category}</td>
+            <td>
+                <span class="status-badge status-completed">Disponível</span>
+            </td>
+            <td>${tool.location || 'Não informada'}</td>
+        `;
+        tbody.appendChild(row);
+    });
+    
+    // Resetar seleção
+    entregaSelectedTools = [];
+    updateEntregaSelectionCount();
+    
+    // Adicionar listeners aos checkboxes
+    addEntregaCheckboxListeners();
+    
+    console.log(`✅ ${ferramentasDisponiveis.length} ferramentas disponíveis carregadas`);
+}
+
+// Adicionar listeners aos checkboxes do recibo de entrega
+function addEntregaCheckboxListeners() {
+    // Checkbox "Selecionar Todos"
+    const checkAll = document.getElementById('checkAllEntrega');
+    if (checkAll) {
+        checkAll.onclick = function() {
+            const checkboxes = document.querySelectorAll('.entrega-tool-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = this.checked;
+                const toolId = parseInt(cb.getAttribute('data-id'));
+                updateEntregaSelection(toolId, this.checked);
+            });
+            updateEntregaSelectionCount();
+        };
+    }
+    
+    // Checkboxes individuais
+    document.querySelectorAll('.entrega-tool-checkbox').forEach(checkbox => {
+        checkbox.onclick = function() {
+            const toolId = parseInt(this.getAttribute('data-id'));
+            updateEntregaSelection(toolId, this.checked);
+            updateEntregaSelectionCount();
+            
+            // Atualizar "Selecionar Todos"
+            const allCheckboxes = document.querySelectorAll('.entrega-tool-checkbox');
+            const allChecked = Array.from(allCheckboxes).every(cb => cb.checked);
+            const anyChecked = Array.from(allCheckboxes).some(cb => cb.checked);
+            
+            const checkAll = document.getElementById('checkAllEntrega');
+            if (checkAll) {
+                checkAll.checked = allChecked;
+                checkAll.indeterminate = !allChecked && anyChecked;
+            }
+        };
+    });
+}
+
+// Atualizar seleção de ferramentas no recibo de entrega
+function updateEntregaSelection(toolId, isSelected) {
+    if (isSelected) {
+        if (!entregaSelectedTools.some(item => item.toolId === toolId)) {
+            entregaSelectedTools.push({
+                toolId: toolId
+            });
+        }
+    } else {
+        const index = entregaSelectedTools.findIndex(item => item.toolId === toolId);
+        if (index > -1) {
+            entregaSelectedTools.splice(index, 1);
+        }
+    }
+}
+
+// Atualizar contagem de seleção do recibo de entrega
+function updateEntregaSelectionCount() {
+    const countElement = document.getElementById('entregaSelectionCount');
+    if (!countElement) return;
+    
+    const count = entregaSelectedTools.length;
+    if (count === 0) {
+        countElement.textContent = 'Nenhuma ferramenta selecionada';
+        countElement.style.color = 'var(--gray-color)';
+    } else {
+        countElement.textContent = `${count} ferramenta${count !== 1 ? 's' : ''} selecionada${count !== 1 ? 's' : ''} para entrega`;
+        countElement.style.color = 'var(--success-color)';
+    }
+}
+
+// Selecionar todas as ferramentas no recibo de entrega
+function selectAllEntregaTools() {
+    const checkAll = document.getElementById('checkAllEntrega');
+    if (checkAll) {
+        checkAll.checked = true;
+        checkAll.click();
+    }
+}
+
+// Desmarcar todas as ferramentas no recibo de entrega
+function deselectAllEntregaTools() {
+    const checkAll = document.getElementById('checkAllEntrega');
+    if (checkAll) {
+        checkAll.checked = false;
+        checkAll.click();
+    }
+}
+
+// Limpar seleção do recibo de entrega
+function clearEntregaSelection() {
+    entregaSelectedTools = [];
+    const checkAll = document.getElementById('checkAllEntrega');
+    if (checkAll) {
+        checkAll.checked = false;
+        checkAll.indeterminate = false;
+    }
+    
+    document.querySelectorAll('.entrega-tool-checkbox').forEach(cb => {
+        cb.checked = false;
+    });
+    
+    updateEntregaSelectionCount();
+    hideEntregaPreview();
+    
+    showNotification('Seleção de ferramentas limpa', 'info');
+}
+
+// Mostrar pré-visualização do recibo de entrega
+function showEntregaPreview() {
+    const previewCard = document.getElementById('entregaPreviewCard');
+    if (previewCard) {
+        previewCard.style.display = 'block';
+    }
+}
+
+// Ocultar pré-visualização do recibo de entrega
+function hideEntregaPreview() {
+    const previewCard = document.getElementById('entregaPreviewCard');
+    if (previewCard) {
+        previewCard.style.display = 'none';
+    }
+}
+
+// Gerar pré-visualização do recibo de entrega
+function generateEntregaPreview() {
+    if (!entregaColaboradorSelecionado) {
+        showNotification('Selecione um colaborador primeiro!', 'error');
+        return;
+    }
+    
+    if (entregaSelectedTools.length === 0) {
+        showNotification('Selecione pelo menos uma ferramenta para entrega!', 'error');
+        return;
+    }
+    
+    const previewBody = document.getElementById('entregaPreviewBody');
+    if (!previewBody) return;
+    
+    previewBody.innerHTML = '';
+    
+    let totalFerramentas = 0;
+    
+    entregaSelectedTools.forEach((item, index) => {
+        const tool = tools.find(t => t.id === item.toolId);
+        
+        if (!tool) return;
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td><strong>${tool.code}</strong></td>
+            <td>${tool.name}</td>
+            <td>${tool.category}</td>
+            <td>${tool.quantidade || 1}</td>
+            <td>${tool.location || 'Não informada'}</td>
+            <td>
+                <select class="form-control-sm entrega-condicao" style="width: 100%;" 
+                        data-tool-id="${tool.id}">
+                    <option value="Bom" selected>Bom</option>
+                    <option value="Regular">Regular</option>
+                    <option value="Precisa de Reparo">Precisa de Reparo</option>
+                    <option value="Danificado">Danificado</option>
+                </select>
+            </td>
+        `;
+        previewBody.appendChild(row);
+        
+        totalFerramentas += parseInt(tool.quantidade) || 1;
+    });
+    // Adicionar linha de resumo
+    const summaryRow = document.createElement('tr');
+    summaryRow.style.backgroundColor = '#f8f9fa';
+    summaryRow.style.fontWeight = 'bold';
+    summaryRow.innerHTML = `
+        <td colspan="4" style="text-align: right;">TOTAL:</td>
+        <td>${totalFerramentas}</td>
+        <td colspan="2"></td>
+    `;
+    previewBody.appendChild(summaryRow);
+    
+    // Adicionar informações do recibo no cabeçalho da pré-visualização
+    const previewCard = document.getElementById('entregaPreviewCard');
+    const previewTitle = previewCard.querySelector('.card-title');
+    
+    if (previewTitle) {
+        previewTitle.innerHTML = `
+            <i class="fas fa-eye"></i> Pré-visualização do Recibo de Entrega
+            <div style="font-size: 14px; font-weight: normal; color: var(--gray-color); margin-top: 5px;">
+                Colaborador: ${entregaColaboradorSelecionado.nome} (${entregaColaboradorSelecionado.matricula}) | 
+                Nº: ${document.getElementById('entregaNumero').value} | 
+                Data: ${document.getElementById('entregaData').value}
+            </div>
+        `;
+    }
+    
+    showEntregaPreview();
+    showNotification(`Pré-visualizando ${entregaSelectedTools.length} ferramentas para entrega`, 'success');
+    }
+
+
+
 
 // ============================================
 // SISTEMA DE RECIBO DE DEVOLUÇÃO
@@ -5449,7 +5783,15 @@ async function generateReciboExcel() {
                     name: 'Arial',
                     size: 10,
                     bold: true,
-                    color: { argb: '34495E' }
+                    color: { argb: '2C3E50' }
+                },
+                fill: {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'ECF0F1' }
+                },
+                alignment: {
+                    vertical: 'middle'
                 }
             },
             
@@ -5499,7 +5841,7 @@ async function generateReciboExcel() {
                 fill: {
                     type: 'pattern',
                     pattern: 'solid',
-                    fgColor: { argb: 'FFFFFF' }
+                    fgColor: { argb: 'ECF0F1' }
                 },
                 border: {
                     bottom: { style: 'thin', color: { argb: 'ECF0F1' } }
