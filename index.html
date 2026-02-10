@@ -16048,7 +16048,369 @@ function showRetornoModal(saidaId) {
     
     document.getElementById('retornoModal').style.display = 'flex';
 }
+// ============================================
+// FUNÇÃO PARA REGISTRAR DEVOLUÇÃO DE FERRAMENTAS
+// ============================================
 
+async function registrarDevolucaoFerramentas() {
+    try {
+        if (!reciboColaboradorSelecionado) {
+            showNotification('Nenhum colaborador selecionado!', 'error');
+            return false;
+        }
+        
+        if (reciboSelectedTools.length === 0) {
+            showNotification('Nenhuma ferramenta selecionada!', 'error');
+            return false;
+        }
+        
+        console.log(`🔄 Registrando devolução de ${reciboSelectedTools.length} ferramentas...`);
+        
+        let successCount = 0;
+        let errorCount = 0;
+        
+        for (const item of reciboSelectedTools) {
+            try {
+                const tool = tools.find(t => t.id === item.toolId);
+                const atribuicao = historicoAtribuicoes.find(a => a.id === item.atribuicaoId);
+                
+                if (!tool || !atribuicao) {
+                    console.warn(`⚠️ Ferramenta ou atribuição não encontrada:`, item);
+                    errorCount++;
+                    continue;
+                }
+                
+                // Obter condição da pré-visualização
+                const condicaoSelect = document.querySelector(`.recibo-condicao[data-tool-id="${tool.id}"]`);
+                const condicao = condicaoSelect ? condicaoSelect.value : 'Bom';
+                
+                // 1. Atualizar status da ferramenta para "Disponível"
+                tool.status = 'Disponível';
+                
+                // 2. Atualizar condição da ferramenta (se diferente)
+                if (condicao !== tool.condition && condicao !== 'Bom') {
+                    tool.condition = condicao;
+                    
+                    // Se a condição for "Precisa de Reparo" ou "Danificado", atualizar status
+                    if (condicao === 'Precisa de Reparo') {
+                        tool.status = 'Manutenção';
+                    } else if (condicao === 'Danificado') {
+                        tool.status = 'Danificado';
+                    }
+                }
+                
+                // 3. Atualizar histórico de atribuição
+                atribuicao.dataDevolucao = new Date().toISOString().split('T')[0];
+                atribuicao.usuarioDevolucao = currentUser?.name || 'Sistema';
+                atribuicao.updatedAt = new Date().toISOString();
+                atribuicao.condicaoDevolucao = condicao;
+                
+                // 4. Remover ferramenta da lista do colaborador
+                const colaboradorIndex = colaboradores.findIndex(c => c.id === reciboColaboradorSelecionado.id);
+                if (colaboradorIndex !== -1 && colaboradores[colaboradorIndex].ferramentasAtribuidas) {
+                    colaboradores[colaboradorIndex].ferramentasAtribuidas = 
+                        colaboradores[colaboradorIndex].ferramentasAtribuidas.filter(id => id !== tool.id);
+                }
+                
+                // 5. Salvar no Supabase se estiver conectado
+                if (isOnlineMode && supabaseClient) {
+                    try {
+                        await saveAtribuicaoToSupabase(atribuicao);
+                    } catch (cloudError) {
+                        console.error(`⚠️ Erro ao salvar devolução na nuvem:`, cloudError);
+                    }
+                }
+                
+                successCount++;
+                console.log(`✅ Ferramenta ${tool.code} devolvida: ${condicao}`);
+                
+            } catch (error) {
+                errorCount++;
+                console.error(`❌ Erro ao devolver ferramenta ${item.toolId}:`, error);
+            }
+        }
+        
+        // Salvar alterações locais
+        await saveTools();
+        await saveColaboradores();
+        
+        // Atualizar interfaces
+        updateFerramentasFromAtribuicoes();
+        updateColaboradoresList();
+        updateLocalAtribuicoesCount();
+        
+        // Recarregar lista de ferramentas do colaborador (para atualizar)
+        if (document.getElementById('reciboColaborador')?.value) {
+            loadFerramentasColaboradorRecibo(parseInt(document.getElementById('reciboColaborador').value));
+        }
+        
+        // Limpar seleção
+        clearReciboSelection();
+        hideReciboPreview();
+        
+        // Gerar novo número de recibo
+        generateReciboNumber();
+        
+        if (errorCount === 0) {
+            showNotification(`${successCount} ferramentas devolvidas com sucesso!`, 'success');
+            return true;
+        } else {
+            showNotification(`${successCount} devolvidas, ${errorCount} com erro.`, 'warning');
+            return false;
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao registrar devolução:', error);
+        showNotification(`Erro ao registrar devolução: ${error.message}`, 'error');
+        return false;
+    }
+}
+// ============================================
+// FUNÇÃO PARA REGISTRAR ENTREGA DE FERRAMENTAS
+// ============================================
+
+async function registrarEntregaFerramentas() {
+    try {
+        if (!entregaColaboradorSelecionado) {
+            showNotification('Nenhum colaborador selecionado!', 'error');
+            return false;
+        }
+        
+        if (entregaSelectedTools.length === 0) {
+            showNotification('Nenhuma ferramenta selecionada!', 'error');
+            return false;
+        }
+        
+        console.log(`🔄 Registrando entrega de ${entregaSelectedTools.length} ferramentas...`);
+        
+        let successCount = 0;
+        let errorCount = 0;
+        
+        for (const item of entregaSelectedTools) {
+            try {
+                const tool = tools.find(t => t.id === item.toolId);
+                
+                if (!tool) {
+                    console.warn(`⚠️ Ferramenta não encontrada:`, item);
+                    errorCount++;
+                    continue;
+                }
+                
+                // Obter condição da pré-visualização
+                const condicaoSelect = document.querySelector(`.entrega-condicao[data-tool-id="${tool.id}"]`);
+                const condicao = condicaoSelect ? condicaoSelect.value : 'Bom';
+                
+                // Verificar se já não está atribuída
+                const jaAtribuida = historicoAtribuicoes.some(a => 
+                    a.toolId === tool.id && !a.dataDevolucao
+                );
+                
+                if (jaAtribuida) {
+                    console.warn(`⚠️ Ferramenta ${tool.code} já está atribuída`);
+                    showNotification(`A ferramenta ${tool.code} já está atribuída a outro colaborador!`, 'warning');
+                    errorCount++;
+                    continue;
+                }
+                
+                // 1. Atualizar status da ferramenta para "Em Uso"
+                tool.status = 'Em Uso';
+                
+                // 2. Atualizar condição da ferramenta (se diferente)
+                if (condicao !== tool.condition && condicao !== 'Bom') {
+                    tool.condition = condicao;
+                }
+                
+                // GERAR ID ÚNICO para a atribuição
+                const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+                
+                // 3. Criar histórico de atribuição
+                const historicoItem = {
+                    id: uniqueId,
+                    supabase_id: null,
+                    colaboradorId: entregaColaboradorSelecionado.id,
+                    colaboradorNome: entregaColaboradorSelecionado.nome,
+                    colaboradorMatricula: entregaColaboradorSelecionado.matricula,
+                    toolId: tool.id,
+                    toolNome: tool.name,
+                    toolCodigo: tool.code,
+                    dataAtribuicao: document.getElementById('entregaData').value || new Date().toISOString().split('T')[0],
+                    observacao: document.getElementById('entregaObservacoes')?.value.trim() || '',
+                    usuarioAtribuicao: currentUser?.name || 'Sistema',
+                    dataDevolucao: null,
+                    usuarioDevolucao: null,
+                    condicaoEntrega: condicao,
+                    status: 'active',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    sync_status: 'pending'
+                };
+                
+                historicoAtribuicoes.push(historicoItem);
+                
+                // 4. Adicionar ferramenta à lista do colaborador
+                const colaboradorIndex = colaboradores.findIndex(c => c.id === entregaColaboradorSelecionado.id);
+                if (colaboradorIndex !== -1) {
+                    if (!colaboradores[colaboradorIndex].ferramentasAtribuidas) {
+                        colaboradores[colaboradorIndex].ferramentasAtribuidas = [];
+                    }
+                    colaboradores[colaboradorIndex].ferramentasAtribuidas.push(tool.id);
+                }
+                
+                // 5. Salvar no Supabase se estiver conectado
+                if (isOnlineMode && supabaseClient) {
+                    try {
+                        await saveAtribuicaoToSupabase(historicoItem);
+                        historicoItem.sync_status = 'synced';
+                    } catch (cloudError) {
+                        console.error(`⚠️ Erro ao salvar entrega na nuvem:`, cloudError);
+                    }
+                }
+                
+                successCount++;
+                console.log(`✅ Ferramenta ${tool.code} entregue: ${condicao}`);
+                
+            } catch (error) {
+                errorCount++;
+                console.error(`❌ Erro ao entregar ferramenta ${item.toolId}:`, error);
+            }
+        }
+        
+        // Salvar alterações locais
+        await saveTools();
+        await saveColaboradores();
+        
+        // Atualizar interfaces
+        updateFerramentasFromAtribuicoes();
+        updateColaboradoresList();
+        updateLocalAtribuicoesCount();
+        
+        // Recarregar lista de ferramentas disponíveis
+        loadFerramentasDisponiveisEntrega(entregaColaboradorSelecionado.id);
+        
+        // Limpar seleção
+        entregaSelectedTools = [];
+        updateEntregaSelectionCount();
+        hideEntregaPreview();
+        
+        // Gerar novo número de entrega
+        generateEntregaNumber();
+        
+        if (errorCount === 0) {
+            showNotification(`${successCount} ferramentas entregues com sucesso!`, 'success');
+            return true;
+        } else {
+            showNotification(`${successCount} entregues, ${errorCount} com erro.`, 'warning');
+            return false;
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao registrar entrega:', error);
+        showNotification(`Erro ao registrar entrega: ${error.message}`, 'error');
+        return false;
+    }
+}
+// ============================================
+// FUNÇÕES PARA SISTEMA DE ENTREGA
+// ============================================
+
+// Gerar número automático da entrega
+function generateEntregaNumber() {
+    const entregaNumInput = document.getElementById('entregaNumero');
+    if (!entregaNumInput) return;
+    
+    const year = new Date().getFullYear();
+    const month = String(new Date().getMonth() + 1).padStart(2, '0');
+    const day = String(new Date().getDate()).padStart(2, '0');
+    const random = String(Math.floor(Math.random() * 9000) + 1000);
+    
+    entregaNumInput.value = `ENT-${year}${month}${day}-${random}`;
+}
+
+// Inicializar sistema de entrega
+function initializeEntregaSystem() {
+    console.log('🔄 Inicializando sistema de entrega...');
+    
+    // Carregar lista de colaboradores no select
+    loadColaboradoresEntregaSelect();
+    
+    // Configurar data atual
+    document.getElementById('entregaData').value = new Date().toISOString().split('T')[0];
+    
+    // Gerar número da entrega
+    generateEntregaNumber();
+    
+    // Adicionar event listeners
+    addEntregaEventListeners();
+}
+
+// Adicionar event listeners para o sistema de entrega
+function addEntregaEventListeners() {
+    // Seleção de colaborador
+    const colaboradorSelect = document.getElementById('entregaColaborador');
+    if (colaboradorSelect) {
+        colaboradorSelect.addEventListener('change', function() {
+            const colaboradorId = parseInt(this.value);
+            loadFerramentasDisponiveisEntrega(colaboradorId);
+            clearEntregaSelection();
+        });
+    }
+    
+    // Botão: Selecionar Todas
+    const selectAllBtn = document.getElementById('selectAllEntregaBtn');
+    if (selectAllBtn) {
+        selectAllBtn.addEventListener('click', selectAllEntregaTools);
+    }
+    
+    // Botão: Desmarcar Todas
+    const deselectAllBtn = document.getElementById('deselectAllEntregaBtn');
+    if (deselectAllBtn) {
+        deselectAllBtn.addEventListener('click', deselectAllEntregaTools);
+    }
+    
+    // Botão: Visualizar Entrega
+    const previewBtn = document.getElementById('previewEntregaBtn');
+    if (previewBtn) {
+        previewBtn.addEventListener('click', generateEntregaPreview);
+    }
+    
+    // Botão: Limpar Seleção
+    const clearBtn = document.getElementById('clearEntregaSelectionBtn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', clearEntregaSelection);
+    }
+    
+    // Botão: Gerar Recibo de Entrega Excel
+    const generateBtn = document.getElementById('generateEntregaExcelBtn');
+    if (generateBtn) {
+        generateBtn.addEventListener('click', function() {
+            // Primeiro registrar a entrega, depois gerar o Excel
+            registrarEntregaFerramentas().then(success => {
+                if (success) {
+                    // Aqui você pode chamar a função para gerar o Excel da entrega
+                    // generateEntregaExcel();
+                }
+            });
+        });
+    }
+}
+// Na função initializeSystem(), adicione:
+async function initializeSystem() {
+    try {
+        // ... código existente ...
+        
+        // 9. Inicializar sistema de recibo de entrega (DEVOLUÇÃO)
+        initializeReciboSystem();
+        addReciboEventListeners();
+        
+        // 10. Inicializar sistema de recibo de entrega (ENTREGA)
+        initializeEntregaSystem();
+        addEntregaEventListeners();
+        
+        // ... resto do código ...
+    } catch (error) {
+        // ... tratamento de erro ...
+    }
+}
 // Registrar retorno de ferramentas
 async function registrarRetorno(saidaId) {
     const saidaIndex = saidas.findIndex(s => s.id === saidaId);
@@ -16473,5 +16835,3 @@ document.querySelector('[data-tab="saida-ferramentas"]')?.addEventListener('clic
     </script>
 </body>
 </html>
-
-
