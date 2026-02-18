@@ -3127,7 +3127,7 @@
             <div class="user-info">
                 <div class="user-welcome">
                     <i class="fas fa-user"></i>
-                    <span id="userWelcomeText">Bem-vindo!</span>
+                    <span id="userWelcomeText"></span>
                     <span class="user-badge" id="userRoleBadge">DEV</span>
                 </div>
                 <button class="logout-btn" id="logoutBtn">
@@ -3197,7 +3197,7 @@
                     <i class="fas fa-list"></i> Catálogo de Itens
                 </button>
                 <button class="tab-button" data-tab="controle-colaborador">
-                    <i class="fas fa-users"></i> Controle por Colaborador
+                    <i class="fas fa-users"></i> Colaboradores
                 </button>
                 <button class="tab-button" data-tab="mapeamento">
                     <i class="fas fa-map"></i> Mapeamento
@@ -3209,7 +3209,10 @@
                     <i class="fas fa-truck-moving"></i> Romaneio
                 </button>
                 <button class="tab-button" data-tab="database" id="databaseTab">
-                    <i class="fas fa-database"></i> Banco de Dados
+                    <i class="fas fa-cog"></i> Config.
+                </button>
+                <button class="tab-button" data-tab="treinamento" id="treinamentoTab">
+                    <i class="fas fa-video"></i> Treinamento
                 </button>
             </div>
 
@@ -3376,11 +3379,12 @@
                                     <option value="Almoxarifado Central">Almoxarifado Central</option>
                                     <option value="Container Mecânica">Container Mecânica</option>
                                     <option value="Container Elétrica">Container Elétrica</option>
-                                    <option value="Container - SUZANO Imperatriz-MA">Container - SUZANO Imperatriz-MA</option>
+                                    <option value="Container - SUZANO Imperatriz-MA">Container - SUZANO Imperatriz-MA
+                                    </option>
                                     <option value="Oficina">Oficina</option>
                                     <option value="Galpão Altercon">Galpão Altercon</option>
                                     <option value="Galpão - FW Imperatriz-MA">Galpão - FW Imperatriz-MA</option>
-                                    <option value="Caminhão">Caminhão</option>                                    
+                                    <option value="Caminhão">Caminhão</option>
                                     <option value="Escritório">Escritório</option>
                                     <option value="Depósito">Depósito</option>
                                 </select>
@@ -4144,11 +4148,11 @@
                 <div class="card" style="margin-top: 30px;">
                     <h3 class="card-title"><i class="fas fa-toolbox"></i> Recibo de Entrega de Ferramentas</h3>
                     <div class="form-container">
-                    
+
                         <!-- Seleção de Colaborador -->
                         <div class="form-group">
                             <label for="entregaColaborador" class="required">Colaborador</label>
-                             
+
                             <select id="entregaColaborador" class="form-control">
                                 <option value="">Selecione um colaborador</option>
 
@@ -4697,6 +4701,397 @@
                     </div>
                 </div>
             </div>
+
+        </div>
+
+        <!-- ============================================ -->
+        <!-- ABA DE TREINAMENTO - VÍDEO AULAS           -->
+        <!-- ============================================ -->
+
+        <div id="treinamento" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2 class="section-title">
+                    <i class="fas fa-video"></i> Treinamento - Sistema de Controle de Ferramentas
+                </h2>
+                <div style="display: flex; gap: 10px;">
+                    <span class="status-badge status-completed" style="font-size: 14px;">
+                        <i class="fas fa-play-circle"></i> 6 Vídeos
+                    </span>
+                    <span class="status-badge status-ontrack" style="font-size: 14px;">
+                        <i class="fas fa-file-pdf"></i> 5 Apostilas
+                    </span>
+                </div>
+            </div>
+
+            <!-- Cards de Vídeos em Grid -->
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; margin-bottom: 30px;">
+
+                <!-- CARD 1 - INTRODUÇÃO -->
+                <div class="card"
+                    style="border-left: 4px solid #3498db; padding: 20px; display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <div
+                            style="width: 50px; height: 50px; background: linear-gradient(135deg, #3498db, #2980b9); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-play" style="color: white; font-size: 24px;"></i>
+                        </div>
+                        <div>
+                            <h3 style="margin: 0; color: var(--primary-color); font-size: 20px;">Introdução</h3>
+                            <p style="margin: 5px 0 0 0; color: var(--gray-color); font-size: 14px;">Video 1 | Visão
+                                geral do sistema</p>
+                        </div>
+                    </div>
+
+                    <div
+                        style="background-color: #f8f9fa; border-radius: 10px; padding: 15px; margin-bottom: 15px; flex-grow: 1;">
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <i class="fas fa-link" style="color: var(--secondary-color); margin-right: 10px;"></i>
+                            <span style="font-weight: 500;">Link do Vídeo:</span>
+                        </div>
+                        <input type="url" id="treinamentoVideo1" class="form-control"
+                            placeholder="https://youtu.be/4PtFXhjWyck"
+                            style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 8px; margin-bottom: 10px;">
+                        <button class="btn btn-primary"
+                            onclick="window.open(document.getElementById('treinamentoVideo1').value, '_blank')"
+                            style="width: 100%;">
+                            <i class="fas fa-play-circle"></i> Assistir Vídeo
+                        </button>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: auto;">
+                        <i class="fas fa-info-circle" style="color: var(--secondary-color);"></i>
+                        <span style="font-size: 13px; color: var(--gray-color);">Conceitos básicos e navegação</span>
+                    </div>
+                </div>
+
+                <!-- CARD 2 - AULA 1 -->
+                <div class="card"
+                    style="border-left: 4px solid #27ae60; padding: 20px; display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <div
+                            style="width: 50px; height: 50px; background: linear-gradient(135deg, #27ae60, #219653); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-cube" style="color: white; font-size: 24px;"></i>
+                        </div>
+                        <div>
+                            <h3 style="margin: 0; color: var(--primary-color); font-size: 20px;">Aula 1</h3>
+                            <p style="margin: 5px 0 0 0; color: var(--gray-color); font-size: 14px;">Video 2 | Cadastro
+                                de Ferramentas</p>
+                        </div>
+                    </div>
+
+                    <div style="background-color: #f8f9fa; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <i class="fas fa-link" style="color: var(--secondary-color); margin-right: 10px;"></i>
+                            <span style="font-weight: 500;">Link do Vídeo:</span>
+                        </div>
+                        <input type="url" id="treinamentoVideo2" class="form-control"
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 8px; margin-bottom: 10px;">
+                        <button class="btn btn-primary"
+                            onclick="window.open(document.getElementById('treinamentoVideo2').value, '_blank')"
+                            style="width: 100%; margin-bottom: 15px;">
+                            <i class="fas fa-play-circle"></i> Assistir Vídeo
+                        </button>
+
+                        <!-- ÁREA DE PDF DA AULA 1 -->
+                        <div style="border-top: 1px dashed var(--border-color); padding-top: 15px; margin-top: 5px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <i class="fas fa-file-pdf" style="color: #e74c3c; margin-right: 10px;"></i>
+                                <span style="font-weight: 500;">Apostila da Aula 1:</span>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="url" id="treinamentoPdf1" class="form-control"
+                                    placeholder="https://exemplo.com/apostila1.pdf"
+                                    style="flex-grow: 1; padding: 10px;">
+                                <button class="btn btn-danger"
+                                    onclick="window.open(document.getElementById('treinamentoPdf1').value, '_blank')"
+                                    style="padding: 10px 20px;">
+                                    <i class="fas fa-download"></i> PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: auto;">
+                        <i class="fas fa-check-circle" style="color: #27ae60;"></i>
+                        <span style="font-size: 13px; color: var(--gray-color);">Como cadastrar novas ferramentas</span>
+                    </div>
+                </div>
+
+                <!-- CARD 3 - AULA 2 -->
+                <div class="card"
+                    style="border-left: 4px solid #f39c12; padding: 20px; display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <div
+                            style="width: 50px; height: 50px; background: linear-gradient(135deg, #f39c12, #e67e22); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-users" style="color: white; font-size: 24px;"></i>
+                        </div>
+                        <div>
+                            <h3 style="margin: 0; color: var(--primary-color); font-size: 20px;">Aula 2</h3>
+                            <p style="margin: 5px 0 0 0; color: var(--gray-color); font-size: 14px;">Video 3 | Controle
+                                de Colaboradores</p>
+                        </div>
+                    </div>
+
+                    <div style="background-color: #f8f9fa; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <i class="fas fa-link" style="color: var(--secondary-color); margin-right: 10px;"></i>
+                            <span style="font-weight: 500;">Link do Vídeo:</span>
+                        </div>
+                        <input type="url" id="treinamentoVideo3" class="form-control"
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 8px; margin-bottom: 10px;">
+                        <button class="btn btn-primary"
+                            onclick="window.open(document.getElementById('treinamentoVideo3').value, '_blank')"
+                            style="width: 100%; margin-bottom: 15px;">
+                            <i class="fas fa-play-circle"></i> Assistir Vídeo
+                        </button>
+
+                        <!-- ÁREA DE PDF DA AULA 2 -->
+                        <div style="border-top: 1px dashed var(--border-color); padding-top: 15px; margin-top: 5px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <i class="fas fa-file-pdf" style="color: #e74c3c; margin-right: 10px;"></i>
+                                <span style="font-weight: 500;">Apostila da Aula 2:</span>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="url" id="treinamentoPdf2" class="form-control"
+                                    placeholder="https://exemplo.com/apostila2.pdf"
+                                    style="flex-grow: 1; padding: 10px;">
+                                <button class="btn btn-danger"
+                                    onclick="window.open(document.getElementById('treinamentoPdf2').value, '_blank')"
+                                    style="padding: 10px 20px;">
+                                    <i class="fas fa-download"></i> PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: auto;">
+                        <i class="fas fa-check-circle" style="color: #f39c12;"></i>
+                        <span style="font-size: 13px; color: var(--gray-color);">Gerenciar colaboradores e
+                            matrículas</span>
+                    </div>
+                </div>
+
+                <!-- CARD 4 - AULA 3 -->
+                <div class="card"
+                    style="border-left: 4px solid #e74c3c; padding: 20px; display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <div
+                            style="width: 50px; height: 50px; background: linear-gradient(135deg, #e74c3c, #c0392b); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-exchange-alt" style="color: white; font-size: 24px;"></i>
+                        </div>
+                        <div>
+                            <h3 style="margin: 0; color: var(--primary-color); font-size: 20px;">Aula 3</h3>
+                            <p style="margin: 5px 0 0 0; color: var(--gray-color); font-size: 14px;">Video 4 |
+                                Atribuição e Devolução</p>
+                        </div>
+                    </div>
+
+                    <div style="background-color: #f8f9fa; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <i class="fas fa-link" style="color: var(--secondary-color); margin-right: 10px;"></i>
+                            <span style="font-weight: 500;">Link do Vídeo:</span>
+                        </div>
+                        <input type="url" id="treinamentoVideo4" class="form-control"
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 8px; margin-bottom: 10px;">
+                        <button class="btn btn-primary"
+                            onclick="window.open(document.getElementById('treinamentoVideo4').value, '_blank')"
+                            style="width: 100%; margin-bottom: 15px;">
+                            <i class="fas fa-play-circle"></i> Assistir Vídeo
+                        </button>
+
+                        <!-- ÁREA DE PDF DA AULA 3 -->
+                        <div style="border-top: 1px dashed var(--border-color); padding-top: 15px; margin-top: 5px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <i class="fas fa-file-pdf" style="color: #e74c3c; margin-right: 10px;"></i>
+                                <span style="font-weight: 500;">Apostila da Aula 3:</span>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="url" id="treinamentoPdf3" class="form-control"
+                                    placeholder="https://exemplo.com/apostila3.pdf"
+                                    style="flex-grow: 1; padding: 10px;">
+                                <button class="btn btn-danger"
+                                    onclick="window.open(document.getElementById('treinamentoPdf3').value, '_blank')"
+                                    style="padding: 10px 20px;">
+                                    <i class="fas fa-download"></i> PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: auto;">
+                        <i class="fas fa-check-circle" style="color: #e74c3c;"></i>
+                        <span style="font-size: 13px; color: var(--gray-color);">Como atribuir e devolver
+                            ferramentas</span>
+                    </div>
+                </div>
+
+                <!-- CARD 5 - AULA 4 -->
+                <div class="card"
+                    style="border-left: 4px solid #9b59b6; padding: 20px; display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <div
+                            style="width: 50px; height: 50px; background: linear-gradient(135deg, #9b59b6, #8e44ad); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-file-alt" style="color: white; font-size: 24px;"></i>
+                        </div>
+                        <div>
+                            <h3 style="margin: 0; color: var(--primary-color); font-size: 20px;">Aula 4</h3>
+                            <p style="margin: 5px 0 0 0; color: var(--gray-color); font-size: 14px;">Video 5 | Romaneios
+                                e Relatórios</p>
+                        </div>
+                    </div>
+
+                    <div style="background-color: #f8f9fa; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <i class="fas fa-link" style="color: var(--secondary-color); margin-right: 10px;"></i>
+                            <span style="font-weight: 500;">Link do Vídeo:</span>
+                        </div>
+                        <input type="url" id="treinamentoVideo5" class="form-control"
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 8px; margin-bottom: 10px;">
+                        <button class="btn btn-primary"
+                            onclick="window.open(document.getElementById('treinamentoVideo5').value, '_blank')"
+                            style="width: 100%; margin-bottom: 15px;">
+                            <i class="fas fa-play-circle"></i> Assistir Vídeo
+                        </button>
+
+                        <!-- ÁREA DE PDF DA AULA 4 -->
+                        <div style="border-top: 1px dashed var(--border-color); padding-top: 15px; margin-top: 5px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <i class="fas fa-file-pdf" style="color: #e74c3c; margin-right: 10px;"></i>
+                                <span style="font-weight: 500;">Apostila da Aula 4:</span>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="url" id="treinamentoPdf4" class="form-control"
+                                    placeholder="https://exemplo.com/apostila4.pdf"
+                                    style="flex-grow: 1; padding: 10px;">
+                                <button class="btn btn-danger"
+                                    onclick="window.open(document.getElementById('treinamentoPdf4').value, '_blank')"
+                                    style="padding: 10px 20px;">
+                                    <i class="fas fa-download"></i> PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: auto;">
+                        <i class="fas fa-check-circle" style="color: #9b59b6;"></i>
+                        <span style="font-size: 13px; color: var(--gray-color);">Gerar romaneios e exportar
+                            relatórios</span>
+                    </div>
+                </div>
+
+                <!-- CARD 6 - AULA 5 -->
+                <div class="card"
+                    style="border-left: 4px solid #1abc9c; padding: 20px; display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <div
+                            style="width: 50px; height: 50px; background: linear-gradient(135deg, #1abc9c, #16a085); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-cloud-upload-alt" style="color: white; font-size: 24px;"></i>
+                        </div>
+                        <div>
+                            <h3 style="margin: 0; color: var(--primary-color); font-size: 20px;">Aula 5</h3>
+                            <p style="margin: 5px 0 0 0; color: var(--gray-color); font-size: 14px;">Video 6 | Backup e
+                                Sincronização</p>
+                        </div>
+                    </div>
+
+                    <div style="background-color: #f8f9fa; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <i class="fas fa-link" style="color: var(--secondary-color); margin-right: 10px;"></i>
+                            <span style="font-weight: 500;">Link do Vídeo:</span>
+                        </div>
+                        <input type="url" id="treinamentoVideo6" class="form-control"
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 8px; margin-bottom: 10px;">
+                        <button class="btn btn-primary"
+                            onclick="window.open(document.getElementById('treinamentoVideo6').value, '_blank')"
+                            style="width: 100%; margin-bottom: 15px;">
+                            <i class="fas fa-play-circle"></i> Assistir Vídeo
+                        </button>
+
+                        <!-- ÁREA DE PDF DA AULA 5 -->
+                        <div style="border-top: 1px dashed var(--border-color); padding-top: 15px; margin-top: 5px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <i class="fas fa-file-pdf" style="color: #e74c3c; margin-right: 10px;"></i>
+                                <span style="font-weight: 500;">Apostila da Aula 5:</span>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="url" id="treinamentoPdf5" class="form-control"
+                                    placeholder="https://exemplo.com/apostila5.pdf"
+                                    style="flex-grow: 1; padding: 10px;">
+                                <button class="btn btn-danger"
+                                    onclick="window.open(document.getElementById('treinamentoPdf5').value, '_blank')"
+                                    style="padding: 10px 20px;">
+                                    <i class="fas fa-download"></i> PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: auto;">
+                        <i class="fas fa-check-circle" style="color: #1abc9c;"></i>
+                        <span style="font-size: 13px; color: var(--gray-color);">Backup, restauração e nuvem</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ÁREA DE INFORMAÇÕES E DICAS -->
+            <div
+                style="background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%); border-radius: 12px; padding: 25px; margin-top: 20px;">
+                <div style="display: flex; align-items: flex-start; gap: 20px;">
+                    <div
+                        style="width: 50px; height: 50px; background: var(--primary-color); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <i class="fas fa-lightbulb" style="color: white; font-size: 24px;"></i>
+                    </div>
+                    <div style="flex-grow: 1;">
+                        <h4
+                            style="color: var(--primary-color); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-info-circle"></i> Dicas de Uso
+                        </h4>
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                            <div style="display: flex; gap: 10px;">
+                                <i class="fas fa-check" style="color: var(--success-color); margin-top: 3px;"></i>
+                                <span style="font-size: 14px;">Cole os links do YouTube nos campos acima</span>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <i class="fas fa-check" style="color: var(--success-color); margin-top: 3px;"></i>
+                                <span style="font-size: 14px;">Os links são salvos automaticamente</span>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <i class="fas fa-check" style="color: var(--success-color); margin-top: 3px;"></i>
+                                <span style="font-size: 14px;">Clique no botão para abrir o vídeo</span>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <i class="fas fa-check" style="color: var(--success-color); margin-top: 3px;"></i>
+                                <span style="font-size: 14px;">PDFs podem ser links de download</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ÁREA DE CONFIGURAÇÃO DOS LINKS -->
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px; padding: 20px; background-color: white; border-radius: 10px;">
+                <div style="display: flex; gap: 20px;">
+                    <button class="btn btn-success" onclick="salvarLinksTreinamento()">
+                        <i class="fas fa-save"></i> Salvar Todos os Links
+                    </button>
+                    <button class="btn btn-warning" onclick="carregarLinksTreinamento()">
+                        <i class="fas fa-folder-open"></i> Carregar Links Salvos
+                    </button>
+                    <button class="btn btn-danger" onclick="limparLinksTreinamento()">
+                        <i class="fas fa-trash"></i> Limpar Campos
+                    </button>
+                </div>
+                <span style="color: var(--gray-color); font-size: 14px;">
+                    <i class="fas fa-sync-alt"></i> Os links são armazenados localmente
+                </span>
+            </div>
         </div>
 
         <!-- Modal para visualizar item -->
@@ -4745,10 +5140,21 @@
         <input type="file" id="restoreFileInput" accept=".json" style="display: none;">
     </div>
 
+    <!-- ============================================ -->
+    <!-- ABA DE TREINAMENTO - VÍDEO AULAS           -->
+    <!-- ============================================ -->
+
+
+    <div id="treinamento" class="tab-content">
+        <!-- TODO O CONTEÚDO QUE ENVIEI ANTERIORMENTE -->
+        <!-- COLE AQUI TODO O HTML DA ABA TREINAMENTO -->
+    </div>
+
+
     <footer class="site-footer">
         <div class="footer-content">
             <p>Desenvolvido por Fábio Mendes Rodrigues, Planejador da F.W. Company</p>
-            <p class="footer-version">Versão 3.0_rev10b | Última atualização: <span id="currentDate"></span></p>
+            <p class="footer-version">Versão 3.0_rev10D | Última atualização: <span id="currentDate"></span></p>
         </div>
     </footer>
 
@@ -4789,7 +5195,7 @@
             'fwuser': {
                 password: 'User123',
                 role: 'user',
-                name: 'Usuário Genérico',
+                name: 'User',
                 email: 'fwuser@fwcompany.com.br'
             },
             'raquel@fwcompany.com.br': {
@@ -4839,63 +5245,63 @@
         let entregaSelectedTools = [];
         let entregaColaboradorSelecionado = null;
 
-       function initializeEntregaSystem() {
-    // 1. Carregar lista de colaboradores (LINHA CRÍTICA)
-    loadColaboradoresEntregaSelect();
+        function initializeEntregaSystem() {
+            // 1. Carregar lista de colaboradores (LINHA CRÍTICA)
+            loadColaboradoresEntregaSelect();
 
-    // 2. Configurar data atual
-    document.getElementById('entregaData').value = new Date().toISOString().split('T')[0];
+            // 2. Configurar data atual
+            document.getElementById('entregaData').value = new Date().toISOString().split('T')[0];
 
-    // 3. Gerar número do recibo
-    generateEntregaNumber();
+            // 3. Gerar número do recibo
+            generateEntregaNumber();
 
-    // 4. Adicionar event listeners
-    addEntregaEventListeners();
-}
+            // 4. Adicionar event listeners
+            addEntregaEventListeners();
+        }
 
         // Carregar colaboradores no select de entrega
         function loadColaboradoresEntregaSelect() {
-    const select = document.getElementById('entregaColaborador');
-    if (!select) return;
+            const select = document.getElementById('entregaColaborador');
+            if (!select) return;
 
-    select.innerHTML = '<option value="">Selecione um colaborador</option>';
+            select.innerHTML = '<option value="">Selecione um colaborador</option>';
 
-    if (colaboradores.length === 0) {
-        select.innerHTML += '<option value="" disabled>Nenhum colaborador cadastrado</option>';
-        select.disabled = true;
-        return;
-    }
+            if (colaboradores.length === 0) {
+                select.innerHTML += '<option value="" disabled>Nenhum colaborador cadastrado</option>';
+                select.disabled = true;
+                return;
+            }
 
-    // Mostrar TODOS os colaboradores (igual ao Item B)
-    const colaboradoresParaMostrar = [...colaboradores];
+            // Mostrar TODOS os colaboradores (igual ao Item B)
+            const colaboradoresParaMostrar = [...colaboradores];
 
-    // Ordenar por nome
-    colaboradoresParaMostrar.sort((a, b) => a.nome.localeCompare(b.nome));
+            // Ordenar por nome
+            colaboradoresParaMostrar.sort((a, b) => a.nome.localeCompare(b.nome));
 
-    // Adicionar opções (igual ao Item B)
-    colaboradoresParaMostrar.forEach(colaborador => {
-        // Contar ferramentas ativas deste colaborador
-        const ferramentasAtivas = historicoAtribuicoes.filter(atribuicao =>
-            atribuicao.colaboradorId === colaborador.id &&
-            !atribuicao.dataDevolucao
-        ).length;
+            // Adicionar opções (igual ao Item B)
+            colaboradoresParaMostrar.forEach(colaborador => {
+                // Contar ferramentas ativas deste colaborador
+                const ferramentasAtivas = historicoAtribuicoes.filter(atribuicao =>
+                    atribuicao.colaboradorId === colaborador.id &&
+                    !atribuicao.dataDevolucao
+                ).length;
 
-        const option = document.createElement('option');
-        option.value = colaborador.id;
-        option.textContent = `${colaborador.nome} (${colaborador.matricula})`;
+                const option = document.createElement('option');
+                option.value = colaborador.id;
+                option.textContent = `${colaborador.nome} (${colaborador.matricula})`;
 
-        // Adicionar informação sobre ferramentas se houver
-        if (ferramentasAtivas > 0) {
-            option.textContent += ` - ${ferramentasAtivas} ferramenta${ferramentasAtivas !== 1 ? 's' : ''} em uso`;
-            option.style.fontWeight = 'bold';
-        } else {
-            option.textContent += ' - Sem ferramentas';
-            option.style.color = 'var(--gray-color)';
+                // Adicionar informação sobre ferramentas se houver
+                if (ferramentasAtivas > 0) {
+                    option.textContent += ` - ${ferramentasAtivas} ferramenta${ferramentasAtivas !== 1 ? 's' : ''} em uso`;
+                    option.style.fontWeight = 'bold';
+                } else {
+                    option.textContent += ' - Sem ferramentas';
+                    option.style.color = 'var(--gray-color)';
+                }
+
+                select.appendChild(option);
+            });
         }
-
-        select.appendChild(option);
-    });
-}
 
         // Gerar número do recibo de entrega
         function generateEntregaNumber() {
@@ -5030,19 +5436,19 @@
                 }, 100);
             });
         }
-// Adicione este event listener (igual ao Item B)
-document.querySelector('[data-tab="exportar"]')?.addEventListener('click', function() {
-    // Pequeno delay para garantir que o conteúdo esteja visível
-    setTimeout(() => {
-        // Recarregar os dois selects
-        loadColaboradoresReciboSelect(); // Item B (já existe)
-        loadColaboradoresEntregaSelect(); // Item A (novo)
-        
-        // Configurar datas
-        document.getElementById('reciboData').value = new Date().toISOString().split('T')[0];
-        document.getElementById('entregaData').value = new Date().toISOString().split('T')[0];
-    }, 100);
-});
+        // Adicione este event listener (igual ao Item B)
+        document.querySelector('[data-tab="exportar"]')?.addEventListener('click', function () {
+            // Pequeno delay para garantir que o conteúdo esteja visível
+            setTimeout(() => {
+                // Recarregar os dois selects
+                loadColaboradoresReciboSelect(); // Item B (já existe)
+                loadColaboradoresEntregaSelect(); // Item A (novo)
+
+                // Configurar datas
+                document.getElementById('reciboData').value = new Date().toISOString().split('T')[0];
+                document.getElementById('entregaData').value = new Date().toISOString().split('T')[0];
+            }, 100);
+        });
         // Funções auxiliares para checkboxes (similares às do recibo de devolução)
         function addEntregaCheckboxListeners() {
             // Checkbox "Selecionar Todos"
@@ -7366,81 +7772,81 @@ document.querySelector('[data-tab="exportar"]')?.addEventListener('click', funct
             }
         }
         // ============================================
-// FUNÇÃO CORRIGIDA: Buscar atribuições do Supabase e sincronizar colaboradores
-// ============================================
-async function fetchAtribuicoesFromSupabase() {
-    try {
-        console.log('🔄 Buscando atribuições da nuvem...');
+        // FUNÇÃO CORRIGIDA: Buscar atribuições do Supabase e sincronizar colaboradores
+        // ============================================
+        async function fetchAtribuicoesFromSupabase() {
+            try {
+                console.log('🔄 Buscando atribuições da nuvem...');
 
-        if (!supabaseClient || !isOnlineMode) {
-            showNotification('Não conectado à nuvem.', 'warning');
-            return false;
-        }
+                if (!supabaseClient || !isOnlineMode) {
+                    showNotification('Não conectado à nuvem.', 'warning');
+                    return false;
+                }
 
-        // Buscar TODAS as atribuições
-        const { data, error } = await supabaseClient
-            .from('tool_assignments')
-            .select('*')
-            .order('created_at', { ascending: false });
+                // Buscar TODAS as atribuições
+                const { data, error } = await supabaseClient
+                    .from('tool_assignments')
+                    .select('*')
+                    .order('created_at', { ascending: false });
 
-        if (error) {
-            console.error('❌ Erro ao buscar atribuições:', error);
-            if (error.message.includes('does not exist')) {
-                showNotification('Tabela de atribuições não existe.', 'error');
+                if (error) {
+                    console.error('❌ Erro ao buscar atribuições:', error);
+                    if (error.message.includes('does not exist')) {
+                        showNotification('Tabela de atribuições não existe.', 'error');
+                        return false;
+                    }
+                    throw error;
+                }
+
+                if (!data || data.length === 0) {
+                    console.log('📭 Nenhuma atribuição na nuvem');
+                    showNotification('Nenhuma atribuição encontrada na nuvem.', 'info');
+                    return false;
+                }
+
+                console.log(`📥 ${data.length} atribuições recebidas da nuvem`);
+
+                // Converter para formato local
+                const atribuicoesDaNuvem = data.map(item => ({
+                    id: item.id,
+                    supabase_id: item.id,
+                    colaboradorId: item.collaborator_id,
+                    colaboradorNome: item.collaborator_name,
+                    colaboradorMatricula: item.collaborator_registration,
+                    toolId: item.tool_id,
+                    toolNome: item.tool_name,
+                    toolCodigo: item.tool_code,
+                    dataAtribuicao: item.assignment_date,
+                    dataDevolucao: item.returned_date || item.actual_return_date,
+                    observacao: item.observations,
+                    usuarioAtribuicao: item.user_assigned,
+                    usuarioDevolucao: item.user_returned,
+                    status: item.status || (item.returned_date ? 'returned' : 'active'),
+                    createdAt: item.created_at,
+                    updatedAt: item.updated_at,
+                    sync_status: 'synced',
+                    source: 'cloud'
+                }));
+
+                // Mesclar com atribuições locais
+                await mergeAtribuicoes(atribuicoesDaNuvem);
+
+                // ===== LINHA CRÍTICA ADICIONADA =====
+                // Sincronizar ferramentas atribuídas com o histórico
+                syncFerramentasAtribuidasComHistorico();
+
+                // Atualizar status das ferramentas
+                updateFerramentasFromAtribuicoes();
+
+                showNotification(`${data.length} atribuições sincronizadas da nuvem!`, 'success');
+                return true;
+
+            } catch (error) {
+                console.error('❌ Erro completo na busca de atribuições:', error);
+                showNotification(`Erro ao buscar atribuições: ${error.message}`, 'error');
                 return false;
             }
-            throw error;
         }
-
-        if (!data || data.length === 0) {
-            console.log('📭 Nenhuma atribuição na nuvem');
-            showNotification('Nenhuma atribuição encontrada na nuvem.', 'info');
-            return false;
-        }
-
-        console.log(`📥 ${data.length} atribuições recebidas da nuvem`);
-
-        // Converter para formato local
-        const atribuicoesDaNuvem = data.map(item => ({
-            id: item.id,
-            supabase_id: item.id,
-            colaboradorId: item.collaborator_id,
-            colaboradorNome: item.collaborator_name,
-            colaboradorMatricula: item.collaborator_registration,
-            toolId: item.tool_id,
-            toolNome: item.tool_name,
-            toolCodigo: item.tool_code,
-            dataAtribuicao: item.assignment_date,
-            dataDevolucao: item.returned_date || item.actual_return_date,
-            observacao: item.observations,
-            usuarioAtribuicao: item.user_assigned,
-            usuarioDevolucao: item.user_returned,
-            status: item.status || (item.returned_date ? 'returned' : 'active'),
-            createdAt: item.created_at,
-            updatedAt: item.updated_at,
-            sync_status: 'synced',
-            source: 'cloud'
-        }));
-
-        // Mesclar com atribuições locais
-        await mergeAtribuicoes(atribuicoesDaNuvem);
-        
-        // ===== LINHA CRÍTICA ADICIONADA =====
-        // Sincronizar ferramentas atribuídas com o histórico
-        syncFerramentasAtribuidasComHistorico();
-        
-        // Atualizar status das ferramentas
-        updateFerramentasFromAtribuicoes();
-
-        showNotification(`${data.length} atribuições sincronizadas da nuvem!`, 'success');
-        return true;
-
-    } catch (error) {
-        console.error('❌ Erro completo na busca de atribuições:', error);
-        showNotification(`Erro ao buscar atribuições: ${error.message}`, 'error');
-        return false;
-    }
-}
         // ============================================
         // FUNÇÃO CORRIGIDA: Processar mesclagem de atribuições
         // ============================================
@@ -11837,47 +12243,47 @@ async function fetchAtribuicoesFromSupabase() {
             }
         }
         // ============================================
-// FUNÇÃO CORRIGIDA: Sincronizar ferramentas atribuídas aos colaboradores
-// ============================================
-function syncFerramentasAtribuidasComHistorico() {
-    console.log('🔄 Sincronizando ferramentas atribuídas com o histórico...');
-    
-    // Resetar ferramentas atribuídas de todos os colaboradores
-    colaboradores.forEach(colaborador => {
-        colaborador.ferramentasAtribuidas = [];
-    });
-    
-    // Buscar todas as atribuições ATIVAS (sem data de devolução)
-    const atribuicoesAtivas = historicoAtribuicoes.filter(atribuicao => 
-        !atribuicao.dataDevolucao
-    );
-    
-    console.log(`📊 ${atribuicoesAtivas.length} atribuições ativas encontradas`);
-    
-    // Para cada atribuição ativa, adicionar a ferramenta ao colaborador
-    atribuicoesAtivas.forEach(atribuicao => {
-        const colaborador = colaboradores.find(c => c.id === atribuicao.colaboradorId);
-        
-        if (colaborador) {
-            if (!colaborador.ferramentasAtribuidas) {
+        // FUNÇÃO CORRIGIDA: Sincronizar ferramentas atribuídas aos colaboradores
+        // ============================================
+        function syncFerramentasAtribuidasComHistorico() {
+            console.log('🔄 Sincronizando ferramentas atribuídas com o histórico...');
+
+            // Resetar ferramentas atribuídas de todos os colaboradores
+            colaboradores.forEach(colaborador => {
                 colaborador.ferramentasAtribuidas = [];
-            }
-            
-            if (!colaborador.ferramentasAtribuidas.includes(atribuicao.toolId)) {
-                colaborador.ferramentasAtribuidas.push(atribuicao.toolId);
-                console.log(`✅ Ferramenta ${atribuicao.toolCodigo} atribuída a ${colaborador.nome}`);
-            }
-        } else {
-            console.warn(`⚠️ Colaborador ID ${atribuicao.colaboradorId} não encontrado`);
+            });
+
+            // Buscar todas as atribuições ATIVAS (sem data de devolução)
+            const atribuicoesAtivas = historicoAtribuicoes.filter(atribuicao =>
+                !atribuicao.dataDevolucao
+            );
+
+            console.log(`📊 ${atribuicoesAtivas.length} atribuições ativas encontradas`);
+
+            // Para cada atribuição ativa, adicionar a ferramenta ao colaborador
+            atribuicoesAtivas.forEach(atribuicao => {
+                const colaborador = colaboradores.find(c => c.id === atribuicao.colaboradorId);
+
+                if (colaborador) {
+                    if (!colaborador.ferramentasAtribuidas) {
+                        colaborador.ferramentasAtribuidas = [];
+                    }
+
+                    if (!colaborador.ferramentasAtribuidas.includes(atribuicao.toolId)) {
+                        colaborador.ferramentasAtribuidas.push(atribuicao.toolId);
+                        console.log(`✅ Ferramenta ${atribuicao.toolCodigo} atribuída a ${colaborador.nome}`);
+                    }
+                } else {
+                    console.warn(`⚠️ Colaborador ID ${atribuicao.colaboradorId} não encontrado`);
+                }
+            });
+
+            // Salvar alterações
+            saveColaboradores();
+            console.log('✅ Sincronização concluída');
+
+            return atribuicoesAtivas.length;
         }
-    });
-    
-    // Salvar alterações
-    saveColaboradores();
-    console.log('✅ Sincronização concluída');
-    
-    return atribuicoesAtivas.length;
-}
 
         // FUNÇÃO PARA SINCRONIZAR ATRIBUIÇÕES PENDENTES
         async function syncPendingAtribuicoes() {
@@ -12885,7 +13291,7 @@ function syncFerramentasAtribuidasComHistorico() {
 
             // Atualizar informações do usuário
             if (currentUser) {
-                document.getElementById('userWelcomeText').textContent = `Bem-vindo, ${currentUser.name}`;
+                document.getElementById('userWelcomeText').textContent = currentUser.name;
                 document.getElementById('userRoleBadge').textContent = getRoleDisplayName(currentUser.role);
                 document.getElementById('userRoleBadge').className = `user-badge ${getRoleBadgeClass(currentUser.role)}`;
             }
@@ -13117,6 +13523,9 @@ function syncFerramentasAtribuidasComHistorico() {
         // ============================================
         // DADOS DE EXEMPLO
         // ============================================
+
+        // 🚩 FLAG DE CONTROLE - false = sem dados de exemplo
+        const CARREGAR_DADOS_EXEMPLO = false;
 
         function getExampleTools() {
             return [
@@ -13629,7 +14038,17 @@ function syncFerramentasAtribuidasComHistorico() {
         // Formatar moeda
         function formatCurrency(value) {
             if (!value && value !== 0) return 'R$ 0,00';
-            return `R$ ${parseFloat(value).toFixed(2).replace('.', ',')}`;
+
+            // Separar parte inteira e decimal
+            let valor = parseFloat(value).toFixed(2);
+            let partes = valor.split('.');
+            let inteiro = partes[0];
+            let decimal = partes[1];
+
+            // Adicionar pontos a cada 3 dígitos
+            inteiro = inteiro.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+            return `R$ ${inteiro},${decimal}`;
         }
 
         // Formatar moeda para exportação
@@ -13646,7 +14065,364 @@ function syncFerramentasAtribuidasComHistorico() {
             ];
             return colors[Math.floor(Math.random() * colors.length)];
         }
+        // ============================================
+        // CONTROLE DE VISUALIZAÇÃO DE VALORES FINANCEIROS
+        // (Mantendo barras visíveis, ocultando apenas R$)
+        // ============================================
 
+        // Variável de controle para saber se os valores estão ocultos
+        let valoresOcultos = false;
+
+        // Função para verificar se o usuário pode ver valores
+        function podeVerValores() {
+            return currentUser && (currentUser.role === 'dev' || currentUser.role === 'almoxarife');
+        }
+
+        // Função para alternar visualização dos valores
+        function toggleValoresFinanceiros() {
+            if (!podeVerValores()) {
+                showNotification('Você não tem permissão para visualizar valores financeiros.', 'error');
+                return;
+            }
+
+            valoresOcultos = !valoresOcultos;
+
+            // Atualizar ícone do olho
+            const eyeIcon = document.getElementById('toggleValoresIcon');
+            if (eyeIcon) {
+                eyeIcon.className = valoresOcultos ? 'fas fa-eye-slash' : 'fas fa-eye';
+            }
+
+            // Atualizar tooltip
+            const toggleBtn = document.getElementById('toggleValoresBtn');
+            if (toggleBtn) {
+                toggleBtn.title = valoresOcultos ? 'Mostrar valores' : 'Ocultar valores';
+            }
+
+            // Atualizar apenas os valores financeiros na interface
+            atualizarValoresFinanceirosInterface();
+
+            // Salvar preferência
+            localStorage.setItem('valoresOcultos', valoresOcultos);
+        }
+
+        // Função para formatar valor com ou sem ocultação (apenas para R$)
+        function formatarValorSeguro(valor) {
+            if (!podeVerValores()) {
+                return '●●●●●●';
+            }
+
+            if (valoresOcultos) {
+                return '●●●●●●';
+            }
+
+            return formatCurrency(valor);
+        }
+
+        // Função para atualizar apenas os valores financeiros na interface
+        function atualizarValoresFinanceirosInterface() {
+            // Atualizar valor total no cabeçalho
+            const totalValueElement = document.getElementById('totalValue');
+            if (totalValueElement) {
+                const valorTotal = tools.reduce((sum, tool) => {
+                    const preco = parseFloat(tool.preco) || 0;
+                    const quantidade = parseInt(tool.quantidade) || 1;
+                    return sum + (preco * quantidade);
+                }, 0);
+
+                totalValueElement.textContent = formatarValorSeguro(valorTotal);
+            }
+
+            // Atualizar apenas os textos dos valores no gráfico, manter as barras
+            if (chartInstance) {
+                // Manter as barras visíveis, mas ocultar os valores nos tooltips se necessário
+                if (!podeVerValores() || valoresOcultos) {
+                    chartInstance.options.plugins.tooltip.callbacks.label = function (context) {
+                        const label = context.dataset.label || '';
+                        return `${label}: ●●●●●●`;
+                    };
+                } else {
+                    // Restaurar tooltips normais
+                    chartInstance.options.plugins.tooltip.callbacks.label = function (context) {
+                        const label = context.dataset.label || '';
+                        const value = context.raw;
+                        return `${label}: ${formatCurrency(value)}`;
+                    };
+                }
+                chartInstance.update();
+            }
+
+            // Atualizar estatísticas de valor na dashboard (mantendo as barras)
+            updateValueStats();
+        }
+
+        // NOVA VERSÃO: Manter as barras, ocultar apenas os valores em R$
+        function updateValueStats() {
+            // Se não pode ver valores, mostrar mensagem de restrição mas manter as barras?
+            // Na verdade, vamos manter as barras sempre visíveis, só ocultar os números
+
+            const categoryValue = {};
+            const categoryCount = {};
+
+            tools.forEach(tool => {
+                const preco = parseFloat(tool.preco) || 0;
+                const quantidade = parseInt(tool.quantidade) || 1;
+                const valor = preco * quantidade;
+
+                if (!categoryValue[tool.category]) {
+                    categoryValue[tool.category] = 0;
+                    categoryCount[tool.category] = 0;
+                }
+                categoryValue[tool.category] += valor;
+                categoryCount[tool.category] += 1;
+            });
+
+            const totalValue = Object.values(categoryValue).reduce((a, b) => a + b, 0);
+            let valueHTML = '';
+
+            // Ordenar categorias por valor (decrescente)
+            const sortedCategories = Object.entries(categoryValue)
+                .sort(([, a], [, b]) => b - a);
+
+            for (const [category, value] of sortedCategories) {
+                const percent = totalValue > 0 ? Math.round((value / totalValue) * 100) : 0;
+                const quantidade = categoryCount[category] || 0;
+
+                // Determinar se deve mostrar o valor em R$ ou oculto
+                let valorDisplay;
+                if (!podeVerValores() || valoresOcultos) {
+                    valorDisplay = '<span class="valor-oculto" title="Valor oculto - Clique no olho para visualizar">●●●●●●</span>';
+                } else {
+                    valorDisplay = formatCurrency(value);
+                }
+
+                valueHTML += `
+            <div class="progress-container" style="margin-bottom: 15px;">
+                <div class="progress-label" style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span style="font-weight: 500;">
+                        <i class="fas fa-tag" style="color: var(--secondary-color); margin-right: 5px;"></i>
+                        ${category}
+                        <span style="color: var(--gray-color); font-size: 12px; margin-left: 5px;">(${quantidade} itens)</span>
+                    </span>
+                    <span style="font-weight: 600; color: ${!podeVerValores() || valoresOcultos ? 'var(--gray-color)' : 'var(--success-color)'}">
+    ${valorDisplay}
+</span>
+                </div>
+                <div class="progress-bar" style="height: 24px; background-color: var(--light-color); border-radius: 12px; overflow: hidden; position: relative;">
+                    <div class="progress-fill" style="width: ${percent}%; height: 100%; background: linear-gradient(90deg, ${getRandomColor()}, ${getRandomColor()}); border-radius: 12px; transition: width 0.5s ease;">
+                        <span style="position: absolute; right: 10px; top: 2px; color: white; font-size: 12px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+                            ${percent}%
+                        </span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: 11px; color: var(--gray-color);">
+                    <span>Média: ${!podeVerValores() || valoresOcultos ? '●●●' : formatCurrency(value / quantidade)}</span>
+                    <span>Valor unit. médio: ${!podeVerValores() || valoresOcultos ? '●●●' : formatCurrency(value / quantidade)}</span>
+                </div>
+            </div>
+        `;
+            }
+
+            // Se não houver categorias
+            if (sortedCategories.length === 0) {
+                valueHTML = '<p style="text-align: center; color: var(--gray-color); padding: 20px 0;">Nenhum valor cadastrado</p>';
+            }
+
+            document.getElementById('valueStats').innerHTML = valueHTML;
+        }
+
+        // Modificar a função formatCurrency original
+        const originalFormatCurrency = formatCurrency;
+        formatCurrency = function (value) {
+            if (!podeVerValores() || valoresOcultos) {
+                return '●●●●●●';
+            }
+            return originalFormatCurrency(value);
+        };
+
+        // Adicionar botão de controle no cabeçalho
+        function adicionarBotaoControleValores() {
+            const projectInfo = document.querySelector('.project-info');
+            if (!projectInfo) return;
+
+            // Verificar se o botão já existe
+            if (document.getElementById('toggleValoresBtn')) return;
+
+            // Criar container do botão
+            const controleDiv = document.createElement('div');
+            controleDiv.className = 'info-item';
+            controleDiv.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: 15px;
+        padding-left: 15px;
+        border-left: 2px solid var(--border-color);
+    `;
+
+            // Carregar preferência salva
+            const savedOcultos = localStorage.getItem('valoresOcultos') === 'true';
+            valoresOcultos = savedOcultos && podeVerValores();
+
+            controleDiv.innerHTML = `
+        <div class="info-label" style="font-size: 12px;">Valores</div>
+        <button id="toggleValoresBtn" 
+                class="btn-icon" 
+                title="${valoresOcultos ? 'Mostrar valores' : 'Ocultar valores'}"
+                style="background: none; border: none; cursor: pointer; font-size: 20px; color: var(--primary-color); padding: 5px;">
+            <i id="toggleValoresIcon" class="${valoresOcultos ? 'fas fa-eye-slash' : 'fas fa-eye'}"></i>
+        </button>
+    `;
+
+            projectInfo.appendChild(controleDiv);
+
+            // Adicionar event listener
+            document.getElementById('toggleValoresBtn').addEventListener('click', toggleValoresFinanceiros);
+        }
+
+        // Modificar a função updateHeaderStats original
+        const originalUpdateHeaderStats = updateHeaderStats;
+        updateHeaderStats = function () {
+            originalUpdateHeaderStats();
+
+            // Atualizar o valor total com a formatação segura
+            const totalValueElement = document.getElementById('totalValue');
+            if (totalValueElement) {
+                const valorTotal = tools.reduce((sum, tool) => {
+                    const preco = parseFloat(tool.preco) || 0;
+                    const quantidade = parseInt(tool.quantidade) || 1;
+                    return sum + (preco * quantidade);
+                }, 0);
+
+                totalValueElement.textContent = formatarValorSeguro(valorTotal);
+            }
+        };
+
+        // Adicionar estilos CSS para o efeito visual
+        const style = document.createElement('style');
+        style.textContent = `
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        background-color: var(--light-color);
+    }
+    
+    .btn-icon:hover {
+        background-color: var(--secondary-color);
+        color: white !important;
+        transform: scale(1.1);
+    }
+    
+    .valor-oculto {
+        filter: blur(4px);
+        user-select: none;
+        transition: filter 0.3s ease;
+        display: inline-block;
+        background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+    }
+    
+    .valor-oculto:hover {
+        filter: blur(2px);
+    }
+    
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+    
+    /* Efeito de transição para os valores */
+    #totalValue, .currency-value, .valor-oculto {
+        transition: all 0.3s ease;
+    }
+    
+    /* Manter as barras sempre vibrantes */
+    .progress-fill {
+        transition: width 0.5s ease;
+    }
+`;
+        document.head.appendChild(style);
+
+        // Adicionar ao DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', function () {
+            // ... código existente ...
+
+            // Adicionar botão de controle de valores após um pequeno delay
+            setTimeout(() => {
+                adicionarBotaoControleValores();
+                atualizarValoresFinanceirosInterface();
+            }, 500);
+        });
+
+        // Modificar a função original updateLocationChart para manter os tooltips das barras
+        const originalUpdateLocationChart = updateLocationChart;
+        updateLocationChart = function () {
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            const ctx = document.getElementById('locationChart').getContext('2d');
+
+            const locations = {};
+            tools.forEach(tool => {
+                locations[tool.location] = (locations[tool.location] || 0) + 1;
+            });
+
+            const locationLabels = Object.keys(locations);
+            const locationData = Object.values(locations);
+
+            if (locationLabels.length > 0) {
+                chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: locationLabels,
+                        datasets: [{
+                            label: 'Quantidade de Itens',
+                            data: locationData,
+                            backgroundColor: locationLabels.map(() => getRandomColor()),
+                            borderColor: 'rgba(255, 255, 255, 0.8)',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        const quantidade = context.raw;
+                                        // Manter tooltip mostrando apenas quantidade, não valor
+                                        return `Quantidade: ${quantidade} itens`;
+                                    }
+                                },
+                                backgroundColor: 'rgba(0,0,0,0.8)',
+                                titleColor: '#fff',
+                                bodyColor: '#fff'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { stepSize: 1 },
+                                grid: { color: 'rgba(0,0,0,0.1)' }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+        };
         // Mostrar notificação
         function showNotification(message, type) {
             const existing = document.querySelectorAll('.notification');
@@ -16703,6 +17479,356 @@ function syncFerramentasAtribuidasComHistorico() {
             }
         }
 
+        // ============================================
+        // SISTEMA DE PERMISSÕES - VERSÃO SIMPLES
+        // ============================================
+
+        // Criar a div de mensagem uma única vez
+        const mensagemDiv = document.createElement('div');
+        mensagemDiv.id = 'mensagemSemPermissao';
+        mensagemDiv.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 9999;
+            text-align: center;
+            max-width: 400px;
+            border-left: 5px solid #e74c3c;
+            display: none;
+    `;
+        document.body.appendChild(mensagemDiv);
+
+        // Função para mostrar mensagem de sem permissão (estilo igual ao valor financeiro)
+        function mostrarMensagemSemPermissao(tabNome) {
+            console.log('📢 Mostrando mensagem de permissão para:', tabNome);
+
+            // Usar a mesma função de notificação do sistema
+            showNotification(`Você não tem permissão para acessar a área de ${tabNome}`, 'error');
+        }
+
+        // Função para configurar as permissões
+        function configurarPermissoes() {
+            console.log('🔧 Configurando permissões...');
+
+            // Verificar usuário
+            const usuarioLogado = localStorage.getItem('currentUser');
+            if (!usuarioLogado) {
+                console.log('👤 Nenhum usuário logado');
+                return;
+            }
+
+            try {
+                const user = JSON.parse(usuarioLogado);
+                console.log('👤 Usuário:', user.email, 'Role:', user.role);
+
+                // Se for admin, não faz nada
+                if (user.role !== 'user') {
+                    console.log('✅ Admin - todas as abas liberadas');
+                    return;
+                }
+
+                console.log('🚫 Usuário comum - bloqueando abas');
+
+                // Bloquear aba Romaneio
+                const btnRomaneio = document.querySelector('.tab-btn[data-tab="romaneio"]');
+                if (btnRomaneio) {
+                    console.log('🔒 Bloqueando Romaneio');
+
+                    // Guardar o evento original
+                    const originalClick = btnRomaneio.onclick;
+
+                    // Substituir pelo nosso evento
+                    btnRomaneio.onclick = function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('🚫 Clique bloqueado em Romaneio');
+                        mostrarMensagemSemPermissao('Romaneio');
+                        return false;
+                    };
+
+                    // Estilo visual
+                    btnRomaneio.style.opacity = '0.6';
+                    btnRomaneio.style.cursor = 'not-allowed';
+                    btnRomaneio.title = 'Você não tem permissão para acessar esta área';
+                }
+
+                // Bloquear aba Exportar (Relatórios)
+                const btnExportar = document.querySelector('.tab-btn[data-tab="exportar"]');
+                if (btnExportar) {
+                    console.log('🔒 Bloqueando Relatórios');
+
+                    // Guardar o evento original
+                    const originalClick = btnExportar.onclick;
+
+                    // Substituir pelo nosso evento
+                    btnExportar.onclick = function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('🚫 Clique bloqueado em Relatórios');
+                        mostrarMensagemSemPermissao('Relatórios');
+                        return false;
+                    };
+
+                    // Estilo visual
+                    btnExportar.style.opacity = '0.6';
+                    btnExportar.style.cursor = 'not-allowed';
+                    btnExportar.title = 'Você não tem permissão para acessar esta área';
+                }
+
+                console.log('✅ Permissões configuradas');
+
+            } catch (e) {
+                console.error('Erro:', e);
+            }
+        }
+
+        // Executar quando a página carregar
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('📄 Página carregada');
+            setTimeout(configurarPermissoes, 1000);
+            setTimeout(configurarPermissoes, 3000);
+        });
+
+        // Executar sempre que clicar em qualquer lugar (para garantir)
+        document.addEventListener('click', function () {
+            // Verificar se os botões ainda estão com os eventos corretos
+            const btnRomaneio = document.querySelector('.tab-btn[data-tab="romaneio"]');
+            if (btnRomaneio && btnRomaneio.onclick && btnRomaneio.onclick.toString().includes('originalClick')) {
+                // Está com o evento antigo, reconfigurar
+                configurarPermissoes();
+            }
+        });
+        // ============================================
+        // FORÇAR OCULTAÇÃO DAS ABAS - VERSÃO CORRIGIDA
+        // ============================================
+
+        // Função que força a ocultação das abas
+        function forcarOcultacaoAbas() {
+            console.log('🔧 FORÇANDO ocultação das abas...');
+
+            // Verificar usuário atual
+            let usuarioRole = 'user'; // Por padrão, assume user
+
+            const usuarioLogado = localStorage.getItem('currentUser');
+            if (usuarioLogado) {
+                try {
+                    const user = JSON.parse(usuarioLogado);
+                    usuarioRole = user.role;
+                    console.log(`👤 Usuário role: ${usuarioRole}`);
+                } catch (e) { }
+            }
+
+            // Se for administrador (dev ou almoxarife), mostrar TODAS as abas
+            if (usuarioRole !== 'user') {
+                console.log('✅ Administrador - mostrando todas as abas');
+
+                // Mostrar todos os botões
+                document.querySelectorAll('.tab-button').forEach(botao => {
+                    botao.style.display = '';
+                    botao.style.visibility = '';
+                    botao.style.opacity = '';
+                    botao.style.pointerEvents = '';
+                });
+
+                // Mostrar todas as divs
+                document.querySelectorAll('.tab-content').forEach(div => {
+                    div.style.display = '';
+                    div.style.visibility = '';
+                });
+
+                return;
+            }
+
+            // Se for usuário comum, ocultar apenas Romaneio e Relatórios
+            console.log('🚫 Usuário comum - ocultando Romaneio e Relatórios');
+
+            // LISTA COMPLETA DE ABAS QUE DEVEM FICAR VISÍVEIS
+            const abasPermitidas = [
+                'dashboard',          // Dashboard
+                'cadastro',           // Cadastro de Ferramentas
+                'ferramentas',        // Lista de Ferramentas
+                'catalogo',           // Catálogo
+                'controle-colaborador', // Colaboradores
+                'mapeamento',         // Mapeamento
+                'configuracoes',      // Configurações
+                'database',           // Banco de Dados
+                'treinamento'         // Treinamento
+            ];
+
+            // Abas que serão bloqueadas (vão mostrar mensagem)
+            const abasBloqueadas = ['romaneio', 'exportar'];
+
+            // CORREÇÃO AQUI: Mudamos de .tab-btn para .tab-button
+            document.querySelectorAll('.tab-button').forEach(botao => {
+                const tabId = botao.getAttribute('data-tab');
+
+                if (abasPermitidas.includes(tabId)) {
+                    // Aba permitida - mostrar normalmente
+                    botao.style.display = '';
+                    botao.style.visibility = '';
+                    botao.style.opacity = '';
+                    botao.style.pointerEvents = '';
+                    botao.classList.remove('disabled-tab');
+                    console.log(`✅ Mostrando botão: ${tabId}`);
+                } else if (abasBloqueadas.includes(tabId)) {
+                    // Aba bloqueada - mostrar mas com mensagem
+                    botao.style.display = '';
+                    botao.style.visibility = '';
+                    botao.style.opacity = '0.6';
+                    botao.style.pointerEvents = 'auto';
+                    botao.style.cursor = 'not-allowed';
+                    botao.classList.add('disabled-tab');
+                    botao.title = 'Você não tem permissão para acessar esta área';
+
+                    // Remover eventos antigos
+                    botao.removeEventListener('click', function () { });
+
+                    // Adicionar novo evento
+                    botao.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('🚫 Clique bloqueado em', tabId);
+                        mostrarMensagemSemPermissao(tabId === 'romaneio' ? 'Romaneio' : 'Relatórios');
+                        return false;
+                    });
+
+                    console.log(`⚠️ Botão bloqueado: ${tabId}`);
+                } else {
+                    // Qualquer outra aba - garantir que não fique oculta
+                    botao.style.display = '';
+                    botao.style.visibility = '';
+                    botao.style.opacity = '';
+                    botao.style.pointerEvents = '';
+                }
+            });
+
+            // Mostrar as divs de conteúdo permitidas
+            document.querySelectorAll('.tab-content').forEach(div => {
+                const divId = div.id;
+
+                if (abasPermitidas.includes(divId)) {
+                    div.style.display = '';
+                    div.style.visibility = '';
+                    console.log(`✅ Mostrando div: ${divId}`);
+                } else if (abasBloqueadas.includes(divId)) {
+                    div.style.display = 'none';
+                    div.style.visibility = 'hidden';
+                    console.log(`🚫 Bloqueando div: ${divId}`);
+                } else {
+                    div.style.display = '';
+                    div.style.visibility = '';
+                }
+            });
+
+            // Se a aba ativa for uma das bloqueadas, mudar para Ferramentas
+            const activeBtn = document.querySelector('.tab-button.active');
+            if (activeBtn) {
+                const activeTab = activeBtn.getAttribute('data-tab');
+                if (abasBloqueadas.includes(activeTab)) {
+                    console.log('🔄 Mudando para aba Ferramentas');
+                    const ferramentasBtn = document.querySelector('.tab-button[data-tab="ferramentas"]');
+                    if (ferramentasBtn) {
+                        ferramentasBtn.click();
+                    }
+                }
+            }
+
+            // Adicionar CSS para os botões bloqueados
+            const style = document.createElement('style');
+            style.id = 'permissoes-style';
+            style.textContent = `
+        .tab-button.disabled-tab {
+            background-color: #f8f9fa !important;
+            color: #999 !important;
+            border-color: #ddd !important;
+            cursor: not-allowed !important;
+            position: relative;
+        }
+        
+        .tab-button.disabled-tab:hover {
+            background-color: #f8f9fa !important;
+            color: #999 !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        
+        .tab-button.disabled-tab i {
+            color: #999 !important;
+        }
+        
+        .tab-button.disabled-tab::after {
+            content: "🔒";
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 12px;
+            background: white;
+            border-radius: 50%;
+            padding: 2px;
+        }
+    `;
+
+            // Remover style antigo se existir
+            const oldStyle = document.getElementById('permissoes-style');
+            if (oldStyle) oldStyle.remove();
+
+            document.head.appendChild(style);
+
+            console.log('✅ Ocultação forçada concluída!');
+        }
+
+        // ============================================
+        // EXECUTAR AS FUNÇÕES
+        // ============================================
+
+        // Executar quando a página carregar
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('📄 Página carregada - aplicando permissões');
+            setTimeout(forcarOcultacaoAbas, 1000);
+        });
+
+        // Executar sempre que o localStorage mudar (quando fizer login)
+        window.addEventListener('storage', function (e) {
+            if (e.key === 'currentUser') {
+                console.log('🔄 Usuário alterado - reaplicando permissões');
+                setTimeout(forcarOcultacaoAbas, 500);
+            }
+        });
+
+        // Executar a cada 3 segundos por segurança
+        setInterval(forcarOcultacaoAbas, 3000);
+        // ============================================
+        // DIAGNÓSTICO - ENCONTRAR BOTÕES
+        // ============================================
+
+        setTimeout(function () {
+            console.log('🔍 DIAGNÓSTICO DOS BOTÕES:');
+
+            // Procurar por TODOS os elementos que possam ser os botões
+            const possiveisBotoes = document.querySelectorAll('button, .tab-btn, [data-tab], .btn');
+
+            console.log(`Total de elementos encontrados: ${possiveisBotoes.length}`);
+
+            possiveisBotoes.forEach((el, index) => {
+                const texto = el.textContent?.trim() || '';
+                if (texto.includes('Romaneio') || texto.includes('Ferramentas') || texto.includes('Relatórios')) {
+                    console.log(`\n✅ BOTÃO ENCONTRADO: ${index + 1}`);
+                    console.log(`- Texto: "${texto}"`);
+                    console.log(`- Tag: ${el.tagName}`);
+                    console.log(`- Classes: "${el.className}"`);
+                    console.log(`- data-tab: "${el.getAttribute('data-tab')}"`);
+                    console.log(`- ID: "${el.id}"`);
+                    console.log(`- HTML: ${el.outerHTML.substring(0, 150)}`);
+                }
+            });
+
+            console.log('=====================================');
+        }, 3000);    
     </script>
 </body>
 
